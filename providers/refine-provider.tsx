@@ -1,23 +1,9 @@
 "use client";
 
-import { Refine, type DataProvider } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import routerProvider from "@refinedev/nextjs-router";
 import { DevtoolsProvider, DevtoolsPanel } from "@refinedev/devtools";
-
-// Placeholder data provider - will be replaced with actual API provider in CUST-001
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const placeholderDataProvider: DataProvider = {
-  getList: async () => ({ data: [], total: 0 }),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getOne: async () => ({ data: {} as any }),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  create: async () => ({ data: {} as any }),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  update: async () => ({ data: {} as any }),
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  deleteOne: async () => ({ data: {} as any }),
-  getApiUrl: () => "/api",
-};
+import { dataProvider } from "./dataProvider";
 
 interface RefineProviderProps {
   children: React.ReactNode;
@@ -28,7 +14,7 @@ export function RefineProvider({ children }: RefineProviderProps) {
     <DevtoolsProvider>
       <Refine
         routerProvider={routerProvider}
-        dataProvider={placeholderDataProvider}
+        dataProvider={dataProvider}
         resources={[
           {
             name: "customers",

@@ -9,6 +9,7 @@ import {
   Briefcase,
   FileText,
   Receipt,
+  BarChart3,
   Settings,
   Menu,
   X,
@@ -47,6 +48,11 @@ const navItems: NavItem[] = [
     label: "Invoices",
     href: "/invoices",
     icon: <Receipt className="h-5 w-5" />,
+  },
+  {
+    label: "Reports",
+    href: "/reports",
+    icon: <BarChart3 className="h-5 w-5" />,
   },
   {
     label: "Settings",

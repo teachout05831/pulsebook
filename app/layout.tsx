@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { RefineProvider } from "@/providers/refine-provider";
 
@@ -19,6 +20,7 @@ export default function RootLayout({
         <Suspense fallback={<div>Loading...</div>}>
           <RefineProvider>{children}</RefineProvider>
         </Suspense>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );
