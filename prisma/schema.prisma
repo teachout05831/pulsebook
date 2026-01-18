@@ -1,0 +1,80 @@
+// ServicePro Database Schema
+// Multi-tenant architecture with company isolation
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// TENANT / COMPANY
+// ============================================================================
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  industry  String?  // e.g., "moving", "pool_service", "pest_control", "plumbing", "cleaning"
+  settings  Json     @default("{}")  // Custom settings, enabled features, etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  users     User[]
+  customers Customer[]
+
+  @@map("companies")
+}
+
+// ============================================================================
+// USERS
+// ============================================================================
+
+enum UserRole {
+  ADMIN      // Full access, can manage company settings
+  OFFICE     // Office staff, can manage customers, jobs, invoices
+  TECHNICIAN // Field worker, limited to assigned jobs
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      UserRole @default(OFFICE)
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("users")
+}
+
+// ============================================================================
+// CUSTOMERS
+// ============================================================================
+
+model Customer {
+  id           String   @id @default(cuid())
+  companyId    String
+  name         String
+  email        String?
+  phone        String?
+  address      String?
+  notes        String?
+  customFields Json     @default("{}")  // Industry-specific fields stored as JSON
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([companyId, email])
+  @@index([companyId, name])
+  @@map("customers")
+}
