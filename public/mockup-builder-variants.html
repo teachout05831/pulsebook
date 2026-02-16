@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Builder - Variant System Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #f8f9fa; color: #1a1a1a; }
+
+  /* Builder Layout */
+  .builder { display: grid; grid-template-columns: 220px 1fr 280px; height: 100vh; }
+
+  /* Left Sidebar */
+  .left-panel { background: white; border-right: 1px solid #e5e7eb; padding: 16px; overflow-y: auto; }
+  .left-panel h3 { font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .section-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; font-size: 13px; cursor: pointer; margin-bottom: 4px; transition: all 0.15s; }
+  .section-item:hover { background: #f3f4f6; }
+  .section-item.active { background: #eff6ff; border: 1px solid #bfdbfe; }
+  .section-item .grip { color: #d1d5db; font-size: 10px; cursor: grab; }
+  .section-item .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Center Preview */
+  .center-panel { background: #f1f5f9; overflow-y: auto; padding: 24px; }
+  .preview-frame { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 900px; margin: 0 auto; overflow: hidden; }
+
+  /* Right Panel */
+  .right-panel { background: white; border-left: 1px solid #e5e7eb; overflow-y: auto; }
+  .right-tabs { display: flex; border-bottom: 1px solid #e5e7eb; }
+  .right-tab { flex: 1; padding: 10px 8px; text-align: center; font-size: 11px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; color: #6b7280; }
+  .right-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+  .editor-content { padding: 16px; }
+  .editor-section-name { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+  .field-group { margin-bottom: 14px; }
+  .field-label { font-size: 11px; font-weight: 500; color: #374151; margin-bottom: 6px; display: block; }
+  .field-select { width: 100%; height: 32px; font-size: 12px; border: 1px solid #d1d5db; border-radius: 6px; padding: 0 8px; background: white; cursor: pointer; }
+  .field-input { width: 100%; height: 32px; font-size: 12px; border: 1px solid #d1d5db; border-radius: 6px; padding: 0 10px; }
+  .field-textarea { width: 100%; font-size: 12px; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 10px; min-height: 80px; resize: vertical; }
+  .upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 24px; text-align: center; color: #9ca3af; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .upload-zone:hover { border-color: #2563eb; background: #eff6ff; }
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+  .toggle-label { font-size: 12px; color: #374151; }
+  .toggle { width: 36px; height: 20px; border-radius: 10px; background: #d1d5db; position: relative; cursor: pointer; transition: background 0.2s; }
+  .toggle.on { background: #2563eb; }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: left 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+  .toggle.on::after { left: 18px; }
+  .divider { border-top: 1px solid #e5e7eb; margin: 16px 0; }
+  .badge-item { border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; margin-bottom: 8px; position: relative; }
+  .badge-remove { position: absolute; top: 8px; right: 8px; background: none; border: none; color: #d1d5db; cursor: pointer; font-size: 14px; }
+  .badge-remove:hover { color: #ef4444; }
+  .add-btn { width: 100%; height: 28px; font-size: 11px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .add-btn:hover { background: #f9fafb; }
+
+  /* ========== ABOUT SECTION VARIANTS ========== */
+  .about-section { padding: 48px 24px; }
+  .about-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #2563eb; margin-bottom: 4px; text-align: center; }
+  .about-heading { font-size: 22px; font-weight: 700; color: #2563eb; margin-bottom: 24px; text-align: center; }
+  .about-desc { font-size: 15px; line-height: 1.7; color: #4b5563; white-space: pre-line; }
+  .about-img { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .about-img img { width: 100%; height: auto; display: block; }
+  .stat-card { background: white; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; text-align: center; border-top: 3px solid #2563eb; }
+  .stat-value { font-size: 24px; font-weight: 700; color: #2563eb; }
+  .stat-label { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+  /* ========== TRUST BADGES VARIANTS ========== */
+  .trust-section { padding: 20px 24px; background: linear-gradient(to right, #f9fafb, white, #f9fafb); border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+  .badge-pill { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: white; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 13px; font-weight: 500; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+  .badge-icon { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .badge-icon.green { background: #dcfce7; color: #16a34a; }
+  .badge-icon.blue { background: #dbeafe; color: #2563eb; }
+  .badge-icon.gold { background: #fef9c3; color: #ca8a04; }
+  .badge-logo { width: 24px; height: 24px; object-fit: contain; border-radius: 4px; }
+  .stars { color: #facc15; letter-spacing: 1px; }
+
+  /* Variant-specific styles */
+  .variant-indicator { position: absolute; top: 8px; right: 8px; background: #2563eb; color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+
+  /* Section selector tabs */
+  .section-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .section-tab { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #e5e7eb; background: white; }
+  .section-tab.active { background: #2563eb; color: white; border-color: #2563eb; }
+
+  .variant-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="builder">
+  <!-- LEFT PANEL: Section List -->
+  <div class="left-panel">
+    <h3>Sections</h3>
+    <div class="section-item"><span class="grip">⋮⋮</span> <span class="dot" style="background:#2563eb"></span> Hero</div>
+    <div class="section-item active" id="left-trust"><span class="grip">⋮⋮</span> <span class="dot" style="background:#16a34a"></span> Trust Badges</div>
+    <div class="section-item" id="left-about"><span class="grip">⋮⋮</span> <span class="dot" style="background:#8b5cf6"></span> About Us</div>
+    <div class="section-item"><span class="grip">⋮⋮</span> <span class="dot" style="background:#f59e0b"></span> Scope of Work</div>
+    <div class="section-item"><span class="grip">⋮⋮</span> <span class="dot" style="background:#ec4899"></span> Pricing</div>
+    <div class="section-item"><span class="grip">⋮⋮</span> <span class="dot" style="background:#06b6d4"></span> FAQ</div>
+    <div class="section-item"><span class="grip">⋮⋮</span> <span class="dot" style="background:#84cc16"></span> Gallery</div>
+    <div class="section-item"><span class="grip">⋮⋮</span> <span class="dot" style="background:#f97316"></span> Testimonials</div>
+    <div class="section-item"><span class="grip">⋮⋮</span> <span class="dot" style="background:#14b8a6"></span> Contact</div>
+    <div style="margin-top:16px">
+      <button class="add-btn" style="height:32px; font-size:12px;">+ Add Section</button>
+    </div>
+  </div>
+
+  <!-- CENTER PANEL: Preview -->
+  <div class="center-panel">
+    <div class="section-tabs">
+      <div class="section-tab active" onclick="showSection('trust')">Trust Badges</div>
+      <div class="section-tab" onclick="showSection('about')">About Us</div>
+    </div>
+
+    <!-- TRUST BADGES PREVIEW -->
+    <div id="trust-preview" class="preview-frame" style="position:relative">
+      <!-- Horizontal (default) -->
+      <div id="trust-horizontal" class="trust-section">
+        <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; align-items:center;">
+          <span class="badge-pill"><span class="stars">★★★★★</span> <strong>4.9</strong> <span style="color:#6b7280">(127 reviews)</span></span>
+          <span class="badge-pill"><span class="badge-icon green">✓</span> Licensed & Insured</span>
+          <span class="badge-pill"><span class="badge-icon green">✓</span> EPA Certified</span>
+          <span class="badge-pill"><img src="https://placehold.co/24x24/2563eb/white?text=BBB" class="badge-logo"> BBB A+ Rated</span>
+          <span class="badge-pill"><span class="badge-icon blue">◆</span> 15+ Years Experience</span>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div id="trust-grid" class="trust-section" style="display:none">
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; max-width:600px; margin:0 auto;">
+          <div class="badge-pill" style="flex-direction:column; padding:16px; text-align:center; display:flex;">
+            <span class="stars" style="font-size:16px">★★★★★</span>
+            <strong style="font-size:18px; margin-top:4px">4.9</strong>
+            <span style="color:#6b7280; font-size:11px">127 reviews</span>
+          </div>
+          <div class="badge-pill" style="flex-direction:column; padding:16px; text-align:center; display:flex;">
+            <span class="badge-icon green" style="width:28px; height:28px; font-size:14px; margin:0 auto">✓</span>
+            <span style="margin-top:6px; font-size:12px">Licensed & Insured</span>
+          </div>
+          <div class="badge-pill" style="flex-direction:column; padding:16px; text-align:center; display:flex;">
+            <span class="badge-icon green" style="width:28px; height:28px; font-size:14px; margin:0 auto">✓</span>
+            <span style="margin-top:6px; font-size:12px">EPA Certified</span>
+          </div>
+          <div class="badge-pill" style="flex-direction:column; padding:16px; text-align:center; display:flex;">
+            <img src="https://placehold.co/32x32/2563eb/white?text=BBB" style="width:32px; height:32px; border-radius:6px; margin:0 auto">
+            <span style="margin-top:6px; font-size:12px">BBB A+ Rated</span>
+          </div>
+          <div class="badge-pill" style="flex-direction:column; padding:16px; text-align:center; display:flex;">
+            <span class="badge-icon blue" style="width:28px; height:28px; font-size:14px; margin:0 auto">◆</span>
+            <span style="margin-top:6px; font-size:12px">15+ Years Experience</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner -->
+      <div id="trust-banner" style="display:none; padding:16px 24px; background:#1e3a5f; color:white;">
+        <div style="display:flex; gap:24px; justify-content:center; align-items:center; flex-wrap:wrap;">
+          <span style="display:flex; align-items:center; gap:6px; font-size:13px;"><span class="stars">★★★★★</span> <strong>4.9</strong> (127 reviews)</span>
+          <span style="width:1px; height:20px; background:rgba(255,255,255,0.3)"></span>
+          <span style="font-size:13px;">✓ Licensed & Insured</span>
+          <span style="width:1px; height:20px; background:rgba(255,255,255,0.3)"></span>
+          <span style="font-size:13px;">✓ EPA Certified</span>
+          <span style="width:1px; height:20px; background:rgba(255,255,255,0.3)"></span>
+          <span style="font-size:13px;">BBB A+ Rated</span>
+          <span style="width:1px; height:20px; background:rgba(255,255,255,0.3)"></span>
+          <span style="font-size:13px;">◆ 15+ Years</span>
+        </div>
+      </div>
+
+      <!-- Minimal -->
+      <div id="trust-minimal" style="display:none; padding:12px 24px; border-bottom:1px solid #e5e7eb;">
+        <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; font-size:12px; color:#6b7280;">
+          <span>★ 4.9 Google Rating</span>
+          <span>•</span>
+          <span>Licensed & Insured</span>
+          <span>•</span>
+          <span>EPA Certified</span>
+          <span>•</span>
+          <span>BBB A+ Rated</span>
+          <span>•</span>
+          <span>15+ Years</span>
+        </div>
+      </div>
+
+      <!-- Stacked -->
+      <div id="trust-stacked" style="display:none; padding:24px;">
+        <div style="max-width:400px; margin:0 auto; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:#f9fafb; border-radius:8px;">
+            <span class="stars" style="font-size:14px;">★★★★★</span>
+            <div><strong style="font-size:14px;">4.9/5 Google Rating</strong><br><span style="font-size:11px; color:#6b7280;">127 verified reviews</span></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:#f9fafb; border-radius:8px;">
+            <span class="badge-icon green" style="width:28px; height:28px; font-size:14px;">✓</span>
+            <div><strong style="font-size:14px;">Licensed & Insured</strong><br><span style="font-size:11px; color:#6b7280;">Full coverage protection</span></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:#f9fafb; border-radius:8px;">
+            <span class="badge-icon green" style="width:28px; height:28px; font-size:14px;">✓</span>
+            <div><strong style="font-size:14px;">EPA Certified</strong></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:#f9fafb; border-radius:8px;">
+            <img src="https://placehold.co/28x28/2563eb/white?text=BBB" style="width:28px; height:28px; border-radius:6px;">
+            <div><strong style="font-size:14px;">BBB A+ Rated</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT SECTION PREVIEW -->
+    <div id="about-preview" class="preview-frame" style="display:none; position:relative">
+      <!-- Standard -->
+      <div id="about-standard" class="about-section">
+        <div class="about-label">About Us</div>
+        <div class="about-heading">Why Choose Us</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; text-align:left;">
+          <div class="about-desc">We've been serving homeowners in the greater metro area for over 15 years. Our team of certified professionals is committed to delivering exceptional quality on every project.
+
+We take pride in our attention to detail, transparent pricing, and commitment to customer satisfaction. Every job is backed by our satisfaction guarantee.</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; align-content:start;">
+            <div class="stat-card"><div class="stat-value">4.9/5</div><div class="stat-label">Google Rating</div></div>
+            <div class="stat-card"><div class="stat-value">127+</div><div class="stat-label">Reviews</div></div>
+            <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Certifications</div></div>
+            <div class="stat-card"><div class="stat-value">15+</div><div class="stat-label">Years Experience</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Split (image + text) -->
+      <div id="about-split" class="about-section" style="display:none">
+        <div class="about-label">About Us</div>
+        <div class="about-heading">Why Choose Us</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;">
+          <div class="about-img">
+            <img src="https://placehold.co/500x350/e2e8f0/64748b?text=Company+Photo" alt="About">
+          </div>
+          <div>
+            <div class="about-desc" style="margin-bottom:24px;">We've been serving homeowners in the greater metro area for over 15 years. Our team of certified professionals is committed to delivering exceptional quality on every project.</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="stat-card"><div class="stat-value">4.9/5</div><div class="stat-label">Google Rating</div></div>
+              <div class="stat-card"><div class="stat-value">127+</div><div class="stat-label">Reviews</div></div>
+              <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Certifications</div></div>
+              <div class="stat-card"><div class="stat-value">15+</div><div class="stat-label">Years Experience</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Centered -->
+      <div id="about-centered" class="about-section" style="display:none">
+        <div style="max-width:600px; margin:0 auto; text-align:center;">
+          <div class="about-label">About Us</div>
+          <div class="about-heading">Why Choose Us</div>
+          <div class="about-img" style="max-width:400px; margin:0 auto 24px;">
+            <img src="https://placehold.co/400x260/e2e8f0/64748b?text=Company+Photo" alt="About">
+          </div>
+          <div class="about-desc" style="text-align:center; margin-bottom:24px;">We've been serving homeowners in the greater metro area for over 15 years. Our team is committed to delivering exceptional quality on every project.</div>
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px;">
+            <div class="stat-card"><div class="stat-value" style="font-size:20px">4.9/5</div><div class="stat-label">Google Rating</div></div>
+            <div class="stat-card"><div class="stat-value" style="font-size:20px">127+</div><div class="stat-label">Reviews</div></div>
+            <div class="stat-card"><div class="stat-value" style="font-size:20px">3</div><div class="stat-label">Certs</div></div>
+            <div class="stat-card"><div class="stat-value" style="font-size:20px">15+</div><div class="stat-label">Years</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div id="about-cards" class="about-section" style="display:none">
+        <div class="about-label">About Us</div>
+        <div class="about-heading">Why Choose Us</div>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;">
+          <div class="about-img" style="grid-row: span 2;">
+            <img src="https://placehold.co/350x400/e2e8f0/64748b?text=Company+Photo" alt="About" style="height:100%; object-fit:cover;">
+          </div>
+          <div style="grid-column: span 2; background:white; border:1px solid #e5e7eb; border-radius:10px; padding:20px;">
+            <div class="about-desc">We've been serving homeowners in the greater metro area for over 15 years. Our team of certified professionals is committed to delivering exceptional quality on every project. We take pride in our attention to detail and transparent pricing.</div>
+          </div>
+          <div class="stat-card"><div class="stat-value">4.9/5</div><div class="stat-label">Google Rating</div></div>
+          <div class="stat-card"><div class="stat-value">127+</div><div class="stat-label">Reviews</div></div>
+        </div>
+      </div>
+
+      <!-- Minimal -->
+      <div id="about-minimal" style="display:none; padding:32px 24px;">
+        <h2 style="font-size:20px; font-weight:700; color:#2563eb; margin-bottom:12px;">Why Choose Us</h2>
+        <p style="font-size:15px; line-height:1.7; color:#4b5563; max-width:700px;">We've been serving homeowners in the greater metro area for over 15 years. Our team of certified professionals is committed to delivering exceptional quality on every project.</p>
+        <div style="display:flex; gap:24px; margin-top:20px; flex-wrap:wrap;">
+          <span style="font-size:14px; color:#4b5563"><strong style="color:#2563eb">4.9/5</strong> Google Rating</span>
+          <span style="font-size:14px; color:#4b5563"><strong style="color:#2563eb">127+</strong> Reviews</span>
+          <span style="font-size:14px; color:#4b5563"><strong style="color:#2563eb">3</strong> Certifications</span>
+          <span style="font-size:14px; color:#4b5563"><strong style="color:#2563eb">15+</strong> Years Experience</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: Editor -->
+  <div class="right-panel">
+    <div class="right-tabs">
+      <div class="right-tab active">Section</div>
+      <div class="right-tab">Theme</div>
+      <div class="right-tab">Offers</div>
+    </div>
+
+    <!-- Trust Badges Editor -->
+    <div id="editor-trust" class="editor-content">
+      <div class="editor-section-name">Trust Badges</div>
+
+      <div class="field-group">
+        <label class="field-label">Layout</label>
+        <select class="field-select" id="trust-variant" onchange="switchTrustVariant(this.value)">
+          <option value="horizontal">Horizontal</option>
+          <option value="grid">Grid</option>
+          <option value="banner">Banner</option>
+          <option value="minimal">Minimal</option>
+          <option value="stacked">Stacked</option>
+        </select>
+        <div class="variant-label" id="trust-variant-desc">Badges in a scrollable row</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Background</label>
+        <div style="display:flex; gap:8px;">
+          <input type="color" value="#ffffff" style="width:32px; height:32px; border:1px solid #d1d5db; border-radius:6px; cursor:pointer;">
+          <input class="field-input" value="#ffffff" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Padding</label>
+        <select class="field-select">
+          <option>Normal</option>
+          <option>Compact</option>
+          <option>Generous</option>
+        </select>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">Show Google Rating</span>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Certifications</span>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Insurance</span>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <label class="field-label">Custom Badges</label>
+      <div class="badge-item">
+        <button class="badge-remove">✕</button>
+        <input class="field-input" value="BBB A+ Rated" style="margin-bottom:8px;">
+        <div class="upload-zone" style="padding:12px;">
+          <div style="font-size:11px;">📷 Badge icon uploaded</div>
+        </div>
+      </div>
+      <button class="add-btn">+ Add Badge</button>
+    </div>
+
+    <!-- About Editor -->
+    <div id="editor-about" class="editor-content" style="display:none;">
+      <div class="editor-section-name">About Us</div>
+
+      <div class="field-group">
+        <label class="field-label">Layout</label>
+        <select class="field-select" id="about-variant" onchange="switchAboutVariant(this.value)">
+          <option value="standard">Standard</option>
+          <option value="split">Split</option>
+          <option value="centered">Centered</option>
+          <option value="cards">Cards</option>
+          <option value="minimal">Minimal</option>
+        </select>
+        <div class="variant-label" id="about-variant-desc">Text and stats side by side</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Background</label>
+        <div style="display:flex; gap:8px;">
+          <input type="color" value="#ffffff" style="width:32px; height:32px; border:1px solid #d1d5db; border-radius:6px; cursor:pointer;">
+          <input class="field-input" value="#ffffff" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Padding</label>
+        <select class="field-select">
+          <option>Normal</option>
+          <option>Compact</option>
+          <option>Generous</option>
+        </select>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Title</label>
+        <input class="field-input" value="Why Choose Us" placeholder="About Us">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Description</label>
+        <textarea class="field-textarea" placeholder="Tell customers about your company...">We've been serving homeowners in the greater metro area for over 15 years. Our team of certified professionals is committed to delivering exceptional quality on every project.</textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">About Image</label>
+        <div class="upload-zone">
+          📷<br>Drop image or click to upload<br>
+          <span style="font-size:10px; color:#d1d5db;">Max 10MB</span>
+        </div>
+      </div>
+
+      <p style="font-size:11px; color:#9ca3af; margin-top:8px;">Stats (Google rating, certifications, etc.) are pulled from your Brand Kit settings automatically.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const trustVariantDescs = {
+    horizontal: 'Badges in a scrollable row',
+    grid: 'Badges in a 3-column grid',
+    banner: 'Full-width colored banner',
+    minimal: 'Simple inline text',
+    stacked: 'Vertical list with descriptions'
+  };
+  const aboutVariantDescs = {
+    standard: 'Text and stats side by side',
+    split: 'Image left, text and stats right',
+    centered: 'Everything centered with image on top',
+    cards: 'Content arranged as cards in a grid',
+    minimal: 'Clean text with inline stats'
+  };
+
+  function switchTrustVariant(v) {
+    ['horizontal','grid','banner','minimal','stacked'].forEach(id => {
+      const el = document.getElementById('trust-' + id);
+      if (el) el.style.display = id === v ? '' : 'none';
+    });
+    document.getElementById('trust-variant-desc').textContent = trustVariantDescs[v] || '';
+  }
+
+  function switchAboutVariant(v) {
+    ['standard','split','centered','cards','minimal'].forEach(id => {
+      const el = document.getElementById('about-' + id);
+      if (el) el.style.display = id === v ? '' : 'none';
+    });
+    document.getElementById('about-variant-desc').textContent = aboutVariantDescs[v] || '';
+  }
+
+  function showSection(which) {
+    document.getElementById('trust-preview').style.display = which === 'trust' ? '' : 'none';
+    document.getElementById('about-preview').style.display = which === 'about' ? '' : 'none';
+    document.getElementById('editor-trust').style.display = which === 'trust' ? '' : 'none';
+    document.getElementById('editor-about').style.display = which === 'about' ? '' : 'none';
+
+    // Update left panel active states
+    document.getElementById('left-trust').className = 'section-item' + (which === 'trust' ? ' active' : '');
+    document.getElementById('left-about').className = 'section-item' + (which === 'about' ? ' active' : '');
+
+    // Update tabs
+    document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

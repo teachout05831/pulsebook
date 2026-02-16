@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Asset Library - Widget Settings Dialog (Admin View)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+
+    .toggle-slider {
+      transition: all 0.2s ease;
+    }
+    .toggle-bg-on {
+      background-color: #3b82f6;
+    }
+    .toggle-bg-off {
+      background-color: #d1d5db;
+    }
+    .toggle-knob-on {
+      transform: translateX(18px);
+    }
+    .toggle-knob-off {
+      transform: translateX(2px);
+    }
+
+    .check-overlay {
+      background: rgba(59, 130, 246, 0.85);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .video-select-card.selected .check-overlay {
+      opacity: 1;
+    }
+    .video-select-card {
+      border: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .video-select-card:hover {
+      border-color: #e5e7eb;
+    }
+    .video-select-card.selected {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #3b82f6;
+    }
+
+    .badge-testimonial { background: #fef3c7; color: #92400e; }
+    .badge-intro { background: #dbeafe; color: #1e40af; }
+    .badge-case-study { background: #f3e8ff; color: #6b21a8; }
+    .badge-process { background: #dcfce7; color: #166534; }
+
+    .widget-item {
+      transition: all 0.15s ease;
+    }
+    .widget-item:hover {
+      background: #f9fafb;
+    }
+
+    .dialog-shadow {
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    }
+
+    .collapse-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .collapse-content.open {
+      max-height: 200px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar { width: 5px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 3px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- ===== BLURRED BACKGROUND: SETTINGS PAGE ===== -->
+  <div class="filter blur-[2px] brightness-75 pointer-events-none">
+
+    <!-- Top Nav -->
+    <div class="bg-white border-b border-gray-200">
+      <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <span class="font-semibold text-gray-900">ServicePro</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-gray-500">Elite Cleaning Services</span>
+          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+            <span class="text-xs font-medium text-blue-700">MJ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Content -->
+    <div class="max-w-4xl mx-auto px-6 py-8">
+      <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <span>Settings</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-gray-900">Consultation Widgets</span>
+      </div>
+
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Call Widgets</h1>
+      <p class="text-gray-500 mb-6">Configure the widgets customers see during video consultations.</p>
+
+      <!-- Widget List Background -->
+      <div class="bg-white rounded-xl border border-gray-200 p-6">
+        <div class="space-y-2">
+          <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div class="text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+            </div>
+            <span class="text-lg">&#11088;</span>
+            <div><p class="text-sm font-medium text-gray-900">Our Reviews</p><p class="text-xs text-gray-400">Google reviews widget</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div class="text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+            </div>
+            <span class="text-lg">&#128247;</span>
+            <div><p class="text-sm font-medium text-gray-900">Our Work</p><p class="text-xs text-gray-400">Photo gallery</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div class="text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+            </div>
+            <span class="text-lg">&#128203;</span>
+            <div><p class="text-sm font-medium text-gray-900">Our Process</p><p class="text-xs text-gray-400">Step-by-step process</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DIALOG OVERLAY ===== -->
+  <div class="fixed inset-0 z-50 flex items-start justify-center pt-8 pb-8 overflow-y-auto">
+    <div class="fixed inset-0 bg-black/50" aria-hidden="true"></div>
+
+    <div class="relative bg-white rounded-2xl dialog-shadow w-full max-w-xl mx-4 z-10">
+
+      <!-- Dialog Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+          </div>
+          <h2 class="text-lg font-semibold text-gray-900">Add Call Widget</h2>
+        </div>
+        <button class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Dialog Body -->
+      <div class="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto scrollbar-thin">
+
+        <!-- Field 1: Widget Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Widget Type</label>
+          <div class="relative">
+            <select class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10">
+              <option>Video</option>
+            </select>
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+              <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+          <p class="mt-1 text-xs text-gray-400">Choose the type of content to display during calls</p>
+        </div>
+
+        <!-- Field 2: Button Label -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Button Label</label>
+          <input type="text" value="Videos" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          <p class="mt-1 text-xs text-gray-400">Text shown on the widget button in the call sidebar</p>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-100"></div>
+
+        <!-- Field 3: Video Source -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Video Source</label>
+              <p class="text-xs text-gray-400 mt-0.5">Choose which videos to show during calls</p>
+            </div>
+          </div>
+
+          <!-- Toggle: Show All -->
+          <div class="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3 mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Show all library videos</p>
+                <p class="text-xs text-gray-400">Include your entire Sales Asset Library</p>
+              </div>
+            </div>
+            <!-- Toggle Switch -->
+            <button id="toggle-all" onclick="toggleShowAll()" class="relative w-10 h-[22px] rounded-full toggle-bg-off cursor-pointer flex-shrink-0 transition-colors">
+              <span class="absolute top-[2px] w-[18px] h-[18px] bg-white rounded-full shadow-sm toggle-slider toggle-knob-off"></span>
+            </button>
+          </div>
+
+          <!-- When OFF: Video Picker (shown by default since toggle is off) -->
+          <div id="video-picker" class="">
+            <div class="flex items-center justify-between mb-2.5">
+              <p class="text-sm font-medium text-gray-600">Select specific videos</p>
+              <span id="selected-count" class="text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full">3 of 6 selected</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5" id="video-grid">
+
+              <!-- Video 1 - Selected -->
+              <div class="video-select-card selected rounded-lg overflow-hidden cursor-pointer" onclick="toggleVideoSelect(this)">
+                <div class="relative aspect-video">
+                  <img src="https://picsum.photos/seed/video1/400/225" alt="" class="w-full h-full object-cover" />
+                  <div class="check-overlay absolute inset-0 flex items-center justify-center rounded-t-md">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">2:34</div>
+                </div>
+                <div class="p-2">
+                  <p class="text-xs font-medium text-gray-900 truncate">Why Customers Choose Us</p>
+                  <span class="badge-testimonial text-[10px] font-medium px-1.5 py-0 rounded-full mt-1 inline-block">Testimonial</span>
+                </div>
+              </div>
+
+              <!-- Video 2 - Not Selected -->
+              <div class="video-select-card rounded-lg overflow-hidden cursor-pointer" onclick="toggleVideoSelect(this)">
+                <div class="relative aspect-video">
+                  <img src="https://picsum.photos/seed/video2/400/225" alt="" class="w-full h-full object-cover" />
+                  <div class="check-overlay absolute inset-0 flex items-center justify-center rounded-t-md">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">1:45</div>
+                </div>
+                <div class="p-2">
+                  <p class="text-xs font-medium text-gray-900 truncate">Meet the Owner: Mike Johnson</p>
+                  <span class="badge-intro text-[10px] font-medium px-1.5 py-0 rounded-full mt-1 inline-block">Intro</span>
+                </div>
+              </div>
+
+              <!-- Video 3 - Selected -->
+              <div class="video-select-card selected rounded-lg overflow-hidden cursor-pointer" onclick="toggleVideoSelect(this)">
+                <div class="relative aspect-video">
+                  <img src="https://picsum.photos/seed/video3/400/225" alt="" class="w-full h-full object-cover" />
+                  <div class="check-overlay absolute inset-0 flex items-center justify-center rounded-t-md">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">4:12</div>
+                </div>
+                <div class="p-2">
+                  <p class="text-xs font-medium text-gray-900 truncate">Kitchen Renovation Case Study</p>
+                  <span class="badge-case-study text-[10px] font-medium px-1.5 py-0 rounded-full mt-1 inline-block">Case Study</span>
+                </div>
+              </div>
+
+              <!-- Video 4 - Selected -->
+              <div class="video-select-card selected rounded-lg overflow-hidden cursor-pointer" onclick="toggleVideoSelect(this)">
+                <div class="relative aspect-video">
+                  <img src="https://picsum.photos/seed/video4/400/225" alt="" class="w-full h-full object-cover" />
+                  <div class="check-overlay absolute inset-0 flex items-center justify-center rounded-t-md">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">3:08</div>
+                </div>
+                <div class="p-2">
+                  <p class="text-xs font-medium text-gray-900 truncate">Our 5-Step Process</p>
+                  <span class="badge-process text-[10px] font-medium px-1.5 py-0 rounded-full mt-1 inline-block">Process</span>
+                </div>
+              </div>
+
+              <!-- Video 5 - Not Selected -->
+              <div class="video-select-card rounded-lg overflow-hidden cursor-pointer" onclick="toggleVideoSelect(this)">
+                <div class="relative aspect-video">
+                  <img src="https://picsum.photos/seed/video5/400/225" alt="" class="w-full h-full object-cover" />
+                  <div class="check-overlay absolute inset-0 flex items-center justify-center rounded-t-md">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">2:15</div>
+                </div>
+                <div class="p-2">
+                  <p class="text-xs font-medium text-gray-900 truncate">Customer Success: The Williams Family</p>
+                  <span class="badge-testimonial text-[10px] font-medium px-1.5 py-0 rounded-full mt-1 inline-block">Testimonial</span>
+                </div>
+              </div>
+
+              <!-- Video 6 - Not Selected -->
+              <div class="video-select-card rounded-lg overflow-hidden cursor-pointer" onclick="toggleVideoSelect(this)">
+                <div class="relative aspect-video">
+                  <img src="https://picsum.photos/seed/video6/400/225" alt="" class="w-full h-full object-cover" />
+                  <div class="check-overlay absolute inset-0 flex items-center justify-center rounded-t-md">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-1 right-1 bg-black/70 px-1.5 py-0.5 rounded text-[10px] text-white font-mono">5:22</div>
+                </div>
+                <div class="p-2">
+                  <p class="text-xs font-medium text-gray-900 truncate">Bathroom Remodel Walkthrough</p>
+                  <span class="badge-process text-[10px] font-medium px-1.5 py-0 rounded-full mt-1 inline-block">Process</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- When ON: All library message (hidden by default) -->
+          <div id="all-library-msg" class="hidden">
+            <div class="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 flex items-start gap-3">
+              <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <p class="text-sm text-blue-800 font-medium">All videos from your Sales Asset Library will be available during calls.</p>
+                <p class="text-xs text-blue-600 mt-1">Currently 6 videos in your library. New uploads will automatically appear.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="border-t border-gray-100 mt-4 pt-4">
+            <!-- Collapsible Direct URL Section -->
+            <button id="url-toggle" onclick="toggleUrlSection()" class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors w-full">
+              <svg id="url-chevron" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+              <span>Or enter a direct video URL</span>
+            </button>
+            <div id="url-section" class="collapse-content mt-3">
+              <div class="flex gap-2">
+                <input type="text" placeholder="https://www.youtube.com/watch?v=..." class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-300" />
+                <button class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium rounded-lg transition-colors flex-shrink-0">
+                  Add URL
+                </button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1.5">Supports YouTube, Vimeo, and Bunny Stream URLs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dialog Footer -->
+      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl">
+        <button class="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+          Cancel
+        </button>
+        <button class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+          Add Widget
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECOND STATE: Widget List After Adding ===== -->
+  <div class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t-4 border-blue-500">
+    <div class="max-w-xl mx-auto px-6 py-5">
+
+      <!-- Section Header -->
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-5 h-5 rounded bg-green-100 flex items-center justify-center">
+          <svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <p class="text-sm font-semibold text-gray-900">Widget List (after adding video widget)</p>
+        <span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Updated</span>
+      </div>
+
+      <!-- Widget List -->
+      <div class="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+
+        <!-- Widget 1: Our Reviews -->
+        <div class="widget-item flex items-center gap-3 px-4 py-3">
+          <div class="text-gray-300 cursor-grab">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+          </div>
+          <span class="text-base">&#11088;</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900">Our Reviews</p>
+            <p class="text-xs text-gray-400">Google reviews widget</p>
+          </div>
+          <div class="w-2 h-2 rounded-full bg-green-400"></div>
+        </div>
+
+        <!-- Widget 2: Our Work -->
+        <div class="widget-item flex items-center gap-3 px-4 py-3">
+          <div class="text-gray-300 cursor-grab">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+          </div>
+          <span class="text-base">&#128247;</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900">Our Work</p>
+            <p class="text-xs text-gray-400">Photo gallery</p>
+          </div>
+          <div class="w-2 h-2 rounded-full bg-green-400"></div>
+        </div>
+
+        <!-- Widget 3: Videos (NEW) -->
+        <div class="widget-item flex items-center gap-3 px-4 py-3 bg-blue-50/50 border-l-2 border-l-blue-500">
+          <div class="text-gray-300 cursor-grab">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+          </div>
+          <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <svg class="w-3.5 h-3.5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <p class="text-sm font-medium text-gray-900">Videos</p>
+              <span class="text-[10px] font-semibold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded uppercase tracking-wide">New</span>
+            </div>
+            <p class="text-xs text-gray-400">3 library videos selected</p>
+          </div>
+          <div class="w-2 h-2 rounded-full bg-green-400"></div>
+        </div>
+
+        <!-- Widget 4: Our Process -->
+        <div class="widget-item flex items-center gap-3 px-4 py-3">
+          <div class="text-gray-300 cursor-grab">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+          </div>
+          <span class="text-base">&#128203;</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900">Our Process</p>
+            <p class="text-xs text-gray-400">Step-by-step process</p>
+          </div>
+          <div class="w-2 h-2 rounded-full bg-green-400"></div>
+        </div>
+
+        <!-- Widget 5: FAQ -->
+        <div class="widget-item flex items-center gap-3 px-4 py-3">
+          <div class="text-gray-300 cursor-grab">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+          </div>
+          <span class="text-base">&#10067;</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900">FAQ</p>
+            <p class="text-xs text-gray-400">Frequently asked questions</p>
+          </div>
+          <div class="w-2 h-2 rounded-full bg-green-400"></div>
+        </div>
+
+        <!-- Widget 6: Your Estimate -->
+        <div class="widget-item flex items-center gap-3 px-4 py-3">
+          <div class="text-gray-300 cursor-grab">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/></svg>
+          </div>
+          <span class="text-base">&#128196;</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900">Your Estimate</p>
+            <p class="text-xs text-gray-400">Customer estimate document</p>
+          </div>
+          <div class="w-2 h-2 rounded-full bg-green-400"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    let showAll = false;
+
+    function toggleShowAll() {
+      showAll = !showAll;
+      const toggle = document.getElementById('toggle-all');
+      const knob = toggle.querySelector('span');
+      const picker = document.getElementById('video-picker');
+      const allMsg = document.getElementById('all-library-msg');
+
+      if (showAll) {
+        toggle.classList.remove('toggle-bg-off');
+        toggle.classList.add('toggle-bg-on');
+        knob.classList.remove('toggle-knob-off');
+        knob.classList.add('toggle-knob-on');
+        picker.classList.add('hidden');
+        allMsg.classList.remove('hidden');
+      } else {
+        toggle.classList.remove('toggle-bg-on');
+        toggle.classList.add('toggle-bg-off');
+        knob.classList.remove('toggle-knob-on');
+        knob.classList.add('toggle-knob-off');
+        picker.classList.remove('hidden');
+        allMsg.classList.add('hidden');
+      }
+    }
+
+    function toggleVideoSelect(card) {
+      card.classList.toggle('selected');
+      updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+      const cards = document.querySelectorAll('.video-select-card');
+      const selected = document.querySelectorAll('.video-select-card.selected');
+      const countEl = document.getElementById('selected-count');
+      countEl.textContent = `${selected.length} of ${cards.length} selected`;
+
+      if (selected.length === 0) {
+        countEl.classList.remove('text-blue-600', 'bg-blue-50');
+        countEl.classList.add('text-red-600', 'bg-red-50');
+      } else {
+        countEl.classList.remove('text-red-600', 'bg-red-50');
+        countEl.classList.add('text-blue-600', 'bg-blue-50');
+      }
+    }
+
+    function toggleUrlSection() {
+      const section = document.getElementById('url-section');
+      const chevron = document.getElementById('url-chevron');
+      section.classList.toggle('open');
+      if (section.classList.contains('open')) {
+        chevron.style.transform = 'rotate(90deg)';
+      } else {
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+  </script>
+
+</body>
+</html>

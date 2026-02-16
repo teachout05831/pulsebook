@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dispatch — Final Design (Left Panel + Right Sidebar)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; background: #f3f4f6; display: flex; flex-direction: column; }
+
+  .banner { position: fixed; top: 50px; left: 50%; transform: translateX(-50%); background: #dbeafe; color: #1d4ed8; padding: 5px 16px; border-radius: 0 0 8px 8px; font-size: 11px; font-weight: 600; z-index: 60; white-space: nowrap; }
+
+  /* ═══ HEADER ═══ */
+  .header { height: 44px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; padding: 0 12px; gap: 8px; z-index: 30; position: relative; flex-shrink: 0; }
+  .header h1 { font-size: 14px; font-weight: 700; color: #111827; }
+  .sep { width: 1px; height: 20px; background: #e5e7eb; }
+  .date-nav { display: flex; align-items: center; gap: 4px; }
+  .date-nav button { background: none; border: none; cursor: pointer; font-size: 14px; color: #6b7280; padding: 2px 6px; border-radius: 4px; }
+  .date-nav button:hover { background: #f3f4f6; }
+  .date-nav span { font-size: 13px; font-weight: 500; color: #374151; }
+  .day-badge { font-size: 11px; background: #e5e7eb; color: #374151; padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+  .stat-dots { display: flex; gap: 4px; }
+  .stat-dot { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #374151; padding: 2px 6px; }
+  .stat-dot .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .view-dropdown { padding: 4px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; font-weight: 500; background: #fff; cursor: pointer; color: #374151; }
+  .add-btn { height: 32px; padding: 0 10px; border: none; border-radius: 6px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+  /* ═══ TIMELINE (top) ═══ */
+  .timeline-area { height: calc(45vh - 22px); overflow: hidden; background: #fff; flex-shrink: 0; }
+  .timeline-flex { display: flex; height: 100%; }
+  .crew-col { width: 150px; flex-shrink: 0; border-right: 1px solid #e5e7eb; overflow-y: auto; }
+  .crew-col-header { height: 28px; background: #fafafa; border-bottom: 1px solid #e5e7eb; }
+  .crew-row { display: flex; align-items: center; height: 56px; padding: 0 10px; gap: 8px; border-bottom: 1px solid #f3f4f6; }
+  .crew-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .crew-info { flex: 1; }
+  .crew-name { font-size: 13px; font-weight: 600; color: #111827; }
+  .crew-meta { font-size: 10px; color: #9ca3af; }
+  .unassigned-row { display: flex; height: 40px; background: #fef2f2; border-bottom: 1px solid #fecaca; align-items: center; padding: 0 10px; gap: 6px; }
+  .unassigned-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
+  .unassigned-label { font-size: 12px; font-weight: 600; color: #dc2626; }
+  .unassigned-count { font-size: 11px; color: #f87171; }
+
+  .grid-area { flex: 1; overflow-x: auto; overflow-y: auto; }
+  .time-headers { display: flex; height: 28px; border-bottom: 1px solid #e5e7eb; background: #fafafa; position: sticky; top: 0; z-index: 2; }
+  .time-header { min-width: 80px; font-size: 10px; color: #9ca3af; font-weight: 500; display: flex; align-items: center; padding-left: 6px; border-right: 1px solid #f3f4f6; }
+  .grid-row { height: 56px; border-bottom: 1px solid #f3f4f6; position: relative; min-width: 960px; }
+  .job-block { height: 40px; border-radius: 6px; padding: 4px 8px; font-size: 11px; color: #fff; font-weight: 500; display: flex; flex-direction: column; justify-content: center; cursor: pointer; position: absolute; top: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.15s, box-shadow 0.15s; }
+  .job-block:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+  .job-block .jb-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .job-block .jb-sub { font-size: 10px; opacity: 0.8; }
+  .ua-chips { display: flex; gap: 4px; padding: 8px; min-width: 960px; height: 40px; background: #fef2f2; }
+  .ua-chip { padding: 4px 10px; background: #fff; border: 1px solid #fecaca; border-radius: 6px; font-size: 11px; font-weight: 500; color: #374151; cursor: pointer; }
+
+  .status-legend { display: flex; gap: 12px; padding: 4px 12px; background: #fff; border-bottom: 1px solid #e5e7eb; font-size: 10px; color: #6b7280; justify-content: flex-end; flex-shrink: 0; }
+  .sl-item { display: flex; align-items: center; gap: 4px; }
+  .sl-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  .drawer-handle { height: 28px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: ns-resize; flex-shrink: 0; }
+  .handle-bar { width: 40px; height: 4px; background: #d1d5db; border-radius: 2px; }
+  .handle-label { font-size: 11px; color: #6b7280; font-weight: 500; }
+
+  /* ═══ MAP AREA (bottom) ═══ */
+  .map-drawer { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+  .map-content { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+  .map-canvas { flex: 1; position: relative; background: linear-gradient(135deg, #dce8d0 0%, #e2dcc8 30%, #ddd8c6 50%, #d5ddd0 70%, #e0e4d6 100%); transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1); }
+  .map-canvas.panel-open { margin-left: 380px; }
+  .map-roads { position: absolute; inset: 0; opacity: 0.12; }
+  .area-label { position: absolute; font-weight: 500; letter-spacing: 1.5px; color: #777; font-size: 11px; }
+
+  /* Pins */
+  .map-pin { position: absolute; cursor: pointer; transition: transform 0.2s; z-index: 2; }
+  .map-pin:hover { transform: scale(1.15); z-index: 5; }
+  .map-pin.selected { transform: scale(1.25); z-index: 10; }
+  .pin-svg { width: 30px; height: 36px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
+  .pin-num { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 700; color: #fff; }
+  .pin-tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 11px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .map-pin:hover .pin-tip { opacity: 1; }
+  .map-pin.selected .pin-tip { opacity: 1; background: #2563eb; }
+  .map-pin.selected::after { content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: 10px; border: 2px solid currentColor; border-radius: 50%; animation: pulse 1.5s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(1.8); opacity: 0; } }
+
+  /* Map controls */
+  .map-zoom { position: absolute; bottom: 12px; right: 12px; background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); overflow: hidden; z-index: 5; }
+  .map-zoom button { display: block; width: 32px; height: 32px; border: none; background: #fff; cursor: pointer; font-size: 16px; color: #374151; border-bottom: 1px solid #e5e7eb; }
+  .map-zoom button:last-child { border-bottom: none; }
+  .map-zoom button:hover { background: #f3f4f6; }
+  .map-legend { position: absolute; bottom: 12px; left: 12px; background: #fff; padding: 6px 10px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 10px; z-index: 5; transition: left 0.35s cubic-bezier(0.4,0,0.2,1); }
+  .map-legend.shifted { left: 392px; }
+  .legend-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .legend-row:last-child { margin-bottom: 0; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ═══ RIGHT SIDEBAR — Always Visible ═══ */
+  .map-sidebar { width: 260px; background: #fff; border-left: 1px solid #e5e7eb; overflow-y: auto; flex-shrink: 0; }
+  .sidebar-title { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+  .sg-header { display: flex; align-items: center; gap: 6px; padding: 5px 12px; background: #fafafa; border-bottom: 1px solid #f3f4f6; }
+  .sg-color { width: 10px; height: 10px; border-radius: 3px; }
+  .sg-name { font-size: 11px; font-weight: 600; }
+  .sg-count { font-size: 10px; color: #9ca3af; margin-left: auto; }
+  .sj-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background 0.15s; }
+  .sj-item:hover { background: #f9fafb; }
+  .sj-item.active { background: #eff6ff; border-left: 3px solid #2563eb; }
+  .sj-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .sj-info { flex: 1; min-width: 0; }
+  .sj-title { font-size: 12px; font-weight: 600; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sj-addr { font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sj-time { font-size: 10px; color: #6b7280; font-weight: 500; }
+  .sj-status { font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 99px; margin-top: 2px; display: inline-block; }
+
+  /* ═══ LEFT DETAIL PANEL ═══ */
+  .detail-panel { position: absolute; left: 0; top: 0; bottom: 0; width: 380px; background: #fff; border-right: 1px solid #e5e7eb; transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); z-index: 20; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.08); }
+  .detail-panel.open { transform: translateX(0); }
+
+  .dp-header { padding: 14px 16px 0; flex-shrink: 0; }
+  .dp-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .dp-header h3 { font-size: 16px; font-weight: 600; color: #111827; }
+  .dp-header p { font-size: 12px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+  .dp-close { background: none; border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; color: #9ca3af; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .dp-close:hover { background: #f3f4f6; color: #374151; }
+
+  /* Tabs */
+  .dp-tabs { display: flex; border-bottom: 1px solid #e5e7eb; }
+  .dp-tab { flex: 1; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #6b7280; background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .dp-tab:hover { color: #374151; background: #f9fafb; }
+  .dp-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+  .dp-body { flex: 1; overflow-y: auto; }
+  .tab-content { display: none; padding: 14px 16px; }
+  .tab-content.active { display: block; }
+
+  /* Details tab */
+  .dp-customer { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .dp-cust-name { font-size: 15px; font-weight: 600; color: #111827; }
+  .dp-cust-phone { font-size: 12px; color: #2563eb; cursor: pointer; margin-top: 2px; }
+  .dp-cust-phone:hover { text-decoration: underline; }
+  .dp-cust-email { font-size: 11px; color: #6b7280; margin-top: 1px; }
+  .dp-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 99px; background: #dbeafe; color: #1d4ed8; }
+
+  .dp-info { margin-bottom: 12px; }
+  .dp-info-row { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #4b5563; margin-bottom: 8px; }
+  .dp-icon { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; color: #9ca3af; }
+
+  .dp-divider { border-top: 1px solid #e5e7eb; margin: 12px 0; }
+
+  .dp-form-group { margin-bottom: 12px; }
+  .dp-label { font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.3px; }
+  .dp-select { width: 100%; padding: 7px 10px; font-size: 12px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; }
+  .dp-tab-group { display: flex; margin-bottom: 6px; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; }
+  .dp-tab-btn { flex: 1; padding: 5px 10px; font-size: 11px; font-weight: 500; border: none; cursor: pointer; text-align: center; background: #fff; color: #6b7280; }
+  .dp-tab-btn.active { background: #f3f4f6; color: #111827; }
+
+  .quick-actions { display: flex; gap: 6px; margin-top: 12px; }
+  .qa-btn { flex: 1; padding: 8px 4px; font-size: 10px; font-weight: 600; border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; cursor: pointer; text-align: center; color: #374151; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.15s; }
+  .qa-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+  .qa-btn .qa-icon { font-size: 16px; }
+
+  /* Photos tab */
+  .photos-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .photos-title { font-size: 13px; font-weight: 600; color: #111827; }
+  .photos-count { font-size: 11px; color: #6b7280; }
+  .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .photo-thumb { aspect-ratio: 1; border-radius: 6px; overflow: hidden; cursor: pointer; position: relative; border: 1px solid #e5e7eb; transition: transform 0.15s; }
+  .photo-thumb:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-thumb .zo { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; }
+  .photo-thumb:hover .zo { opacity: 1; }
+  .zo svg { width: 20px; height: 20px; color: #fff; }
+  .upload-btn { margin-top: 10px; width: 100%; padding: 10px; font-size: 12px; font-weight: 500; border: 2px dashed #d1d5db; border-radius: 6px; background: #f9fafb; cursor: pointer; color: #6b7280; text-align: center; }
+  .upload-btn:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+
+  /* History tab */
+  .history-list { position: relative; padding-left: 22px; }
+  .history-list::before { content: ''; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: #e5e7eb; }
+  .history-item { position: relative; margin-bottom: 18px; }
+  .history-item:last-child { margin-bottom: 0; }
+  .history-dot { position: absolute; left: -19px; top: 3px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #e5e7eb; }
+  .history-text { font-size: 12px; color: #374151; line-height: 1.4; }
+  .history-time { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+  .history-user { font-size: 10px; color: #6b7280; }
+
+  /* Footer */
+  .dp-footer { padding: 10px 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; flex-shrink: 0; }
+  .dp-btn { flex: 1; padding: 8px 14px; font-size: 12px; font-weight: 600; border-radius: 6px; cursor: pointer; border: none; text-align: center; }
+  .dp-btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+  .dp-btn-outline:hover { background: #f9fafb; }
+  .dp-btn-primary { background: #2563eb; color: #fff; }
+  .dp-btn-primary:hover { background: #1d4ed8; }
+
+  /* Lightbox */
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 200; }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 85%; max-height: 80vh; border-radius: 8px; }
+  .lb-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+  .lb-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); border: none; color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+  .lb-nav.prev { left: 16px; }
+  .lb-nav.next { right: 16px; }
+</style>
+</head>
+<body>
+
+<div class="banner">FINAL DESIGN — Click sidebar job or map pin → Left panel opens. Sidebar always visible. Tabs: Details · Photos · History</div>
+
+<!-- ═══ Header ═══ -->
+<div class="header">
+  <h1>Dispatch</h1><div class="sep"></div>
+  <div class="date-nav">
+    <button>‹</button><button>›</button>
+    <span>Monday, February 9, 2026</span>
+    <span class="day-badge">Day</span>
+  </div>
+  <div class="sep"></div>
+  <div class="stat-dots">
+    <div class="stat-dot"><div class="dot" style="background:#ef4444;"></div>2</div>
+    <div class="stat-dot"><div class="dot" style="background:#3b82f6;"></div>5</div>
+    <div class="stat-dot"><div class="dot" style="background:#eab308;"></div>1</div>
+    <div class="stat-dot"><div class="dot" style="background:#22c55e;"></div>1</div>
+  </div>
+  <div class="header-right">
+    <span style="font-size:12px;color:#6b7280;">View:</span>
+    <button class="view-dropdown">👥 Crew + Map ▾</button>
+    <button class="add-btn">+ Job</button>
+  </div>
+</div>
+
+<!-- ═══ Timeline (top) ═══ -->
+<div class="timeline-area">
+  <div class="timeline-flex">
+    <div class="crew-col">
+      <div class="crew-col-header"></div>
+      <div class="unassigned-row">
+        <div class="unassigned-dot"></div>
+        <span class="unassigned-label">Unassigned</span>
+        <span class="unassigned-count">2</span>
+      </div>
+      <div class="crew-row">
+        <div class="crew-avatar" style="background:#2563eb;">T1</div>
+        <div class="crew-info"><div class="crew-name">Truck 1</div><div class="crew-meta">Adam R. · 5 jobs</div></div>
+      </div>
+      <div class="crew-row">
+        <div class="crew-avatar" style="background:#dc2626;">T2</div>
+        <div class="crew-info"><div class="crew-name">Truck 2</div><div class="crew-meta">John S., Sammy T · 2 jobs</div></div>
+      </div>
+    </div>
+    <div class="grid-area">
+      <div class="time-headers">
+        <div class="time-header">6am</div><div class="time-header">7am</div><div class="time-header">8am</div><div class="time-header">9am</div><div class="time-header">10am</div><div class="time-header">11am</div><div class="time-header">12pm</div><div class="time-header">1pm</div><div class="time-header">2pm</div><div class="time-header">3pm</div><div class="time-header">4pm</div><div class="time-header">5pm</div>
+      </div>
+      <div class="ua-chips"><div class="ua-chip" onclick="selectJob(8)">HVAC Maintenance</div><div class="ua-chip">Garage Door Fix</div></div>
+      <div class="grid-row">
+        <div class="job-block" style="background:#2563eb;left:80px;width:120px;" onclick="selectJob(1)"><span class="jb-title">AC Unit Repair</span><span class="jb-sub">Adam Richardson</span></div>
+        <div class="job-block" style="background:#2563eb;left:240px;width:140px;" onclick="selectJob(2)"><span class="jb-title">Electrical Panel</span><span class="jb-sub">David Chen</span></div>
+        <div class="job-block" style="background:#eab308;left:480px;width:100px;" onclick="selectJob(3)"><span class="jb-title">HVAC Maint.</span><span class="jb-sub">James Thompson</span></div>
+        <div class="job-block" style="background:#22c55e;left:640px;width:120px;" onclick="selectJob(4)"><span class="jb-title">Water Heater</span><span class="jb-sub">Maria Gonzales</span></div>
+      </div>
+      <div class="grid-row">
+        <div class="job-block" style="background:#2563eb;left:240px;width:120px;" onclick="selectJob(5)"><span class="jb-title">Plumbing Insp.</span><span class="jb-sub">Sarah Mitchell</span></div>
+        <div class="job-block" style="background:#dc2626;left:480px;width:100px;" onclick="selectJob(6)"><span class="jb-title">Kitchen Faucet</span><span class="jb-sub">Lisa Park</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="status-legend">
+  <div class="sl-item"><div class="sl-dot" style="background:#6b7280;"></div>Unassigned</div>
+  <div class="sl-item"><div class="sl-dot" style="background:#3b82f6;"></div>Scheduled</div>
+  <div class="sl-item"><div class="sl-dot" style="background:#eab308;"></div>In Progress</div>
+  <div class="sl-item"><div class="sl-dot" style="background:#22c55e;"></div>Completed</div>
+  <div class="sl-item"><div class="sl-dot" style="background:#ef4444;"></div>Cancelled</div>
+</div>
+
+<div class="drawer-handle">
+  <div class="handle-bar"></div>
+  <span class="handle-label">🗺 Map View · 8 jobs</span>
+  <div class="handle-bar"></div>
+</div>
+
+<!-- ═══ Map + Sidebar (bottom) ═══ -->
+<div class="map-drawer">
+  <div class="map-content">
+    <!-- Map -->
+    <div class="map-canvas" id="mapCanvas">
+      <svg class="map-roads" style="width:100%;height:100%;">
+        <line x1="0" y1="28%" x2="100%" y2="30%" stroke="#888" stroke-width="2.5"/>
+        <line x1="0" y1="58%" x2="100%" y2="60%" stroke="#888" stroke-width="2"/>
+        <line x1="0" y1="80%" x2="100%" y2="78%" stroke="#888" stroke-width="1.5"/>
+        <line x1="22%" y1="0" x2="24%" y2="100%" stroke="#888" stroke-width="2"/>
+        <line x1="48%" y1="0" x2="45%" y2="100%" stroke="#888" stroke-width="2.5"/>
+        <line x1="72%" y1="0" x2="74%" y2="100%" stroke="#888" stroke-width="1.5"/>
+      </svg>
+      <div class="area-label" style="top:14%;left:38%;">SCOTTSDALE</div>
+      <div class="area-label" style="top:62%;left:48%;">TEMPE</div>
+      <div class="area-label" style="top:38%;left:10%;font-size:12px;">PHOENIX</div>
+      <div class="area-label" style="top:26%;left:60%;font-size:10px;color:#999;">Paradise Valley</div>
+
+      <!-- Pins -->
+      <div class="map-pin" id="pin1" style="top:18%;left:42%;color:#2563eb;" onclick="selectJob(1)">
+        <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#2563eb"/></svg>
+        <span class="pin-num">1</span><div class="pin-tip">AC Unit Repair · 07:00</div>
+      </div>
+      <div class="map-pin" id="pin2" style="top:35%;left:55%;color:#2563eb;" onclick="selectJob(2)">
+        <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#2563eb"/></svg>
+        <span class="pin-num">2</span><div class="pin-tip">Electrical Panel · 09:00</div>
+      </div>
+      <div class="map-pin" id="pin3" style="top:52%;left:40%;color:#eab308;" onclick="selectJob(3)">
+        <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#eab308"/></svg>
+        <span class="pin-num">3</span><div class="pin-tip">HVAC Maint. · 13:00</div>
+      </div>
+      <div class="map-pin" id="pin4" style="top:24%;left:68%;color:#22c55e;" onclick="selectJob(4)">
+        <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#22c55e"/></svg>
+        <span class="pin-num">4</span><div class="pin-tip">Water Heater · 15:00</div>
+      </div>
+      <div class="map-pin" id="pin5" style="top:42%;left:28%;color:#2563eb;" onclick="selectJob(5)">
+        <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#2563eb"/></svg>
+        <span class="pin-num">1</span><div class="pin-tip">Plumbing Insp. · 09:00</div>
+      </div>
+      <div class="map-pin" id="pin6" style="top:65%;left:58%;color:#dc2626;" onclick="selectJob(6)">
+        <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#dc2626"/></svg>
+        <span class="pin-num">2</span><div class="pin-tip">Kitchen Faucet · 13:00</div>
+      </div>
+      <div class="map-pin" id="pin7" style="top:72%;left:35%;color:#6b7280;" onclick="selectJob(7)">
+        <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#6b7280"/></svg>
+        <span class="pin-num">?</span><div class="pin-tip">HVAC Maintenance · Unassigned</div>
+      </div>
+
+      <div class="map-zoom"><button>+</button><button>−</button></div>
+      <div class="map-legend" id="mapLegend">
+        <div class="legend-row"><div class="legend-dot" style="background:#2563eb;"></div>Truck 1 (5)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#dc2626;"></div>Truck 2 (2)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#6b7280;"></div>Unassigned (2)</div>
+      </div>
+
+      <!-- ═══ LEFT DETAIL PANEL ═══ -->
+      <div class="detail-panel" id="detailPanel">
+        <div class="dp-header">
+          <div class="dp-header-top">
+            <div>
+              <h3 id="dpTitle">AC Unit Repair</h3>
+              <p id="dpDesc">Central AC not cooling properly. Customer reports warm air from all vents.</p>
+            </div>
+            <button class="dp-close" onclick="closePanel()">✕</button>
+          </div>
+          <div class="dp-tabs">
+            <button class="dp-tab active" onclick="switchTab('details')">Details</button>
+            <button class="dp-tab" onclick="switchTab('photos')">Photos</button>
+            <button class="dp-tab" onclick="switchTab('history')">History</button>
+          </div>
+        </div>
+
+        <div class="dp-body">
+          <!-- Details Tab -->
+          <div class="tab-content active" id="tab-details">
+            <div class="dp-customer">
+              <div>
+                <div class="dp-cust-name" id="dpCustomer">Adam Richardson</div>
+                <div class="dp-cust-phone" id="dpPhone">📞 (480) 555-1234</div>
+                <div class="dp-cust-email" id="dpEmail">adam.r@email.com</div>
+              </div>
+              <span class="dp-badge" id="dpPriority">Normal</span>
+            </div>
+            <div class="dp-info">
+              <div class="dp-info-row">
+                <svg class="dp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="dpAddr">4521 E Cactus Rd, Scottsdale, AZ 85254</span>
+              </div>
+              <div class="dp-info-row">
+                <svg class="dp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="dpDate">2026-02-09 at 07:00</span>
+              </div>
+              <div class="dp-info-row">
+                <svg class="dp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span id="dpDuration">90 minutes</span>
+              </div>
+              <div class="dp-info-row">
+                <svg class="dp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span id="dpNotes">Check refrigerant levels and clean condenser coils.</span>
+              </div>
+            </div>
+            <div class="dp-divider"></div>
+            <div class="dp-form-group">
+              <label class="dp-label">Status</label>
+              <select class="dp-select" id="dpStatus"><option>Scheduled</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select>
+            </div>
+            <div class="dp-form-group">
+              <label class="dp-label">Assigned Technician</label>
+              <div class="dp-tab-group"><button class="dp-tab-btn active">Individual</button><button class="dp-tab-btn">Crew</button></div>
+              <select class="dp-select" id="dpTech"><option>Truck 1 — Adam R.</option><option>Truck 2 — John S., Sammy T</option><option>Jimmy G.</option></select>
+            </div>
+            <div class="quick-actions">
+              <button class="qa-btn"><span class="qa-icon">📞</span>Call</button>
+              <button class="qa-btn"><span class="qa-icon">📍</span>Navigate</button>
+              <button class="qa-btn"><span class="qa-icon">📧</span>Email</button>
+              <button class="qa-btn"><span class="qa-icon">📋</span>Copy Addr</button>
+            </div>
+          </div>
+
+          <!-- Photos Tab -->
+          <div class="tab-content" id="tab-photos">
+            <div class="photos-header"><span class="photos-title">Job Photos</span><span class="photos-count">5 photos</span></div>
+            <div class="photo-grid">
+              <div class="photo-thumb" onclick="openLB(0)"><img src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=200&h=200&fit=crop"/><div class="zo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div></div>
+              <div class="photo-thumb" onclick="openLB(1)"><img src="https://images.unsplash.com/photo-1631545806609-3c480a498e26?w=200&h=200&fit=crop"/><div class="zo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div></div>
+              <div class="photo-thumb" onclick="openLB(2)"><img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=200&h=200&fit=crop"/><div class="zo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div></div>
+              <div class="photo-thumb" onclick="openLB(3)"><img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=200&h=200&fit=crop"/><div class="zo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div></div>
+              <div class="photo-thumb" onclick="openLB(4)"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200&h=200&fit=crop"/><div class="zo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div></div>
+            </div>
+            <button class="upload-btn">📷 Upload Photos</button>
+          </div>
+
+          <!-- History Tab -->
+          <div class="tab-content" id="tab-history">
+            <div class="history-list">
+              <div class="history-item"><div class="history-dot" style="background:#22c55e;"></div><div class="history-text">Status changed to <strong>Scheduled</strong></div><div class="history-time">Today at 6:30 AM</div><div class="history-user">by Admin</div></div>
+              <div class="history-item"><div class="history-dot" style="background:#2563eb;"></div><div class="history-text">Assigned to <strong>Truck 1 — Adam R.</strong></div><div class="history-time">Today at 6:28 AM</div><div class="history-user">by Admin</div></div>
+              <div class="history-item"><div class="history-dot" style="background:#8b5cf6;"></div><div class="history-text">Dispatched to technician</div><div class="history-time">Today at 6:25 AM</div><div class="history-user">by System</div></div>
+              <div class="history-item"><div class="history-dot" style="background:#f59e0b;"></div><div class="history-text">Customer confirmed appointment</div><div class="history-time">Yesterday at 4:15 PM</div><div class="history-user">via SMS</div></div>
+              <div class="history-item"><div class="history-dot" style="background:#6b7280;"></div><div class="history-text">Reminder sent to customer</div><div class="history-time">Yesterday at 9:00 AM</div><div class="history-user">by System</div></div>
+              <div class="history-item"><div class="history-dot" style="background:#3b82f6;"></div><div class="history-text">Job created from estimate #1042</div><div class="history-time">Feb 7 at 2:30 PM</div><div class="history-user">by Admin</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dp-footer">
+          <button class="dp-btn dp-btn-outline" onclick="closePanel()">Close</button>
+          <button class="dp-btn dp-btn-primary">View Full Job →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RIGHT SIDEBAR — Always Visible ═══ -->
+    <div class="map-sidebar">
+      <div class="sidebar-title">Today's Jobs (8)</div>
+
+      <div class="sg-header"><div class="sg-color" style="background:#2563eb;"></div><span class="sg-name" style="color:#2563eb;">Truck 1 — Adam R.</span><span class="sg-count">5 jobs</span></div>
+      <div class="sj-item" id="sj1" onclick="selectJob(1)">
+        <div class="sj-num" style="background:#2563eb;">1</div>
+        <div class="sj-info"><div class="sj-title">AC Unit Repair</div><div class="sj-addr">4521 E Cactus Rd, Scottsdale</div><div class="sj-time">07:00 · 90 min</div></div>
+      </div>
+      <div class="sj-item" id="sj2" onclick="selectJob(2)">
+        <div class="sj-num" style="background:#2563eb;">2</div>
+        <div class="sj-info"><div class="sj-title">Electrical Panel Upgrade</div><div class="sj-addr">789 E Camelback Rd, Phoenix</div><div class="sj-time">09:00 · 120 min</div></div>
+      </div>
+      <div class="sj-item" id="sj3" onclick="selectJob(3)">
+        <div class="sj-num" style="background:#eab308;">3</div>
+        <div class="sj-info"><div class="sj-title">HVAC Maintenance</div><div class="sj-addr">555 W Indian School, Phoenix</div><div class="sj-time">13:00 · 60 min</div><div class="sj-status" style="background:#fef3c7;color:#92400e;">In Progress</div></div>
+      </div>
+      <div class="sj-item" id="sj4" onclick="selectJob(4)">
+        <div class="sj-num" style="background:#22c55e;">4</div>
+        <div class="sj-info"><div class="sj-title">Water Heater Install</div><div class="sj-addr">321 E Paradise Ln, Scottsdale</div><div class="sj-time">15:00 · 90 min</div><div class="sj-status" style="background:#dcfce7;color:#166534;">Completed</div></div>
+      </div>
+
+      <div class="sg-header"><div class="sg-color" style="background:#dc2626;"></div><span class="sg-name" style="color:#dc2626;">Truck 2 — John S., Sammy T</span><span class="sg-count">2 jobs</span></div>
+      <div class="sj-item" id="sj5" onclick="selectJob(5)">
+        <div class="sj-num" style="background:#2563eb;">1</div>
+        <div class="sj-info"><div class="sj-title">Plumbing Inspection</div><div class="sj-addr">1220 N Central Ave, Phoenix</div><div class="sj-time">09:00 · 60 min</div></div>
+      </div>
+      <div class="sj-item" id="sj6" onclick="selectJob(6)">
+        <div class="sj-num" style="background:#dc2626;">2</div>
+        <div class="sj-info"><div class="sj-title">Kitchen Faucet Replace</div><div class="sj-addr">999 S Mill Ave, Tempe</div><div class="sj-time">13:00 · 45 min</div></div>
+      </div>
+
+      <div class="sg-header"><div class="sg-color" style="background:#6b7280;"></div><span class="sg-name" style="color:#6b7280;">Unassigned</span><span class="sg-count">2 jobs</span></div>
+      <div class="sj-item" id="sj7" onclick="selectJob(7)">
+        <div class="sj-num" style="background:#6b7280;">?</div>
+        <div class="sj-info"><div class="sj-title">HVAC Maintenance</div><div class="sj-addr">456 W McDowell Rd, Phoenix</div><div class="sj-time">—</div></div>
+      </div>
+      <div class="sj-item" id="sj8">
+        <div class="sj-num" style="background:#6b7280;">?</div>
+        <div class="sj-info"><div class="sj-title">Garage Door Fix</div><div class="sj-addr">123 N 7th St, Phoenix</div><div class="sj-time">—</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLB()">
+  <button class="lb-close" onclick="closeLB()">✕</button>
+  <button class="lb-nav prev" onclick="event.stopPropagation(); navLB(-1)">‹</button>
+  <img id="lbImg" src="" onclick="event.stopPropagation()" />
+  <button class="lb-nav next" onclick="event.stopPropagation(); navLB(1)">›</button>
+</div>
+
+<script>
+const photos = [
+  'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=900&h=700&fit=crop',
+  'https://images.unsplash.com/photo-1631545806609-3c480a498e26?w=900&h=700&fit=crop',
+  'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=900&h=700&fit=crop',
+  'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=900&h=700&fit=crop',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=900&h=700&fit=crop',
+];
+let currentPhoto = 0;
+let selectedJobId = null;
+
+const jobs = {
+  1: { title:'AC Unit Repair', desc:'Central AC not cooling properly. Customer reports warm air from all vents.', customer:'Adam Richardson', phone:'(480) 555-1234', email:'adam.r@email.com', addr:'4521 E Cactus Rd, Scottsdale, AZ 85254', date:'2026-02-09 at 07:00', dur:'90 minutes', notes:'Check refrigerant levels and clean condenser coils.', status:0, tech:0, priority:'Normal' },
+  2: { title:'Electrical Panel Upgrade', desc:'Main breaker panel upgrade from 100A to 200A service.', customer:'David Chen', phone:'(480) 555-2345', email:'david.c@email.com', addr:'789 E Camelback Rd, Phoenix, AZ 85014', date:'2026-02-09 at 09:00', dur:'120 minutes', notes:'Customer has permit ready. Need to coordinate with APS for disconnect.', status:0, tech:0, priority:'High' },
+  3: { title:'HVAC Maintenance', desc:'Annual HVAC maintenance check. Seasonal tune-up.', customer:'James Thompson', phone:'(480) 555-3456', email:'james.t@email.com', addr:'555 W Indian School Rd, Phoenix, AZ 85013', date:'2026-02-09 at 13:00', dur:'60 minutes', notes:'Regular maintenance customer. VIP account.', status:1, tech:0, priority:'Normal' },
+  4: { title:'Water Heater Install', desc:'Replace 40-gallon gas water heater with new tankless unit.', customer:'Maria Gonzales', phone:'(480) 555-4567', email:'maria.g@email.com', addr:'321 E Paradise Ln, Scottsdale, AZ 85260', date:'2026-02-09 at 15:00', dur:'90 minutes', notes:'Tankless unit already ordered and on truck.', status:2, tech:0, priority:'Normal' },
+  5: { title:'Plumbing Inspection', desc:'Annual plumbing inspection. Check all fixtures and pipes.', customer:'Sarah Mitchell', phone:'(480) 555-5678', email:'sarah.m@email.com', addr:'1220 N Central Ave, Phoenix, AZ 85004', date:'2026-02-09 at 09:00', dur:'60 minutes', notes:'Test job for Sarah Mitchell.', status:0, tech:1, priority:'Normal' },
+  6: { title:'Kitchen Faucet Replace', desc:'Replace kitchen sink faucet. Customer provided new fixture.', customer:'Lisa Park', phone:'(480) 555-6789', email:'lisa.p@email.com', addr:'999 S Mill Ave, Tempe, AZ 85281', date:'2026-02-09 at 13:00', dur:'45 minutes', notes:'Customer-supplied Delta faucet. Check supply line compatibility.', status:0, tech:1, priority:'Low' },
+  7: { title:'HVAC Maintenance', desc:'New customer HVAC inspection. System making unusual noise.', customer:'Robert Williams', phone:'(480) 555-7890', email:'robert.w@email.com', addr:'456 W McDowell Rd, Phoenix, AZ 85003', date:'Not scheduled', dur:'60 minutes', notes:'Unassigned — needs crew assignment.', status:0, tech:2, priority:'Normal' },
+};
+
+const statusOptions = ['Scheduled','In Progress','Completed','Cancelled'];
+const techOptions = ['Truck 1 — Adam R.','Truck 2 — John S., Sammy T','Unassigned'];
+
+function selectJob(id) {
+  selectedJobId = id;
+  const job = jobs[id];
+  if (!job) return;
+
+  // Update panel content
+  document.getElementById('dpTitle').textContent = job.title;
+  document.getElementById('dpDesc').textContent = job.desc;
+  document.getElementById('dpCustomer').textContent = job.customer;
+  document.getElementById('dpPhone').textContent = '📞 ' + job.phone;
+  document.getElementById('dpEmail').textContent = job.email;
+  document.getElementById('dpAddr').textContent = job.addr;
+  document.getElementById('dpDate').textContent = job.date;
+  document.getElementById('dpDuration').textContent = job.dur;
+  document.getElementById('dpNotes').textContent = job.notes;
+  document.getElementById('dpPriority').textContent = job.priority;
+  document.getElementById('dpStatus').selectedIndex = job.status;
+  document.getElementById('dpTech').selectedIndex = job.tech;
+
+  // Open panel
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('mapCanvas').classList.add('panel-open');
+  document.getElementById('mapLegend').classList.add('shifted');
+
+  // Highlight sidebar
+  document.querySelectorAll('.sj-item').forEach(s => s.classList.remove('active'));
+  const sj = document.getElementById('sj' + id);
+  if (sj) { sj.classList.add('active'); sj.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+
+  // Highlight pin
+  document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+  const pin = document.getElementById('pin' + id);
+  if (pin) pin.classList.add('selected');
+
+  // Reset to details tab
+  switchTab('details');
+}
+
+function closePanel() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('mapCanvas').classList.remove('panel-open');
+  document.getElementById('mapLegend').classList.remove('shifted');
+  document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('.sj-item').forEach(s => s.classList.remove('active'));
+  selectedJobId = null;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.dp-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.dp-tab').forEach(t => { if (t.textContent.toLowerCase() === name) t.classList.add('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// Close panel on map background click
+document.getElementById('mapCanvas').addEventListener('click', function(e) {
+  if (e.target === this || e.target.closest('.map-roads') || e.target.closest('.area-label')) {
+    closePanel();
+  }
+});
+
+function openLB(i) { currentPhoto = i; document.getElementById('lbImg').src = photos[i]; document.getElementById('lightbox').classList.add('open'); }
+function closeLB() { document.getElementById('lightbox').classList.remove('open'); }
+function navLB(d) { currentPhoto = (currentPhoto + d + photos.length) % photos.length; document.getElementById('lbImg').src = photos[currentPhoto]; }
+</script>
+
+</body>
+</html>

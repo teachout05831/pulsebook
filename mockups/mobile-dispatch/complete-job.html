@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Complete Job - Mobile Dispatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: #0f172a;
+      min-height: 100vh;
+    }
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      background: #1e293b;
+      border-radius: 40px;
+      border: 8px solid #334155;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .notch {
+      width: 150px;
+      height: 30px;
+      background: #334155;
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+    }
+    .scroll-container {
+      height: calc(100% - 60px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-container::-webkit-scrollbar { display: none; }
+    .signature-pad {
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border: 2px dashed #475569;
+      position: relative;
+    }
+    .signature-pad::after {
+      content: '';
+      position: absolute;
+      bottom: 30px;
+      left: 20px;
+      right: 20px;
+      height: 1px;
+      background: #475569;
+    }
+    .signature-line {
+      font-family: 'Brush Script MT', cursive;
+      font-size: 32px;
+      color: #1e40af;
+      position: absolute;
+      bottom: 35px;
+      left: 30px;
+    }
+    .checkbox-custom {
+      transition: all 0.2s;
+    }
+    .checkbox-custom.checked {
+      background: #10b981;
+      border-color: #10b981;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-8">
+
+  <div class="phone-frame">
+    <!-- Notch -->
+    <div class="notch"></div>
+
+    <!-- Header -->
+    <div class="bg-slate-800 px-4 py-3 flex items-center justify-between border-b border-slate-700">
+      <div class="flex items-center gap-2">
+        <button class="p-2 hover:bg-slate-700 rounded-lg">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <span class="text-white font-semibold">Complete Job</span>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="scroll-container bg-slate-900 px-4 py-4">
+
+      <!-- Job Summary Card -->
+      <div class="bg-slate-800 rounded-2xl p-4 mb-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-white font-semibold">Johnson Family Move</h2>
+            <p class="text-slate-400 text-sm">Ready for completion</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Summary -->
+      <div class="bg-slate-800 rounded-2xl p-4 mb-4">
+        <h3 class="text-slate-400 text-sm font-medium mb-4">Time Summary</h3>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                </svg>
+              </div>
+              <span class="text-slate-300">Loading</span>
+            </div>
+            <span class="text-white font-mono">2h 15m</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                </svg>
+              </div>
+              <span class="text-slate-300">Transit</span>
+            </div>
+            <span class="text-white font-mono">0h 45m</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+              </div>
+              <span class="text-slate-300">Unloading</span>
+            </div>
+            <span class="text-white font-mono">1h 52m</span>
+          </div>
+
+          <div class="border-t border-slate-700 pt-3 mt-3">
+            <div class="flex items-center justify-between">
+              <span class="text-white font-medium">Total Time</span>
+              <span class="text-emerald-400 font-mono text-lg font-bold">4h 52m</span>
+            </div>
+            <div class="flex items-center justify-between mt-1">
+              <span class="text-slate-500 text-sm">Estimated</span>
+              <span class="text-slate-400 text-sm">4h 00m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Summary -->
+      <div class="bg-slate-800 rounded-2xl p-4 mb-4">
+        <h3 class="text-slate-400 text-sm font-medium mb-3">Inventory</h3>
+
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span class="text-white">42/42 items delivered</span>
+          </div>
+          <span class="text-emerald-400 font-medium">100%</span>
+        </div>
+
+        <div class="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+          <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <div class="flex-1">
+            <p class="text-amber-400 text-sm">1 damage noted</p>
+            <p class="text-slate-400 text-xs">Pre-existing scratch on dresser</p>
+          </div>
+          <button class="p-2 hover:bg-amber-500/20 rounded-lg">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Signature Section -->
+      <div class="bg-slate-800 rounded-2xl p-4 mb-4">
+        <h3 class="text-slate-400 text-sm font-medium mb-3">Customer Signature</h3>
+
+        <div class="signature-pad rounded-xl h-32 mb-3">
+          <span class="signature-line">John Johnson</span>
+          <p class="absolute bottom-2 left-0 right-0 text-center text-slate-500 text-xs">Sign above line</p>
+        </div>
+
+        <div class="flex gap-2">
+          <button class="flex-1 flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-xl text-sm transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Clear
+          </button>
+          <button class="flex-1 flex items-center justify-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 py-2 rounded-xl text-sm transition-colors border border-blue-500/30">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+            </svg>
+            Re-sign
+          </button>
+        </div>
+      </div>
+
+      <!-- Confirmation Checklist -->
+      <div class="bg-slate-800 rounded-2xl p-4 mb-4">
+        <h3 class="text-slate-400 text-sm font-medium mb-3">Confirmation</h3>
+
+        <div class="space-y-3">
+          <label class="flex items-center gap-3 cursor-pointer" onclick="this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-white text-sm">All items accounted for</span>
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer" onclick="this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-white text-sm">Customer satisfied with service</span>
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer" onclick="this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-white text-sm">Work area left clean</span>
+          </label>
+
+          <label class="flex items-center gap-3 cursor-pointer" onclick="this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-slate-600 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="text-slate-300 text-sm">Payment collected</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Add Notes -->
+      <div class="bg-slate-800 rounded-2xl p-4 mb-4">
+        <h3 class="text-slate-400 text-sm font-medium mb-3">Completion Notes (Optional)</h3>
+        <textarea
+          class="w-full bg-slate-700 text-white border border-slate-600 rounded-xl px-4 py-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+          rows="3"
+          placeholder="Add any notes about the job..."
+        >Move completed successfully. Customer very happy with service. Piano moved without any issues.</textarea>
+      </div>
+
+      <!-- Tip Section -->
+      <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-emerald-400 font-medium">Tip Received</h3>
+          <span class="text-emerald-400 font-bold text-xl">$60.00</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="flex-1 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg text-sm transition-colors">$20</button>
+          <button class="flex-1 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg text-sm transition-colors">$40</button>
+          <button class="flex-1 py-2 bg-emerald-500/30 text-emerald-400 rounded-lg text-sm border border-emerald-500/50">$60</button>
+          <button class="flex-1 py-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg text-sm transition-colors">Other</button>
+        </div>
+      </div>
+
+      <!-- Complete Button -->
+      <button class="w-full flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-semibold text-lg transition-colors mb-4">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Complete Move
+      </button>
+
+      <!-- Cancel Option -->
+      <button class="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-white py-3 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        Cancel
+      </button>
+
+      <div class="h-8"></div>
+    </div>
+  </div>
+
+  <!-- Back link -->
+  <a href="index.html" class="fixed bottom-8 left-8 text-slate-400 hover:text-white flex items-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Back to mockups
+  </a>
+
+</body>
+</html>

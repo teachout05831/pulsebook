@@ -1,0 +1,200 @@
+import type { LobbyBrandKit } from "@/features/consultations/components/ConsultationLobby";
+import type { CallWidget, VideoAssetData } from "@/features/consultations/components/CallWidgetBar";
+
+export const mockBrandKit: LobbyBrandKit = {
+  googleRating: 4.9,
+  googleReviewCount: 127,
+  certifications: ["IICRC Certified", "EPA Lead-Safe"],
+  insuranceInfo: "Fully Insured",
+  yearsInBusiness: 12,
+  serviceArea: "Greater Austin, TX",
+  companyDescription: "Premium residential and commercial cleaning services. We specialize in deep cleaning, move-in/move-out, and recurring maintenance programs.",
+  companyPhotos: [
+    "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&q=80",
+    "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80",
+    "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80",
+    "https://images.unsplash.com/photo-1527515637462-cee1235c1c47?w=800&q=80",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80",
+  ],
+  beforeAfterPhotos: [
+    {
+      before: "https://images.unsplash.com/photo-1585421514738-01798e348b17?w=600&q=80",
+      after: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80",
+      label: "Kitchen Deep Clean",
+    },
+    {
+      before: "https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?w=600&q=80",
+      after: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&q=80",
+      label: "Bathroom Restoration",
+    },
+  ],
+  testimonials: [
+    {
+      quote: "They transformed our office space. Incredibly thorough and professional from start to finish. Would recommend to anyone!",
+      author: "Jennifer R.",
+      role: "Office Manager",
+    },
+    {
+      quote: "Best cleaning service we've ever used. They showed up on time, were super friendly, and our house has never looked better.",
+      author: "David M.",
+      role: "Homeowner",
+    },
+    {
+      quote: "We use them weekly for our restaurant. Consistent quality every single time. A+ service.",
+      author: "Maria S.",
+      role: "Restaurant Owner",
+    },
+  ],
+  testimonial: {
+    quote: "They transformed our office space. Incredibly thorough and professional from start to finish.",
+    author: "Jennifer R.",
+    role: "Office Manager",
+  },
+};
+
+const mockVideoAssets: VideoAssetData[] = [
+  {
+    id: "demo-v1",
+    companyId: "demo",
+    title: "Why Customers Choose Us",
+    description: "Hear from real customers about their experience with Elite Cleaning Services.",
+    category: "testimonial",
+    bunnyCdnUrl: "https://iframe.mediadelivery.net/embed/demo/testimonial-1",
+    thumbnailUrl: "https://picsum.photos/seed/vid-testimonial1/400/225",
+    durationSeconds: 154,
+    isReusable: true,
+    estimateId: null,
+    totalPlays: 89,
+    createdAt: "2025-01-15T10:00:00Z",
+  },
+  {
+    id: "demo-v2",
+    companyId: "demo",
+    title: "Meet the Owner: Mike Johnson",
+    description: "A personal introduction from our founder about our mission and values.",
+    category: "intro",
+    bunnyCdnUrl: "https://iframe.mediadelivery.net/embed/demo/intro-1",
+    thumbnailUrl: "https://picsum.photos/seed/vid-intro1/400/225",
+    durationSeconds: 105,
+    isReusable: true,
+    estimateId: null,
+    totalPlays: 156,
+    createdAt: "2025-01-10T10:00:00Z",
+  },
+  {
+    id: "demo-v3",
+    companyId: "demo",
+    title: "Kitchen Renovation Case Study",
+    description: "See how we transformed this outdated kitchen into a modern masterpiece.",
+    category: "case_study",
+    bunnyCdnUrl: "https://iframe.mediadelivery.net/embed/demo/case-study-1",
+    thumbnailUrl: "https://picsum.photos/seed/vid-case1/400/225",
+    durationSeconds: 252,
+    isReusable: true,
+    estimateId: null,
+    totalPlays: 67,
+    createdAt: "2025-01-20T10:00:00Z",
+  },
+  {
+    id: "demo-v4",
+    companyId: "demo",
+    title: "Our 5-Step Process",
+    description: "Walk through our proven cleaning process from start to finish.",
+    category: "process",
+    bunnyCdnUrl: "https://iframe.mediadelivery.net/embed/demo/process-1",
+    thumbnailUrl: "https://picsum.photos/seed/vid-process1/400/225",
+    durationSeconds: 188,
+    isReusable: true,
+    estimateId: null,
+    totalPlays: 203,
+    createdAt: "2025-01-05T10:00:00Z",
+  },
+  {
+    id: "demo-v5",
+    companyId: "demo",
+    title: "Customer Success: The Williams Family",
+    description: "The Williams family shares their move-in cleaning experience.",
+    category: "testimonial",
+    bunnyCdnUrl: "https://iframe.mediadelivery.net/embed/demo/testimonial-2",
+    thumbnailUrl: "https://picsum.photos/seed/vid-testimonial2/400/225",
+    durationSeconds: 135,
+    isReusable: true,
+    estimateId: null,
+    totalPlays: 45,
+    createdAt: "2025-01-25T10:00:00Z",
+  },
+  {
+    id: "demo-v6",
+    companyId: "demo",
+    title: "Bathroom Remodel Walkthrough",
+    description: "A full walkthrough of our bathroom deep cleaning and restoration process.",
+    category: "process",
+    bunnyCdnUrl: "https://iframe.mediadelivery.net/embed/demo/process-2",
+    thumbnailUrl: "https://picsum.photos/seed/vid-process2/400/225",
+    durationSeconds: 322,
+    isReusable: true,
+    estimateId: null,
+    totalPlays: 34,
+    createdAt: "2025-02-01T10:00:00Z",
+  },
+];
+
+export const mockWidgets: CallWidget[] = [
+  { id: "reviews", type: "reviews", label: "Our Reviews" },
+  { id: "portfolio", type: "portfolio", label: "Our Work" },
+  {
+    id: "video",
+    type: "video",
+    label: "Videos",
+    showAllLibraryVideos: true,
+    videoAssets: mockVideoAssets,
+  },
+  {
+    id: "process",
+    type: "process",
+    label: "Our Process",
+    processSteps: [
+      {
+        title: "Free Consultation",
+        description: "We start with a quick video call (like this one!) to understand your needs, walk through the space, and answer any questions.",
+        imageUrl: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80",
+      },
+      {
+        title: "Custom Quote",
+        description: "Within 24 hours, you'll receive a detailed estimate broken down by room and service type. No hidden fees, ever.",
+      },
+      {
+        title: "Schedule & Prep",
+        description: "Pick a date that works for you. We'll send a checklist so you know exactly what to expect on cleaning day.",
+        imageUrl: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=600&q=80",
+      },
+      {
+        title: "The Clean",
+        description: "Our certified team arrives on time with all professional-grade supplies. We work room by room following our quality checklist.",
+        imageUrl: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80",
+      },
+      {
+        title: "Final Walkthrough",
+        description: "We do a final inspection together. If anything isn't perfect, we fix it on the spot. 100% satisfaction guaranteed.",
+      },
+    ],
+  },
+  {
+    id: "faq",
+    type: "faq",
+    label: "FAQ",
+    faqs: [
+      { question: "What's included in a deep clean?", answer: "Our deep clean covers all surfaces, appliances (inside and out), baseboards, light fixtures, and more. We use eco-friendly, professional-grade products." },
+      { question: "Do I need to be home?", answer: "Not at all! Many clients give us a key or access code. We're fully insured and all team members pass background checks." },
+      { question: "How long does a typical clean take?", answer: "A standard home takes 2-4 hours depending on size. Deep cleans and move-out cleans may take 4-6 hours." },
+      { question: "What if I'm not satisfied?", answer: "We have a 100% satisfaction guarantee. If anything isn't right, we'll come back within 24 hours to fix it at no extra charge." },
+    ],
+  },
+  { id: "estimate", type: "estimate", label: "Your Estimate" },
+];
+
+export const brand = {
+  companyName: "Elite Cleaning Services",
+  logoUrl: null as string | null,
+  primaryColor: "#2563eb",
+};

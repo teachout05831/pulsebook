@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dispatch Map - Popup Card (Google Maps Style)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; background: #f3f4f6; }
+
+  /* ── Header ── */
+  .header {
+    height: 44px; background: #fff; border-bottom: 1px solid #e5e7eb;
+    display: flex; align-items: center; padding: 0 12px; gap: 8px;
+    position: relative; z-index: 30;
+  }
+  .header h1 { font-size: 14px; font-weight: 700; color: #111827; }
+  .sep { width: 1px; height: 20px; background: #e5e7eb; }
+  .date-nav { display: flex; align-items: center; gap: 4px; }
+  .date-nav button { background: none; border: none; cursor: pointer; font-size: 14px; color: #6b7280; padding: 2px 6px; border-radius: 4px; }
+  .date-nav span { font-size: 13px; font-weight: 500; color: #374151; }
+  .day-badge { font-size: 11px; background: #e5e7eb; color: #374151; padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+  .stat-dots { display: flex; gap: 4px; }
+  .stat-dot { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #374151; padding: 2px 6px; border-radius: 4px; }
+  .stat-dot .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+
+  /* ── Map (fills remaining space) ── */
+  .map-wrapper {
+    height: calc(100vh - 44px);
+    display: flex; overflow: hidden;
+  }
+
+  .map-canvas {
+    flex: 1; position: relative;
+    background: linear-gradient(135deg, #dce8d0 0%, #e2dcc8 30%, #ddd8c6 50%, #d5ddd0 70%, #e0e4d6 100%);
+  }
+  .map-roads { position: absolute; inset: 0; opacity: 0.12; }
+  .area-label { position: absolute; font-weight: 500; letter-spacing: 1.5px; color: #777; font-size: 11px; }
+
+  /* ── Map Pins ── */
+  .map-pin {
+    position: absolute; cursor: pointer;
+    transition: transform 0.2s ease; z-index: 2;
+  }
+  .map-pin:hover { transform: scale(1.15); z-index: 5; }
+  .map-pin.selected { transform: scale(1.25); z-index: 10; }
+  .pin-svg { width: 30px; height: 36px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)); }
+  .pin-num {
+    position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .pin-hover-tip {
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: #fff; padding: 4px 8px; border-radius: 4px;
+    font-size: 10px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity 0.15s;
+  }
+  .map-pin:hover .pin-hover-tip { opacity: 1; }
+  .map-pin.selected .pin-hover-tip { opacity: 0; }
+
+  /* ── Popup Card (Google Maps style) ── */
+  .popup-card {
+    position: absolute;
+    width: 340px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.05);
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    overflow: hidden;
+  }
+  .popup-card.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+  }
+  /* Arrow pointing down to pin */
+  .popup-arrow {
+    position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+    width: 16px; height: 8px;
+  }
+  .popup-arrow::after {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%) rotate(45deg);
+    width: 12px; height: 12px; background: #fff;
+    box-shadow: 3px 3px 6px rgba(0,0,0,0.1);
+  }
+
+  /* Photo carousel at top of card */
+  .popup-photos {
+    position: relative; height: 160px; background: #f3f4f6; overflow: hidden;
+  }
+  .popup-photos img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+  .photo-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.9); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #374151;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: background 0.15s;
+  }
+  .photo-nav:hover { background: #fff; }
+  .photo-nav.prev { left: 8px; }
+  .photo-nav.next { right: 8px; }
+  .photo-dots {
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 4px;
+  }
+  .photo-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.5); transition: background 0.2s;
+  }
+  .photo-dot.active { background: #fff; }
+  .photo-counter {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,0.6); color: #fff;
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 500;
+  }
+  .photo-expand {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(0,0,0,0.6); color: #fff; border: none;
+    width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .photo-expand:hover { background: rgba(0,0,0,0.8); }
+
+  /* No photos state */
+  .popup-no-photos {
+    height: 80px; background: #f9fafb; display: flex;
+    align-items: center; justify-content: center; gap: 6px;
+    color: #9ca3af; font-size: 12px;
+  }
+
+  /* Card body */
+  .popup-body { padding: 12px 14px; }
+  .popup-title { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 2px; }
+  .popup-subtitle { font-size: 12px; color: #6b7280; line-height: 1.3; margin-bottom: 10px; }
+
+  .popup-info-row {
+    display: flex; align-items: flex-start; gap: 6px;
+    font-size: 12px; color: #4b5563; margin-bottom: 5px;
+  }
+  .popup-icon { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; color: #9ca3af; }
+
+  .popup-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+  .popup-tag {
+    font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 99px;
+  }
+  .tag-status { background: #dbeafe; color: #1d4ed8; }
+  .tag-priority { background: #e0e7ff; color: #4338ca; }
+  .tag-tech { color: #fff; }
+
+  /* Card footer actions */
+  .popup-actions {
+    display: flex; gap: 4px; padding: 8px 14px; border-top: 1px solid #f3f4f6;
+  }
+  .popup-action {
+    flex: 1; padding: 7px 8px; font-size: 11px; font-weight: 600;
+    border-radius: 6px; cursor: pointer; border: none; text-align: center;
+    transition: background 0.15s;
+  }
+  .action-view { background: #2563eb; color: #fff; }
+  .action-view:hover { background: #1d4ed8; }
+  .action-status { background: #f3f4f6; color: #374151; }
+  .action-status:hover { background: #e5e7eb; }
+  .action-nav { background: #f3f4f6; color: #374151; }
+  .action-nav:hover { background: #e5e7eb; }
+
+  .popup-close {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,0.5); border: none; cursor: pointer;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; z-index: 5;
+    transition: background 0.15s;
+  }
+  .popup-close:hover { background: rgba(0,0,0,0.7); }
+
+  /* ── Sidebar job list ── */
+  .sidebar {
+    width: 250px; background: #fff; border-left: 1px solid #e5e7eb;
+    overflow-y: auto; flex-shrink: 0;
+  }
+  .sidebar-title { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; }
+  .sg-header { display: flex; align-items: center; gap: 6px; padding: 5px 12px; background: #fafafa; border-bottom: 1px solid #f3f4f6; }
+  .sg-color { width: 10px; height: 10px; border-radius: 2px; }
+  .sg-name { font-size: 11px; font-weight: 600; }
+  .sg-count { font-size: 10px; color: #9ca3af; margin-left: auto; }
+  .sj-item {
+    display: flex; align-items: center; gap: 8px; padding: 7px 12px;
+    border-bottom: 1px solid #f9fafb; cursor: pointer; transition: background 0.1s;
+  }
+  .sj-item:hover { background: #f9fafb; }
+  .sj-item.active { background: #eff6ff; }
+  .sj-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .sj-info { flex: 1; min-width: 0; }
+  .sj-title { font-size: 12px; font-weight: 500; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sj-addr { font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sj-time { font-size: 10px; color: #b0b0b0; }
+
+  /* Map controls */
+  .map-zoom {
+    position: absolute; bottom: 16px; right: 16px; background: #fff;
+    border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); overflow: hidden; z-index: 5;
+  }
+  .map-zoom button { display: block; width: 32px; height: 32px; border: none; background: #fff; cursor: pointer; font-size: 16px; color: #374151; border-bottom: 1px solid #e5e7eb; }
+  .map-zoom button:last-child { border-bottom: none; }
+  .map-zoom button:hover { background: #f3f4f6; }
+
+  .map-legend {
+    position: absolute; bottom: 16px; left: 16px;
+    background: #fff; padding: 8px 12px; border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 10px; z-index: 5;
+  }
+  .legend-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .legend-row:last-child { margin-bottom: 0; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+    display: none; align-items: center; justify-content: center; z-index: 200;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 90%; max-height: 85vh; border-radius: 8px; }
+  .lb-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+  .lb-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); border: none; color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+  .lb-nav.prev { left: 16px; }
+  .lb-nav.next { right: 16px; }
+
+  .banner {
+    position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+    background: #fef3c7; color: #92400e; padding: 4px 14px;
+    border-radius: 0 0 6px 6px; font-size: 11px; font-weight: 600; z-index: 60;
+  }
+</style>
+</head>
+<body>
+
+<div class="banner">MOCKUP — Click a map pin or sidebar job to see the popup card</div>
+
+<!-- Header -->
+<div class="header">
+  <h1>Dispatch</h1><div class="sep"></div>
+  <div class="date-nav">
+    <button>‹</button><button>›</button>
+    <span>Monday, February 9, 2026</span>
+    <span class="day-badge">Day</span>
+  </div>
+  <div class="sep"></div>
+  <div class="stat-dots">
+    <div class="stat-dot"><div class="dot" style="background:#ef4444;"></div>2</div>
+    <div class="stat-dot"><div class="dot" style="background:#3b82f6;"></div>4</div>
+    <div class="stat-dot"><div class="dot" style="background:#eab308;"></div>1</div>
+    <div class="stat-dot"><div class="dot" style="background:#22c55e;"></div>1</div>
+  </div>
+  <div class="header-right">
+    <span style="font-size:12px;color:#6b7280;">View:</span>
+    <button style="display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-weight:500;background:#fff;cursor:pointer;">🗺 Technician + Map ▾</button>
+  </div>
+</div>
+
+<!-- Map + Sidebar -->
+<div class="map-wrapper">
+  <div class="map-canvas" id="mapCanvas">
+    <svg class="map-roads" style="width:100%;height:100%;">
+      <line x1="0" y1="28%" x2="100%" y2="30%" stroke="#888" stroke-width="2.5"/>
+      <line x1="0" y1="55%" x2="100%" y2="57%" stroke="#888" stroke-width="2"/>
+      <line x1="0" y1="78%" x2="100%" y2="75%" stroke="#888" stroke-width="1.5"/>
+      <line x1="22%" y1="0" x2="24%" y2="100%" stroke="#888" stroke-width="2"/>
+      <line x1="48%" y1="0" x2="45%" y2="100%" stroke="#888" stroke-width="2.5"/>
+      <line x1="72%" y1="0" x2="74%" y2="100%" stroke="#888" stroke-width="1.5"/>
+      <line x1="88%" y1="0" x2="86%" y2="100%" stroke="#888" stroke-width="1.5"/>
+    </svg>
+    <div class="area-label" style="top:14%;left:42%;">SCOTTSDALE</div>
+    <div class="area-label" style="top:62%;left:52%;">TEMPE</div>
+    <div class="area-label" style="top:38%;left:12%;font-size:12px;">PHOENIX</div>
+    <div class="area-label" style="top:28%;left:62%;font-size:10px;color:#999;">Paradise Valley</div>
+
+    <!-- ═══ Pins ═══ -->
+    <div class="map-pin" id="pin1" style="top:18%;left:45%;" onclick="selectPin(1)">
+      <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#2563eb"/></svg>
+      <span class="pin-num">1</span>
+      <div class="pin-hover-tip">AC Unit Repair — Adam R.</div>
+    </div>
+    <div class="map-pin" id="pin2" style="top:36%;left:32%;" onclick="selectPin(2)">
+      <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#2563eb"/></svg>
+      <span class="pin-num">2</span>
+      <div class="pin-hover-tip">Duct Clean — Adam R.</div>
+    </div>
+    <div class="map-pin" id="pin3" style="top:52%;left:55%;" onclick="selectPin(3)">
+      <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#2563eb"/></svg>
+      <span class="pin-num">3</span>
+      <div class="pin-hover-tip">Filter Replace — Adam R.</div>
+    </div>
+    <div class="map-pin" id="pin4" style="top:40%;left:65%;" onclick="selectPin(4)">
+      <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#16a34a"/></svg>
+      <span class="pin-num">1</span>
+      <div class="pin-hover-tip">Electrical Insp. — John S.</div>
+    </div>
+    <div class="map-pin" id="pin5" style="top:22%;left:72%;" onclick="selectPin(5)">
+      <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#16a34a"/></svg>
+      <span class="pin-num">2</span>
+      <div class="pin-hover-tip">Window Repair — John S.</div>
+    </div>
+    <div class="map-pin" id="pin6" style="top:68%;left:38%;" onclick="selectPin(6)">
+      <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#dc2626"/></svg>
+      <span class="pin-num">1</span>
+      <div class="pin-hover-tip">Roof Inspection — Jimmy G.</div>
+    </div>
+    <div class="map-pin" id="pin7" style="top:75%;left:58%;" onclick="selectPin(7)">
+      <svg class="pin-svg" viewBox="0 0 30 36"><path d="M15 0C6.7 0 0 6.7 0 15c0 11.2 15 21 15 21s15-9.8 15-21C30 6.7 23.3 0 15 0z" fill="#6b7280"/></svg>
+      <span class="pin-num">?</span>
+      <div class="pin-hover-tip">HVAC Maintenance — Unassigned</div>
+    </div>
+
+    <!-- ═══ Popup Card (positioned above selected pin) ═══ -->
+    <div class="popup-card" id="popupCard">
+      <button class="popup-close" onclick="closePopup()">✕</button>
+
+      <!-- Photo carousel -->
+      <div class="popup-photos" id="popupPhotos">
+        <img id="popupImg" src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=200&fit=crop" />
+        <button class="photo-nav prev" onclick="navPhoto(-1)">‹</button>
+        <button class="photo-nav next" onclick="navPhoto(1)">›</button>
+        <div class="photo-dots" id="photoDots">
+          <div class="photo-dot active"></div>
+          <div class="photo-dot"></div>
+          <div class="photo-dot"></div>
+          <div class="photo-dot"></div>
+          <div class="photo-dot"></div>
+        </div>
+        <div class="photo-counter" id="photoCounter">1 / 5</div>
+        <button class="photo-expand" onclick="openLB(currentPhoto)" title="View full size">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
+      </div>
+
+      <!-- Card body -->
+      <div class="popup-body">
+        <div class="popup-title" id="popupTitle">AC Unit Repair</div>
+        <div class="popup-subtitle" id="popupDesc">Central AC not cooling properly. Customer reports warm air.</div>
+
+        <div class="popup-info-row">
+          <svg class="popup-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="popupCustomer"><strong>Adam Richardson</strong> · (480) 555-1234</span>
+        </div>
+        <div class="popup-info-row">
+          <svg class="popup-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="popupAddr">4521 E Cactus Rd, Scottsdale, AZ 85254</span>
+        </div>
+        <div class="popup-info-row">
+          <svg class="popup-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="popupTime">Today at 07:00 · 90 min</span>
+        </div>
+
+        <div class="popup-tags" id="popupTags">
+          <span class="popup-tag tag-status">Scheduled</span>
+          <span class="popup-tag tag-priority">Normal</span>
+          <span class="popup-tag tag-tech" id="techTag" style="background:#2563eb;">Adam R.</span>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="popup-actions">
+        <button class="popup-action action-view" onclick="alert('Opens full job page')">View Job</button>
+        <button class="popup-action action-status">Status ▾</button>
+        <button class="popup-action action-nav">Navigate ↗</button>
+      </div>
+
+      <div class="popup-arrow"></div>
+    </div>
+
+    <!-- Map controls -->
+    <div class="map-zoom"><button>+</button><button>−</button></div>
+    <div class="map-legend">
+      <div class="legend-row"><div class="legend-dot" style="background:#2563eb;"></div>Adam R. (3)</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#16a34a;"></div>John S. (2)</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#dc2626;"></div>Jimmy G. (1)</div>
+      <div class="legend-row"><div class="legend-dot" style="background:#6b7280;"></div>Unassigned (2)</div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-title">Today's Jobs (8)</div>
+    <div class="sg-header"><div class="sg-color" style="background:#2563eb;"></div><span class="sg-name" style="color:#2563eb;">Adam R.</span><span class="sg-count">3 jobs</span></div>
+    <div class="sj-item" id="sj1" onclick="selectPin(1)"><div class="sj-num" style="background:#2563eb;">1</div><div class="sj-info"><div class="sj-title">AC Unit Repair</div><div class="sj-addr">4521 E Cactus Rd</div><div class="sj-time">07:00</div></div></div>
+    <div class="sj-item" id="sj2" onclick="selectPin(2)"><div class="sj-num" style="background:#2563eb;">2</div><div class="sj-info"><div class="sj-title">Duct Clean</div><div class="sj-addr">1234 N Hayden Rd</div><div class="sj-time">09:00</div></div></div>
+    <div class="sj-item" id="sj3" onclick="selectPin(3)"><div class="sj-num" style="background:#2563eb;">3</div><div class="sj-info"><div class="sj-title">Filter Replace</div><div class="sj-addr">789 E Indian School</div><div class="sj-time">13:00</div></div></div>
+    <div class="sg-header"><div class="sg-color" style="background:#16a34a;"></div><span class="sg-name" style="color:#16a34a;">John Smith</span><span class="sg-count">2 jobs</span></div>
+    <div class="sj-item" id="sj4" onclick="selectPin(4)"><div class="sj-num" style="background:#16a34a;">1</div><div class="sj-info"><div class="sj-title">Electrical Insp.</div><div class="sj-addr">555 W Camelback Rd</div><div class="sj-time">08:30</div></div></div>
+    <div class="sj-item" id="sj5" onclick="selectPin(5)"><div class="sj-num" style="background:#16a34a;">2</div><div class="sj-info"><div class="sj-title">Window Repair</div><div class="sj-addr">321 E Paradise Ln</div><div class="sj-time">12:00</div></div></div>
+    <div class="sg-header"><div class="sg-color" style="background:#dc2626;"></div><span class="sg-name" style="color:#dc2626;">Jimmy G.</span><span class="sg-count">1 job</span></div>
+    <div class="sj-item" id="sj6" onclick="selectPin(6)"><div class="sj-num" style="background:#dc2626;">1</div><div class="sj-info"><div class="sj-title">Roof Inspection</div><div class="sj-addr">999 S Mill Ave</div><div class="sj-time">10:00</div></div></div>
+    <div class="sg-header"><div class="sg-color" style="background:#6b7280;"></div><span class="sg-name" style="color:#6b7280;">Unassigned</span><span class="sg-count">2 jobs</span></div>
+    <div class="sj-item" id="sj7" onclick="selectPin(7)"><div class="sj-num" style="background:#6b7280;">?</div><div class="sj-info"><div class="sj-title">HVAC Maintenance</div><div class="sj-addr">456 W McDowell</div><div class="sj-time">—</div></div></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLB()">
+  <button class="lb-close" onclick="closeLB()">✕</button>
+  <button class="lb-nav prev" onclick="event.stopPropagation(); navLB(-1)">‹</button>
+  <img id="lbImg" src="" onclick="event.stopPropagation()" />
+  <button class="lb-nav next" onclick="event.stopPropagation(); navLB(1)">›</button>
+</div>
+
+<script>
+const photos = [
+  'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=600&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1631545806609-3c480a498e26?w=600&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=600&h=300&fit=crop',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=300&fit=crop',
+];
+const fullPhotos = [
+  'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=1200&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1631545806609-3c480a498e26?w=1200&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=1200&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&h=800&fit=crop',
+];
+
+let currentPhoto = 0;
+let selectedPin = null;
+
+function selectPin(id) {
+  // Deselect previous
+  document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('.sj-item').forEach(s => s.classList.remove('active'));
+
+  // Select
+  const pin = document.getElementById('pin' + id);
+  const sj = document.getElementById('sj' + id);
+  if (pin) pin.classList.add('selected');
+  if (sj) sj.classList.add('active');
+  selectedPin = id;
+
+  // Position popup above the pin
+  const popup = document.getElementById('popupCard');
+  const pinRect = pin.getBoundingClientRect();
+  const mapRect = document.getElementById('mapCanvas').getBoundingClientRect();
+
+  // Calculate position relative to map
+  let left = pinRect.left - mapRect.left + pinRect.width / 2 - 170; // center the 340px card
+  let top = pinRect.top - mapRect.top - 10; // above the pin
+
+  // Keep within bounds
+  if (left < 10) left = 10;
+  if (left + 340 > mapRect.width - 10) left = mapRect.width - 350;
+
+  // If too close to top, show below pin instead
+  const cardHeight = 420;
+  if (top < cardHeight + 20) {
+    top = pinRect.top - mapRect.top + pinRect.height + 12;
+    popup.querySelector('.popup-arrow').style.display = 'none';
+  } else {
+    top = top - cardHeight;
+    popup.querySelector('.popup-arrow').style.display = 'block';
+  }
+
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+
+  // Reset photo carousel
+  currentPhoto = 0;
+  updatePhoto();
+
+  // Open with animation
+  popup.classList.add('open');
+
+  // Scroll sidebar item into view
+  if (sj) sj.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closePopup() {
+  document.getElementById('popupCard').classList.remove('open');
+  document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('.sj-item').forEach(s => s.classList.remove('active'));
+  selectedPin = null;
+}
+
+function navPhoto(dir) {
+  event.stopPropagation();
+  currentPhoto = (currentPhoto + dir + photos.length) % photos.length;
+  updatePhoto();
+}
+
+function updatePhoto() {
+  document.getElementById('popupImg').src = photos[currentPhoto];
+  document.getElementById('photoCounter').textContent = (currentPhoto + 1) + ' / ' + photos.length;
+  document.querySelectorAll('.photo-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === currentPhoto);
+  });
+}
+
+function openLB(i) {
+  document.getElementById('lbImg').src = fullPhotos[i];
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLB() { document.getElementById('lightbox').classList.remove('open'); }
+function navLB(d) {
+  currentPhoto = (currentPhoto + d + photos.length) % photos.length;
+  document.getElementById('lbImg').src = fullPhotos[currentPhoto];
+}
+
+// Close popup when clicking map background
+document.getElementById('mapCanvas').addEventListener('click', function(e) {
+  if (e.target === this || e.target.closest('.map-roads') || e.target.closest('.area-label')) {
+    closePopup();
+  }
+});
+</script>
+
+</body>
+</html>

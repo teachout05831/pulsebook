@@ -1,0 +1,2902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDL — Integration Walkthrough</title>
+  <style>
+    :root {
+      --sidebar-bg: #0f172a;
+      --sidebar-border: #1e293b;
+      --sidebar-text: #94a3b8;
+      --sidebar-active: rgba(37,99,235,0.2);
+      --sidebar-active-text: #fff;
+      --sidebar-active-border: #3b82f6;
+      --main-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --primary-light: rgba(59,130,246,0.1);
+      --green: #22c55e;
+      --green-light: rgba(34,197,94,0.1);
+      --amber: #f59e0b;
+      --amber-light: rgba(245,158,11,0.1);
+      --red: #ef4444;
+      --red-light: rgba(239,68,68,0.1);
+      --purple: #7c3aed;
+      --purple-light: rgba(124,58,237,0.1);
+      --orange: #ea580c;
+      --orange-light: rgba(234,88,12,0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1a1040 100%);
+      padding: 48px 32px;
+      text-align: center;
+      border-bottom: 1px solid var(--sidebar-border);
+    }
+    .page-header h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .page-header p { color: var(--sidebar-text); font-size: 1rem; max-width: 600px; margin: 0 auto; }
+    .step-badge {
+      display: inline-block; padding: 3px 12px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(124,58,237,0.15));
+      color: #a78bfa; border: 1px solid rgba(124,58,237,0.3);
+    }
+
+    /* ===== STEP NAV ===== */
+    .step-nav {
+      display: flex; justify-content: center; gap: 4px;
+      padding: 14px 20px; background: #1e293b;
+      border-bottom: 1px solid #334155;
+      position: sticky; top: 0; z-index: 100; flex-wrap: wrap;
+    }
+    .step-btn {
+      padding: 7px 16px; border: 1px solid transparent; border-radius: 8px;
+      background: transparent; color: var(--sidebar-text); font-size: 0.78rem;
+      font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .step-btn:hover { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+    .step-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* ===== STEP CONTENT ===== */
+    .step { display: none; }
+    .step.active { display: block; }
+    .step-inner { max-width: 1100px; margin: 0 auto; padding: 40px 24px 60px; }
+    .step-title-area { text-align: center; margin-bottom: 36px; }
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--primary); color: #fff; font-size: 0.9rem;
+      font-weight: 700; margin-bottom: 12px;
+    }
+    .step-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .step-subtitle { color: var(--sidebar-text); font-size: 0.95rem; }
+
+    /* Annotations */
+    .annotation {
+      background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 10px; padding: 14px 18px; margin: 20px 0;
+      font-size: 0.85rem; color: #cbd5e1;
+    }
+    .annotation strong { color: #60a5fa; }
+    .annotation-green { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); }
+    .annotation-green strong { color: #4ade80; }
+    .annotation-amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+    .annotation-amber strong { color: #fbbf24; }
+    .annotation-purple { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.2); }
+    .annotation-purple strong { color: #a78bfa; }
+    .annotation-red { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+    .annotation-red strong { color: #f87171; }
+
+    /* ===== APP FRAME ===== */
+    .app-frame {
+      background: var(--main-bg); border-radius: 12px; overflow: hidden;
+      border: 1px solid #334155; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .app-frame-bar {
+      background: #1e293b; padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ef4444; }
+    .dot-y { background: #f59e0b; }
+    .dot-g { background: #22c55e; }
+    .app-frame-url {
+      flex: 1; text-align: center; font-size: 0.7rem; color: #64748b; font-family: monospace;
+    }
+
+    /* ===== SIDEBAR MOCKUP ===== */
+    .mock-app { display: flex; min-height: 520px; }
+    .mock-sidebar {
+      width: 220px; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border);
+      padding: 0; flex-shrink: 0; display: flex; flex-direction: column;
+    }
+    .mock-sidebar-logo {
+      padding: 14px 16px; border-bottom: 1px solid var(--sidebar-border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .mock-logo-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 0.8rem;
+    }
+    .mock-logo-text { color: #fff; font-size: 0.95rem; font-weight: 600; }
+    .mock-nav { padding: 12px 8px; flex: 1; overflow-y: auto; }
+    .mock-nav-section {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #475569; padding: 12px 10px 4px;
+    }
+    .mock-nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 8px; font-size: 0.8rem;
+      color: var(--sidebar-text); cursor: default;
+      border-left: 3px solid transparent; margin-bottom: 1px;
+    }
+    .mock-nav-item.active {
+      background: var(--sidebar-active); color: var(--sidebar-active-text);
+      border-left-color: var(--sidebar-active-border);
+    }
+    .mock-nav-icon { font-size: 0.85rem; width: 18px; text-align: center; }
+
+    /* ===== MAIN CONTENT ===== */
+    .mock-main { flex: 1; background: var(--main-bg); overflow: hidden; }
+    .mock-content { padding: 24px 32px; }
+    .mock-page-title { font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .mock-page-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; }
+
+    /* ===== SETTINGS LAYOUT ===== */
+    .mock-settings-layout { display: flex; min-height: 520px; }
+    .mock-settings-sidebar {
+      width: 220px; background: #fff; border-right: 1px solid var(--border); flex-shrink: 0;
+    }
+    .mock-settings-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      font-size: 1rem; font-weight: 700; color: var(--text);
+    }
+    .mock-settings-nav { padding: 16px 10px; }
+    .mock-settings-section-label {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted); padding: 10px 10px 4px;
+    }
+    .mock-settings-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 8px; font-size: 0.8rem;
+      color: #334155; cursor: default; margin-bottom: 1px;
+    }
+    .mock-settings-item.active {
+      background: rgba(59,130,246,0.08); color: var(--primary-dark); font-weight: 500;
+    }
+    .mock-settings-item .s-icon { font-size: 0.8rem; width: 18px; text-align: center; }
+    .mock-settings-content { flex: 1; padding: 28px 36px; overflow-y: auto; }
+
+    /* ===== CARDS ===== */
+    .mock-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden; margin-bottom: 12px;
+    }
+    .mock-card-header {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .mock-card-title { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+    .mock-card-body { padding: 12px 14px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 6px; font-size: 0.78rem;
+      font-weight: 500; border: 1px solid; cursor: default; white-space: nowrap;
+    }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-outline { background: #fff; color: var(--text); border-color: var(--border); }
+    .btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
+    .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .btn-amber { background: var(--amber); color: #fff; border-color: var(--amber); }
+    .btn-purple { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .btn-orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .btn-sm { padding: 4px 10px; font-size: 0.72rem; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; font-weight: 600;
+    }
+    .badge-blue { background: var(--primary-light); color: var(--primary-dark); }
+    .badge-green { background: var(--green-light); color: #16a34a; }
+    .badge-amber { background: var(--amber-light); color: #b45309; }
+    .badge-red { background: var(--red-light); color: var(--red); }
+    .badge-purple { background: var(--purple-light); color: var(--purple); }
+    .badge-gray { background: #f1f5f9; color: var(--text-muted); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .badge-live { background: var(--red); color: #fff; }
+    .badge-live .badge-dot { background: #fff; animation: pulse 1s infinite; }
+    .ai-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 12px;
+      background: linear-gradient(135deg, #dbeafe, #ede9fe);
+      font-size: 0.6rem; font-weight: 600; color: var(--purple);
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* Toggle */
+    .toggle {
+      width: 36px; height: 20px; border-radius: 10px; background: #cbd5e1;
+      position: relative; cursor: pointer; transition: 0.2s; flex-shrink: 0;
+    }
+    .toggle.on { background: var(--primary); }
+    .toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: 0.2s;
+    }
+    .toggle.on::after { left: 18px; }
+
+    /* Arrows */
+    .arrow-down { text-align: center; padding: 16px 0; font-size: 1.5rem; color: #475569; }
+
+    /* ===== PIPELINE ===== */
+    .pipeline-row {
+      display: flex; align-items: flex-start; gap: 0; justify-content: center;
+      flex-wrap: wrap; padding: 20px;
+    }
+    .pipe-step {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; width: 120px;
+    }
+    .pipe-icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 8px;
+    }
+    .pipe-step.done .pipe-icon { background: var(--green-light); border: 2px solid var(--green); }
+    .pipe-step.active .pipe-icon {
+      background: var(--primary-light); border: 2px solid var(--primary);
+      animation: pulseBox 2s infinite;
+    }
+    .pipe-step.pending .pipe-icon { background: #f1f5f9; border: 2px solid #cbd5e1; }
+    @keyframes pulseBox { 0%,100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.3); } 50% { box-shadow: 0 0 0 8px rgba(37,99,235,0); } }
+    .pipe-label { font-size: 0.72rem; font-weight: 600; color: #e2e8f0; }
+    .pipe-service { font-size: 0.6rem; color: #64748b; margin-top: 2px; }
+    .pipe-arrow { display: flex; align-items: center; margin-top: 14px; color: #475569; font-size: 16px; }
+    .pipe-arrow.done { color: var(--green); }
+
+    /* ===== DETAIL 3-COL ===== */
+    .mock-detail { display: grid; grid-template-columns: 230px 1fr 280px; gap: 12px; padding: 16px; min-height: 420px; }
+
+    /* ===== VIDEO CALL ===== */
+    .call-layout {
+      display: grid; grid-template-columns: 1fr 360px; gap: 0;
+      min-height: 480px; background: #111827; border-radius: 10px; overflow: hidden;
+    }
+    .call-video-area { position: relative; display: flex; flex-direction: column; }
+    .call-main-video {
+      flex: 1; background: #0a0a0a; display: flex; align-items: center;
+      justify-content: center; position: relative; min-height: 300px;
+    }
+    .call-timer {
+      color: rgba(255,255,255,0.6); font-size: 12px; font-family: monospace;
+      position: absolute; top: 12px; left: 12px;
+      background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 4px;
+    }
+    .call-rec {
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 4px;
+      display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--red);
+    }
+    .call-rec .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: pulse 1s infinite; }
+    .person-icon { font-size: 48px; opacity: 0.2; color: #fff; }
+    .call-pip {
+      position: absolute; bottom: 16px; right: 16px;
+      width: 160px; height: 110px; background: #1a1a2e; border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pip-person { font-size: 24px; opacity: 0.3; color: #fff; }
+    .pip-label {
+      position: absolute; bottom: 6px; left: 8px;
+      background: rgba(0,0,0,0.6); color: #fff; padding: 2px 8px;
+      border-radius: 4px; font-size: 10px;
+    }
+    .call-controls {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; padding: 14px; background: rgba(0,0,0,0.5);
+    }
+    .call-btn {
+      width: 42px; height: 42px; border-radius: 50%; border: none;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: 0.15s;
+    }
+    .call-btn-default { background: rgba(255,255,255,0.12); color: #fff; }
+    .call-btn-end { background: var(--red); color: #fff; width: 48px; height: 48px; }
+    .call-btn-action {
+      background: var(--green); color: #fff; padding: 0 16px; width: auto;
+      border-radius: 20px; font-size: 12px; font-weight: 600; gap: 6px;
+    }
+
+    /* Side panel */
+    .side-panel {
+      background: #111827; border-left: 1px solid rgba(255,255,255,0.08);
+      display: flex; flex-direction: column; color: #fff; overflow-y: auto;
+    }
+    .side-panel-header {
+      padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .side-panel-header h3 { font-size: 0.85rem; font-weight: 600; }
+
+    /* Transcript entries */
+    .transcript-entry {
+      padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex; gap: 8px;
+    }
+    .te-time { font-size: 0.6rem; color: var(--primary); font-family: monospace; white-space: nowrap; padding-top: 2px; }
+    .te-speaker { font-size: 0.65rem; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 1px; }
+    .te-text { font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.4; }
+    .te-highlight { background: rgba(245,158,11,0.2); padding: 0 3px; border-radius: 2px; color: #fbbf24; }
+
+    /* Quick Estimate widget */
+    .widget-section { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .widget-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; font-size: 0.72rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .widget-item-name { color: rgba(255,255,255,0.7); }
+    .widget-item-price { color: var(--green); font-family: monospace; font-weight: 600; }
+    .widget-footer {
+      padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.2); margin-top: auto;
+    }
+
+    /* ===== CUSTOMER VIEW ===== */
+    .customer-layout {
+      display: flex; flex-direction: column; min-height: 520px;
+      background: #111827; border-radius: 10px; overflow: hidden;
+    }
+    .customer-video-small {
+      height: 180px; background: #0a0a0a; position: relative;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .customer-estimate-area { flex: 1; overflow-y: auto; background: #fff; }
+
+    /* ===== POST CALL ===== */
+    .postcall-overlay {
+      min-height: 480px; background: #111827; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .postcall-card {
+      background: #fff; border-radius: 16px; padding: 40px; max-width: 520px;
+      width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    /* ===== REVIEW PAGE ===== */
+    .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .review-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .review-tab {
+      padding: 8px 16px; font-size: 0.78rem; font-weight: 500;
+      cursor: pointer; color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+    }
+    .review-tab.active { color: var(--primary-dark); border-bottom-color: var(--primary); }
+
+    /* ===== BUILDER ===== */
+    .mock-builder { display: flex; flex-direction: column; min-height: 480px; }
+    .mock-builder-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid var(--border); background: #fff;
+    }
+    .mock-builder-body { display: flex; flex: 1; overflow: hidden; }
+    .mock-builder-left {
+      width: 200px; border-right: 1px solid var(--border);
+      background: #fff; overflow-y: auto; padding: 8px;
+    }
+    .mock-builder-center {
+      flex: 1; background: #f1f5f9; padding: 16px; overflow-y: auto;
+      display: flex; justify-content: center;
+    }
+    .mock-builder-right {
+      width: 260px; border-left: 1px solid var(--border);
+      background: #fff; overflow-y: auto; padding: 12px;
+    }
+    .section-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 8px; border-radius: 6px; font-size: 0.72rem;
+      color: var(--text); margin-bottom: 2px; position: relative;
+    }
+    .section-item:hover { background: #f8fafc; }
+    .section-item.selected { background: #f1f5f9; border: 1px solid rgba(59,130,246,0.3); }
+    .section-item.ai-pop::after {
+      content: ''; position: absolute; top: 4px; right: 6px;
+      width: 10px; height: 10px;
+      background: linear-gradient(135deg, #3b82f6, #7c3aed);
+      border-radius: 50%;
+    }
+    .preview-section {
+      background: #fff; border-radius: 8px; margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; position: relative;
+    }
+    .preview-section.ai-hl { outline: 2px dashed var(--primary); outline-offset: 2px; }
+    .preview-ai-tag { position: absolute; top: 6px; right: 6px; z-index: 5; }
+
+    /* ===== TABLE ===== */
+    .mock-table { width: 100%; border-collapse: collapse; }
+    .mock-table th {
+      text-align: left; padding: 8px 12px; font-size: 0.65rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted);
+      background: #f8fafc; border-bottom: 1px solid var(--border);
+    }
+    .mock-table td {
+      padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.78rem;
+    }
+
+    /* Flow diagram */
+    .flow-row {
+      display: flex; align-items: center; gap: 8px; justify-content: center;
+      padding: 12px 0; flex-wrap: wrap;
+    }
+    .flow-box {
+      padding: 8px 16px; border-radius: 8px; font-size: 0.75rem;
+      font-weight: 500; text-align: center; min-width: 120px;
+    }
+    .flow-arrow { color: #475569; font-size: 1.2rem; }
+
+    /* Two-path grid */
+    .paths-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    .path-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; overflow: hidden;
+    }
+    .path-header { padding: 12px 16px; font-size: 0.85rem; font-weight: 600; }
+    .path-body { padding: 14px 16px; font-size: 0.78rem; color: #94a3b8; line-height: 1.8; }
+
+    /* ===== SETTING ROWS ===== */
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .setting-info h4 { font-size: 0.8rem; font-weight: 500; color: var(--text); margin-bottom: 1px; }
+    .setting-info p { font-size: 0.68rem; color: var(--text-muted); }
+    .select-field {
+      padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+      font-size: 0.78rem; min-width: 200px; background: #fff;
+    }
+
+    /* ===== AI COACH ===== */
+    .stage-bar {
+      display: flex; gap: 2px; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .stage-pip {
+      flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08);
+    }
+    .stage-pip.done { background: var(--green); }
+    .stage-pip.active { background: var(--primary); animation: pulseBox 2s infinite; }
+    .stage-label {
+      padding: 4px 14px 10px; font-size: 0.65rem; color: rgba(255,255,255,0.4);
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .stage-label strong { color: #fff; font-size: 0.72rem; }
+    .coach-card {
+      margin: 8px 10px; padding: 10px 12px; border-radius: 8px;
+      border-left: 3px solid; font-size: 0.7rem; line-height: 1.5;
+    }
+    .coach-card-blue { background: rgba(59,130,246,0.1); border-color: var(--primary); }
+    .coach-card-green { background: rgba(34,197,94,0.1); border-color: var(--green); }
+    .coach-card-amber { background: rgba(245,158,11,0.1); border-color: var(--amber); }
+    .coach-card-purple { background: rgba(124,58,237,0.1); border-color: var(--purple); }
+    .coach-card-gray { background: rgba(255,255,255,0.04); border-color: #475569; }
+    .coach-card-type {
+      font-size: 0.58rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 4px;
+    }
+    .coach-card-blue .coach-card-type { color: #60a5fa; }
+    .coach-card-green .coach-card-type { color: #4ade80; }
+    .coach-card-amber .coach-card-type { color: #fbbf24; }
+    .coach-card-purple .coach-card-type { color: #a78bfa; }
+    .coach-card-gray .coach-card-type { color: #94a3b8; }
+    .coach-card-body { color: rgba(255,255,255,0.6); }
+    .coach-card-body strong { color: rgba(255,255,255,0.85); }
+    .coach-card-script {
+      background: rgba(0,0,0,0.2); border-radius: 4px; padding: 6px 8px;
+      margin-top: 6px; font-style: italic; color: rgba(255,255,255,0.5);
+    }
+    .coach-card-actions {
+      display: flex; gap: 6px; margin-top: 8px;
+    }
+    .coach-btn {
+      padding: 3px 8px; border-radius: 4px; font-size: 0.6rem;
+      font-weight: 600; cursor: pointer; border: none;
+    }
+    .coach-btn-use { background: var(--primary); color: #fff; }
+    .coach-btn-dismiss { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+    .coach-btn-more { background: transparent; color: rgba(255,255,255,0.3); }
+
+    /* Stage flow diagram (Step 9) */
+    .stage-flow {
+      display: flex; align-items: center; gap: 4px; justify-content: center;
+      flex-wrap: wrap; padding: 16px; margin: 16px 0;
+    }
+    .stage-box {
+      padding: 8px 12px; border-radius: 8px; font-size: 0.68rem;
+      font-weight: 500; text-align: center; min-width: 90px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.5);
+    }
+    .stage-box.active-stage {
+      background: var(--primary-light); border-color: var(--primary);
+      color: #60a5fa; font-weight: 600;
+    }
+    .stage-arrow { color: #475569; font-size: 0.8rem; }
+
+    /* Card type grid */
+    .card-type-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0;
+    }
+    .card-type-example {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 16px; overflow: hidden;
+    }
+    .card-type-header {
+      font-size: 0.78rem; font-weight: 600; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .mock-sidebar, .mock-settings-sidebar { display: none; }
+      .call-layout { grid-template-columns: 1fr; }
+      .review-grid { grid-template-columns: 1fr; }
+      .paths-grid { grid-template-columns: 1fr; }
+      .mock-detail { grid-template-columns: 1fr; }
+      .mock-builder-left, .mock-builder-right { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="page-header">
+  <span class="step-badge">Integration Walkthrough</span>
+  <h1>Intelligent Document Layer (IDL)</h1>
+  <p>How Daily.co call recording, transcription, and AI estimate generation integrate into ServicePro — step by step through the real UI.</p>
+</div>
+
+<!-- ===== STEP NAV ===== -->
+<div class="step-nav">
+  <button class="step-btn active" onclick="showStep('overview')">1. Overview</button>
+  <button class="step-btn" onclick="showStep('start-call')">2. Start a Call</button>
+  <button class="step-btn" onclick="showStep('live-call')">3. Live Call</button>
+  <button class="step-btn" onclick="showStep('customer-view')">4. Customer View</button>
+  <button class="step-btn" onclick="showStep('post-call')">5. Post-Call</button>
+  <button class="step-btn" onclick="showStep('review')">6. Review & Approve</button>
+  <button class="step-btn" onclick="showStep('builder')">7. Page Builder</button>
+  <button class="step-btn" onclick="showStep('settings')">8. Settings</button>
+  <button class="step-btn" onclick="showStep('ai-coach')">9. AI Coach</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 1: OVERVIEW -->
+<!-- ============================================================ -->
+<div id="step-overview" class="step active">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">1</div>
+      <div class="step-title">The Full Pipeline</div>
+      <div class="step-subtitle">Two paths from consultation call to published estimate — live close or AI auto-generate.</div>
+    </div>
+
+    <!-- Pipeline visualization -->
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 24px 12px; margin-bottom: 24px;">
+      <div class="pipeline-row">
+        <div class="pipe-step done"><div class="pipe-icon">&#128222;</div><div class="pipe-label">Call Ends</div><div class="pipe-service">Daily.co</div></div>
+        <div class="pipe-arrow done">&#8594;</div>
+        <div class="pipe-step done"><div class="pipe-icon">&#128233;</div><div class="pipe-label">Webhook</div><div class="pipe-service">recording.ready</div></div>
+        <div class="pipe-arrow done">&#8594;</div>
+        <div class="pipe-step done"><div class="pipe-icon">&#9650;</div><div class="pipe-label">Upload</div><div class="pipe-service">Bunny Stream</div></div>
+        <div class="pipe-arrow done">&#8594;</div>
+        <div class="pipe-step active"><div class="pipe-icon">&#128483;</div><div class="pipe-label">Transcribe</div><div class="pipe-service">Daily.co</div></div>
+        <div class="pipe-arrow">&#8594;</div>
+        <div class="pipe-step pending"><div class="pipe-icon">&#129302;</div><div class="pipe-label">AI Analyze</div><div class="pipe-service">Claude</div></div>
+        <div class="pipe-arrow">&#8594;</div>
+        <div class="pipe-step pending"><div class="pipe-icon">&#128196;</div><div class="pipe-label">Draft</div><div class="pipe-service">Estimate + Page</div></div>
+        <div class="pipe-arrow">&#8594;</div>
+        <div class="pipe-step pending"><div class="pipe-icon">&#9989;</div><div class="pipe-label">Review</div><div class="pipe-service">Dashboard</div></div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Pricing:</strong> Daily.co transcription costs $0.0059/min (live) or $0.0043/min (post-call). For a 30-min call with 2 participants, that's ~$0.35 live or ~$0.13 post-call. Recordings upload to your existing Bunny Stream CDN for playback.
+    </div>
+
+    <!-- Two paths -->
+    <div class="paths-grid">
+      <div class="path-card">
+        <div class="path-header" style="background: rgba(234,88,12,0.1); color: #fb923c;">&#9889; Path A: Live Close (During Call)</div>
+        <div class="path-body">
+          <strong style="color: #e2e8f0;">1.</strong> Rep opens Estimate widget during video call<br>
+          <strong style="color: #e2e8f0;">2.</strong> Quick-adds services from your Service Catalog<br>
+          <strong style="color: #e2e8f0;">3.</strong> Adjusts pricing, adds notes in real-time<br>
+          <strong style="color: #e2e8f0;">4.</strong> Clicks <strong style="color: #fb923c;">"Present to Customer"</strong><br>
+          <strong style="color: #e2e8f0;">5.</strong> Customer sees branded estimate on their screen<br>
+          <strong style="color: #e2e8f0;">6.</strong> Customer taps <strong style="color: #4ade80;">"Approve &amp; Sign"</strong><br>
+          <strong style="color: #e2e8f0;">7.</strong> Deal closed on the call &#127881;<br>
+          <strong style="color: #e2e8f0;">8.</strong> After call: AI still processes recording for page content
+        </div>
+      </div>
+      <div class="path-card">
+        <div class="path-header" style="background: rgba(124,58,237,0.1); color: #a78bfa;">&#129302; Path B: AI Auto (After Call)</div>
+        <div class="path-body">
+          <strong style="color: #e2e8f0;">1.</strong> Call ends, recording saved to Daily.co<br>
+          <strong style="color: #e2e8f0;">2.</strong> Webhook triggers automated pipeline<br>
+          <strong style="color: #e2e8f0;">3.</strong> Recording uploaded to Bunny Stream<br>
+          <strong style="color: #e2e8f0;">4.</strong> Daily.co transcribes, Claude analyzes + service catalog<br>
+          <strong style="color: #e2e8f0;">5.</strong> AI creates draft estimate with line items<br>
+          <strong style="color: #e2e8f0;">6.</strong> AI populates page template with call content<br>
+          <strong style="color: #e2e8f0;">7.</strong> Rep reviews, edits, publishes (~10 min after call)<br>
+          <strong style="color: #e2e8f0;">8.</strong> Customer receives polished estimate page
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>Key point:</strong> Both paths use the same existing infrastructure — Consultations feature (Daily.co), Bunny Stream (media), Service Catalog (line items), PageBuilder (estimate pages), and the Estimate Pricing System. IDL is a pipeline that connects them all.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 2: START A CALL -->
+<!-- ============================================================ -->
+<div id="step-start-call" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">2</div>
+      <div class="step-title">Starting a Consultation Call</div>
+      <div class="step-subtitle">Three entry points in the dashboard — Customer Detail, Estimates list, and the existing Consultations feature.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> The "Start Consultation" button already exists on the Customer Detail header (from the Consultations feature). IDL adds recording + transcription toggle and links to the estimate workflow.
+    </div>
+
+    <!-- Customer Detail mockup -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/customers/john-smith-123</div>
+      </div>
+      <div class="mock-app">
+        <div class="mock-sidebar">
+          <div class="mock-sidebar-logo">
+            <div class="mock-logo-icon">S</div>
+            <div class="mock-logo-text">ServicePro</div>
+          </div>
+          <div class="mock-nav">
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#127968;</span> Dashboard</div>
+            <div class="mock-nav-section">Sales</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128200;</span> Sales / Leads</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128196;</span> Estimates</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128197;</span> Online Booking</div>
+            <div class="mock-nav-section">Operations</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128295;</span> Jobs</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128197;</span> Dispatch</div>
+            <div class="mock-nav-section">Clients</div>
+            <div class="mock-nav-item active"><span class="mock-nav-icon">&#128101;</span> Customers</div>
+          </div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-content">
+            <!-- Customer header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+              <div style="display: flex; gap: 14px; align-items: center;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 600; color: var(--primary-dark);">JS</div>
+                <div>
+                  <div style="font-size: 1.2rem; font-weight: 700; color: var(--text);">John Smith</div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">john@email.com &middot; (555) 234-5678</div>
+                </div>
+                <span class="badge badge-green"><span class="badge-dot" style="background: var(--green);"></span> Active</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <span class="btn btn-outline btn-sm">&#9998; Edit</span>
+                <span class="btn btn-outline btn-sm">&#128196; New Estimate</span>
+                <!-- THIS IS THE KEY BUTTON -->
+                <span class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, var(--primary), var(--purple)); border: none; box-shadow: 0 0 0 3px rgba(124,58,237,0.2); animation: pulseBox 2s infinite;">
+                  &#128249; Start Consultation
+                </span>
+              </div>
+            </div>
+
+            <!-- Create Consultation Modal -->
+            <div style="background: #fff; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); max-width: 440px; margin: 0 auto;">
+              <div style="padding: 16px 20px; border-bottom: 1px solid var(--border);">
+                <div style="font-size: 1rem; font-weight: 600; color: var(--text);">New Consultation</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Video call with John Smith</div>
+              </div>
+              <div style="padding: 16px 20px;">
+                <div style="margin-bottom: 14px;">
+                  <div style="font-size: 0.75rem; font-weight: 500; color: var(--text); margin-bottom: 4px;">Title</div>
+                  <div style="padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.8rem; color: var(--text);">Kitchen Renovation Consultation</div>
+                </div>
+                <div style="margin-bottom: 14px;">
+                  <div style="font-size: 0.75rem; font-weight: 500; color: var(--text); margin-bottom: 4px;">Link to Estimate (optional)</div>
+                  <div style="padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.8rem; color: var(--text-muted);">Select existing estimate...</div>
+                </div>
+                <!-- NEW IDL TOGGLES -->
+                <div style="background: rgba(124,58,237,0.05); border: 1px solid rgba(124,58,237,0.15); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+                  <div style="font-size: 0.7rem; font-weight: 600; color: var(--purple); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">&#129302; AI Document Layer</div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div>
+                      <div style="font-size: 0.75rem; font-weight: 500; color: var(--text);">Record &amp; Transcribe</div>
+                      <div style="font-size: 0.65rem; color: var(--text-muted);">Auto-record via Daily.co, upload to Bunny</div>
+                    </div>
+                    <div class="toggle on"></div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.75rem; font-weight: 500; color: var(--text);">Auto-Generate Estimate</div>
+                      <div style="font-size: 0.65rem; color: var(--text-muted);">AI creates draft from transcript after call</div>
+                    </div>
+                    <div class="toggle on"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px;">
+                <span class="btn btn-outline btn-sm">Cancel</span>
+                <span class="btn btn-primary btn-sm">&#128249; Start Call</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>What's new:</strong> The existing "Create Consultation" modal gets an IDL section with two toggles — record/transcribe and auto-generate estimate. These default to ON based on company settings. The rest of the consultation flow stays exactly the same.
+    </div>
+
+    <div class="annotation annotation-amber">
+      <strong>Three entry points:</strong> (1) Customer Detail header → "Start Consultation" button. (2) Estimates list → "New Estimate" dropdown → "From Consultation." (3) Consultations page → "New Consultation." All open the same modal.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 3: LIVE CALL -->
+<!-- ============================================================ -->
+<div id="step-live-call" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">3</div>
+      <div class="step-title">During the Live Call</div>
+      <div class="step-subtitle">The rep sees the video call with a side panel — three tabs: live transcript, AI Coach with real-time coaching cards, and a Quick Estimate widget. Only the rep sees the side panel — the customer never knows it exists.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> The existing consultation video room (built with Daily.co SDK). IDL adds: (1) a recording indicator, (2) a live transcript panel with search, (3) an AI Coach that reads the transcript and surfaces coaching cards, and (4) a Quick Estimate widget tab. The rep switches between tabs as needed during the call.
+    </div>
+
+    <!-- Live call mockup -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/consultations/call/abc-123</div>
+      </div>
+      <div class="call-layout">
+        <!-- Video area -->
+        <div class="call-video-area">
+          <div class="call-main-video">
+            <div class="call-timer">18:42</div>
+            <div class="call-rec"><div class="rec-dot"></div>REC</div>
+            <div class="person-icon">&#128100;</div>
+            <div style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 0.7rem;">John Smith</div>
+            <div class="call-pip">
+              <div class="pip-person">&#128100;</div>
+              <div class="pip-label">You (Host)</div>
+            </div>
+          </div>
+          <div class="call-controls">
+            <div class="call-btn call-btn-default">&#128263;</div>
+            <div class="call-btn call-btn-default">&#128249;</div>
+            <div class="call-btn call-btn-default">&#128187;</div>
+            <div class="call-btn call-btn-end">&#128222;</div>
+            <div class="call-btn call-btn-action">$ Estimate</div>
+          </div>
+        </div>
+
+        <!-- Side panel with tabs -->
+        <div class="side-panel">
+          <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 600; color: #fff; border-bottom: 2px solid var(--primary); cursor: pointer;">&#128483; Transcript</div>
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.4); cursor: pointer;">&#129302; Coach</div>
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.4); cursor: pointer;">&#128176; Estimate</div>
+          </div>
+
+          <!-- Live transcript -->
+          <div style="padding: 8px 14px;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+              <span class="badge badge-live" style="font-size: 0.6rem;"><span class="badge-dot"></span> Live</span>
+              <span style="font-size: 0.6rem; color: rgba(255,255,255,0.3);">Daily.co Transcription</span>
+            </div>
+          </div>
+
+          <div style="flex: 1; overflow-y: auto;">
+            <div class="transcript-entry">
+              <div class="te-time">00:12</div>
+              <div>
+                <div class="te-speaker">You (Host)</div>
+                <div class="te-text">Hi John, thanks for joining. So today we're going to go over your <span class="te-highlight">kitchen renovation</span> project.</div>
+              </div>
+            </div>
+            <div class="transcript-entry">
+              <div class="te-time">00:28</div>
+              <div>
+                <div class="te-speaker">John Smith</div>
+                <div class="te-text">Yes, we want to completely redo the kitchen. New <span class="te-highlight">cabinets</span>, <span class="te-highlight">countertops</span>, updating the <span class="te-highlight">plumbing fixtures</span>.</div>
+              </div>
+            </div>
+            <div class="transcript-entry">
+              <div class="te-time">01:15</div>
+              <div>
+                <div class="te-speaker">You (Host)</div>
+                <div class="te-text">Great, and what's the approximate size of the kitchen?</div>
+              </div>
+            </div>
+            <div class="transcript-entry">
+              <div class="te-time">01:22</div>
+              <div>
+                <div class="te-speaker">John Smith</div>
+                <div class="te-text">It's about <span class="te-highlight">200 square feet</span>. We want to add an <span class="te-highlight">island</span> in the center with <span class="te-highlight">quartz countertops</span>, white marble look.</div>
+              </div>
+            </div>
+            <div class="transcript-entry">
+              <div class="te-time">02:45</div>
+              <div>
+                <div class="te-speaker">John Smith</div>
+                <div class="te-text"><span class="te-highlight">Painted white shaker-style</span> cabinets. Our budget is around <span class="te-highlight">$35,000 to $45,000</span>.</div>
+              </div>
+            </div>
+            <div class="transcript-entry">
+              <div class="te-time">18:42</div>
+              <div>
+                <div class="te-speaker" style="color: rgba(255,255,255,0.3);">...</div>
+                <div class="te-text" style="color: rgba(255,255,255,0.2); font-style: italic;">Transcript updates in real-time as you speak</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);">
+            <div style="display: flex; gap: 6px;">
+              <input type="text" placeholder="Search transcript..." style="flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.7rem;" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-purple">
+      <strong>Live transcript:</strong> Powered by Daily.co's built-in transcription ($0.0059/min per unmuted participant). The transcript streams in real-time with speaker diarization — it knows who said what. Keywords like materials, dimensions, and budget amounts get highlighted automatically.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="annotation">
+      <strong>Estimate widget tab:</strong> When the rep switches to the "Estimate" tab, they see the Quick Estimate builder — search your Service Catalog, quick-add items, adjust quantities, and add notes. This is the "Path A: Live Close" option.
+    </div>
+
+    <!-- Estimate tab view -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/consultations/call/abc-123 — Estimate Tab</div>
+      </div>
+      <div class="call-layout">
+        <div class="call-video-area">
+          <div class="call-main-video">
+            <div class="call-timer">22:15</div>
+            <div class="call-rec"><div class="rec-dot"></div>REC</div>
+            <div class="person-icon">&#128100;</div>
+          </div>
+          <div class="call-controls">
+            <div class="call-btn call-btn-default">&#128263;</div>
+            <div class="call-btn call-btn-default">&#128249;</div>
+            <div class="call-btn call-btn-end">&#128222;</div>
+            <div class="call-btn call-btn-action" style="background: var(--orange);">&#9889; Present</div>
+          </div>
+        </div>
+        <div class="side-panel">
+          <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.4); cursor: pointer;">&#128483; Transcript</div>
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.4); cursor: pointer;">&#129302; Coach</div>
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 600; color: #fff; border-bottom: 2px solid var(--green); cursor: pointer;">&#128176; Estimate</div>
+          </div>
+
+          <!-- Search -->
+          <div class="widget-section">
+            <input type="text" placeholder="Search services &amp; materials..." style="width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.72rem;" />
+          </div>
+
+          <!-- Quick chips -->
+          <div class="widget-section">
+            <div style="font-size: 0.6rem; text-transform: uppercase; color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 6px;">Quick Add from Catalog</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              <span style="padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); background: var(--green); border-color: var(--green); color: #fff;">&#10003; Cabinets</span>
+              <span style="padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); background: var(--green); border-color: var(--green); color: #fff;">&#10003; Countertops</span>
+              <span style="padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); background: var(--green); border-color: var(--green); color: #fff;">&#10003; Island</span>
+              <span style="padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);">Plumbing</span>
+              <span style="padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);">Electrical</span>
+              <span style="padding: 3px 8px; border-radius: 12px; font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);">Demolition</span>
+            </div>
+          </div>
+
+          <!-- Line items -->
+          <div style="flex: 1; overflow-y: auto; padding: 8px 14px;">
+            <div style="font-size: 0.6rem; color: rgba(255,255,255,0.3); text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">Added Items</div>
+            <div class="widget-item"><span class="widget-item-name">Cabinet Install - Shaker White</span><span class="widget-item-price">$8,500</span></div>
+            <div class="widget-item"><span class="widget-item-name">Quartz Countertop (200 sq ft)</span><span class="widget-item-price">$15,000</span></div>
+            <div class="widget-item"><span class="widget-item-name">Kitchen Island Build</span><span class="widget-item-price">$4,200</span></div>
+          </div>
+
+          <!-- Footer with total -->
+          <div class="widget-footer">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4);">Subtotal</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.6); font-family: monospace;">$27,700</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">Total</span>
+              <span style="font-size: 1.1rem; font-weight: 700; color: #fff; font-family: monospace;">$30,034</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span class="btn btn-sm" style="flex: 1; justify-content: center; background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.12);">Save Draft</span>
+              <span class="btn btn-sm" style="flex: 1; justify-content: center; background: var(--orange); color: #fff; border-color: var(--orange);">&#9889; Present</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>Service Catalog integration:</strong> The quick-add chips come directly from your Service Catalog (Settings > Service Catalog). No duplicate data — same services, same prices. The rep can also search materials from the Materials Catalog.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="annotation annotation-purple">
+      <strong>AI Coach tab:</strong> When the rep switches to the "Coach" tab, they see real-time coaching guidance. The coach reads the live transcript in the background and surfaces contextual cards — what stage you're in, suggested services to mention, and how to handle objections. <strong>Only the rep sees this — the customer has no idea it exists.</strong>
+    </div>
+
+    <!-- Coach tab view -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/consultations/call/abc-123 — Coach Tab</div>
+      </div>
+      <div class="call-layout">
+        <div class="call-video-area">
+          <div class="call-main-video">
+            <div class="call-timer">05:32</div>
+            <div class="call-rec"><div class="rec-dot"></div>REC</div>
+            <div class="person-icon">&#128100;</div>
+          </div>
+          <div class="call-controls">
+            <div class="call-btn call-btn-default">&#128263;</div>
+            <div class="call-btn call-btn-default">&#128249;</div>
+            <div class="call-btn call-btn-end">&#128222;</div>
+            <div class="call-btn call-btn-action">$ Estimate</div>
+          </div>
+        </div>
+        <div class="side-panel">
+          <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.4); cursor: pointer;">&#128483; Transcript</div>
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 600; color: #fff; border-bottom: 2px solid var(--purple); cursor: pointer;">&#129302; Coach</div>
+            <div style="flex: 1; padding: 10px; text-align: center; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.4); cursor: pointer;">&#128176; Estimate</div>
+          </div>
+
+          <!-- Stage progress bar -->
+          <div class="stage-bar">
+            <div class="stage-pip done"></div>
+            <div class="stage-pip done"></div>
+            <div class="stage-pip active"></div>
+            <div class="stage-pip"></div>
+            <div class="stage-pip"></div>
+            <div class="stage-pip"></div>
+            <div class="stage-pip"></div>
+            <div class="stage-pip"></div>
+          </div>
+          <div class="stage-label">
+            <span>Stage 3 of 8</span>
+            <strong>Needs Assessment</strong>
+          </div>
+
+          <!-- Coaching cards -->
+          <div style="flex: 1; overflow-y: auto; padding-bottom: 8px;">
+
+            <!-- Stage prompt card -->
+            <div class="coach-card coach-card-blue">
+              <div class="coach-card-type">Stage Prompt</div>
+              <div class="coach-card-body">
+                <strong>Needs Assessment</strong> — Now's the time to ask specific questions about scope, timeline, and preferences. Dig into details.
+              </div>
+              <div class="coach-card-script">"What's your ideal timeline for getting this done? Are there any events or deadlines driving the schedule?"</div>
+              <div class="coach-card-actions">
+                <div class="coach-btn coach-btn-use">Use</div>
+                <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+                <div class="coach-btn coach-btn-more">More...</div>
+              </div>
+            </div>
+
+            <!-- Service suggestion card -->
+            <div class="coach-card coach-card-green">
+              <div class="coach-card-type">Service Match</div>
+              <div class="coach-card-body">
+                Customer mentioned <strong>"quartz countertops"</strong> and <strong>"island"</strong> — matches <strong>Kitchen Island Build</strong> ($4,200) and <strong>Quartz Countertop Install</strong> ($75/sq ft) from your catalog.
+              </div>
+              <div class="coach-card-actions">
+                <div class="coach-btn coach-btn-use">Add to Estimate</div>
+                <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+              </div>
+            </div>
+
+            <!-- Info card -->
+            <div class="coach-card coach-card-gray">
+              <div class="coach-card-type">Info</div>
+              <div class="coach-card-body">
+                Customer budget: <strong>$35,000 - $45,000</strong>. Current estimate running total: <strong>$27,700</strong>. You have room to add more services.
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Coach footer -->
+          <div style="padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.2);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 0.6rem; color: rgba(255,255,255,0.3);">3 cards active</span>
+              <span style="font-size: 0.6rem; color: var(--purple); font-weight: 600; cursor: pointer;">View All Stages &#8250;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-amber">
+      <strong>How it works:</strong> The coach reads every transcript message as it arrives. It matches keywords to detect which sales stage you're in (greeting, discovery, needs assessment, pricing, objection handling, closing, wrap-up). It also matches keywords against your Service Catalog to suggest relevant services. No AI API calls during the call — it's all client-side keyword matching, so it's instant and free. See <strong>Step 9</strong> for the full deep-dive on how the coach works.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- ===== THE REP'S VIEW: COACH + LIVE ESTIMATE ===== -->
+    <div style="margin-top: 16px; margin-bottom: 8px; text-align: center;">
+      <div style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 4px;">The Rep's View: Coach + Live Estimate</div>
+      <div style="font-size: 0.9rem; color: var(--sidebar-text); max-width: 700px; margin: 0 auto;">The rep doesn't need to read the transcript — they're in the conversation. The side panel splits between <strong style="color: #fff;">AI Coach</strong> (top) and <strong style="color: #fff;">Live Estimate</strong> (bottom), with a <strong style="color: #fff;">Push to Customer</strong> toolbar to present company content mid-call.</div>
+    </div>
+
+    <div style="margin-top: 20px; margin-bottom: 8px;">
+      <div style="font-size: 0.82rem; color: var(--sidebar-text);">Coach cards on top, live-building estimate on bottom, presentation controls below the video. Transcript accessible via tab when needed. The rep sees coaching, pricing, and push controls at all times.</div>
+    </div>
+
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/consultations/call/abc-123 — Coach + Estimate Split</div>
+      </div>
+      <div class="call-layout">
+        <div class="call-video-area">
+          <div class="call-main-video">
+            <div class="call-timer">12:18</div>
+            <div class="call-rec"><div class="rec-dot"></div>REC</div>
+            <div class="person-icon">&#128100;</div>
+            <div style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 0.7rem;">John Smith</div>
+            <div class="call-pip">
+              <div class="pip-person">&#128100;</div>
+              <div class="pip-label">You (Host)</div>
+            </div>
+          </div>
+          <!-- Present to Customer toolbar -->
+          <div style="display: flex; align-items: center; gap: 2px; padding: 6px 10px; background: rgba(0,0,0,0.35); border-top: 1px solid rgba(255,255,255,0.06); overflow-x: auto;">
+            <span style="font-size: 0.5rem; color: rgba(255,255,255,0.25); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; white-space: nowrap; margin-right: 4px;">Push to Customer</span>
+            <div style="display: flex; gap: 3px; flex-wrap: nowrap;">
+              <div title="Reviews" style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 7px; border-radius: 6px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 44px;">
+                <span style="font-size: 0.75rem;">&#11088;</span>
+                <span style="font-size: 0.45rem; color: rgba(255,255,255,0.4);">Reviews</span>
+              </div>
+              <div title="About Us" style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 7px; border-radius: 6px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 44px;">
+                <span style="font-size: 0.75rem;">&#127970;</span>
+                <span style="font-size: 0.45rem; color: rgba(255,255,255,0.4);">About</span>
+              </div>
+              <div title="Gallery" style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 7px; border-radius: 6px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 44px;">
+                <span style="font-size: 0.75rem;">&#128247;</span>
+                <span style="font-size: 0.45rem; color: rgba(255,255,255,0.4);">Gallery</span>
+              </div>
+              <div title="Before &amp; After" style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 7px; border-radius: 6px; cursor: pointer; background: rgba(234,88,12,0.2); border: 1px solid rgba(234,88,12,0.4); min-width: 44px;">
+                <span style="font-size: 0.75rem;">&#128260;</span>
+                <span style="font-size: 0.45rem; color: #fb923c;">B&amp;A</span>
+              </div>
+              <div title="Trust Badges" style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 7px; border-radius: 6px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 44px;">
+                <span style="font-size: 0.75rem;">&#128737;</span>
+                <span style="font-size: 0.45rem; color: rgba(255,255,255,0.4);">Trust</span>
+              </div>
+              <div title="Video" style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 7px; border-radius: 6px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 44px;">
+                <span style="font-size: 0.75rem;">&#127909;</span>
+                <span style="font-size: 0.45rem; color: rgba(255,255,255,0.4);">Video</span>
+              </div>
+              <div title="FAQ" style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 7px; border-radius: 6px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 44px;">
+                <span style="font-size: 0.75rem;">&#10067;</span>
+                <span style="font-size: 0.45rem; color: rgba(255,255,255,0.4);">FAQ</span>
+              </div>
+              <div title="Estimate" style="display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 7px; border-radius: 6px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 44px;">
+                <span style="font-size: 0.75rem;">&#128176;</span>
+                <span style="font-size: 0.45rem; color: rgba(255,255,255,0.4);">Estimate</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pushed content indicator -->
+          <div style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: rgba(234,88,12,0.15); border-bottom: 1px solid rgba(234,88,12,0.3);">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #fb923c; animation: pulse 1s infinite;"></span>
+            <span style="font-size: 0.58rem; color: #fb923c; font-weight: 500;">Showing "Before &amp; After" on customer's screen</span>
+            <span style="font-size: 0.55rem; color: rgba(255,255,255,0.3); margin-left: auto; cursor: pointer;">Stop &#10005;</span>
+          </div>
+
+          <div class="call-controls">
+            <div class="call-btn call-btn-default">&#128263;</div>
+            <div class="call-btn call-btn-default">&#128249;</div>
+            <div class="call-btn call-btn-default">&#128187;</div>
+            <!-- Screenshot button with badge -->
+            <div class="call-btn call-btn-default" style="position: relative; background: rgba(59,130,246,0.25); border: 1px solid rgba(59,130,246,0.4);" title="Capture Screenshot">
+              &#128248;
+              <span style="position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.5rem; font-weight: 700; display: flex; align-items: center; justify-content: center;">4</span>
+            </div>
+            <div class="call-btn call-btn-end">&#128222;</div>
+          </div>
+
+          <!-- Screenshot flash indicator -->
+          <div style="display: flex; align-items: center; gap: 6px; padding: 3px 10px; background: rgba(59,130,246,0.12); border-top: 1px solid rgba(59,130,246,0.2);">
+            <span style="font-size: 0.6rem;">&#128248;</span>
+            <span style="font-size: 0.55rem; color: #60a5fa; font-weight: 500;">Screenshot saved — "Kitchen current state"</span>
+            <span style="font-size: 0.52rem; color: rgba(255,255,255,0.25); margin-left: auto;">4 captured</span>
+          </div>
+        </div>
+
+        <!-- Split side panel: Coach top + Estimate bottom -->
+        <div class="side-panel" style="display: flex; flex-direction: column;">
+          <!-- Mini tab bar -->
+          <div style="display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 4px;">
+            <div style="flex: 1; padding: 9px 8px; text-align: center; font-size: 0.68rem; font-weight: 600; color: #fff; border-bottom: 2px solid var(--purple); cursor: pointer;">&#129302; Coach + Estimate</div>
+            <div style="flex: 1; padding: 9px 8px; text-align: center; font-size: 0.68rem; font-weight: 500; color: rgba(255,255,255,0.35); cursor: pointer;">&#128483; Transcript</div>
+            <div style="flex: 1; padding: 9px 8px; text-align: center; font-size: 0.68rem; font-weight: 500; color: rgba(255,255,255,0.35); cursor: pointer;">&#128221; Notes</div>
+          </div>
+
+          <!-- TOP: Coach section -->
+          <div style="flex: 0 0 auto; max-height: 45%; overflow-y: auto;">
+            <!-- Stage bar -->
+            <div class="stage-bar" style="padding: 8px 10px;">
+              <div class="stage-pip done"></div>
+              <div class="stage-pip done"></div>
+              <div class="stage-pip active"></div>
+              <div class="stage-pip"></div>
+              <div class="stage-pip"></div>
+              <div class="stage-pip"></div>
+              <div class="stage-pip"></div>
+              <div class="stage-pip"></div>
+            </div>
+            <div class="stage-label" style="padding: 2px 10px 6px; border-bottom: none;">
+              <span>Stage 3/8</span>
+              <strong>Needs Assessment</strong>
+            </div>
+
+            <!-- Compact coach card -->
+            <div class="coach-card coach-card-blue" style="margin: 4px 8px;">
+              <div class="coach-card-type">Stage Prompt</div>
+              <div class="coach-card-body">Ask about <strong>timeline</strong> and <strong>preferences</strong>. Dig into specifics.</div>
+              <div class="coach-card-script" style="font-size: 0.62rem;">"What's your ideal timeline? Any events driving the schedule?"</div>
+              <div class="coach-card-actions">
+                <div class="coach-btn coach-btn-use">Use</div>
+                <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+              </div>
+            </div>
+
+            <div class="coach-card coach-card-green" style="margin: 4px 8px;">
+              <div class="coach-card-type">Service Match</div>
+              <div class="coach-card-body">Detected <strong>"quartz countertops"</strong> — <strong>Quartz Countertop Install</strong> ($75/sq ft)</div>
+              <div class="coach-card-actions">
+                <div class="coach-btn coach-btn-use">Add to Estimate &#8595;</div>
+                <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DIVIDER -->
+          <div style="border-top: 2px solid rgba(59,130,246,0.3); margin: 0 10px; position: relative;">
+            <span style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: #111827; padding: 0 8px; font-size: 0.58rem; color: rgba(255,255,255,0.3); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Live Estimate</span>
+          </div>
+
+          <!-- BOTTOM: Live Estimate section -->
+          <div style="flex: 1; overflow-y: auto; padding: 12px 10px 0;">
+            <!-- Voice command indicator -->
+            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 6px; padding: 4px 8px; background: rgba(124,58,237,0.1); border-radius: 6px; border: 1px solid rgba(124,58,237,0.2);">
+              <span style="font-size: 0.65rem;">&#127908;</span>
+              <span style="font-size: 0.58rem; color: #a78bfa; font-weight: 500;">Voice commands active</span>
+              <span style="font-size: 0.55rem; color: rgba(255,255,255,0.25); margin-left: auto;">"Add that" · "Include the..."</span>
+            </div>
+
+            <!-- Auto-detected items -->
+            <div style="font-size: 0.58rem; color: rgba(255,255,255,0.25); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.04em;">Auto-Detected from Call</div>
+            <div class="widget-item" style="border-bottom-color: rgba(255,255,255,0.06);">
+              <span class="widget-item-name" style="display: flex; align-items: center; gap: 4px;">
+                <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--green);"></span>
+                Cabinet Install - Shaker White
+              </span>
+              <span class="widget-item-price">$8,500</span>
+            </div>
+            <div class="widget-item" style="border-bottom-color: rgba(255,255,255,0.06);">
+              <span class="widget-item-name" style="display: flex; align-items: center; gap: 4px;">
+                <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--green);"></span>
+                Quartz Countertop (200 sq ft)
+              </span>
+              <span class="widget-item-price">$15,000</span>
+            </div>
+            <div class="widget-item" style="border-bottom-color: rgba(255,255,255,0.06);">
+              <span class="widget-item-name" style="display: flex; align-items: center; gap: 4px;">
+                <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--green);"></span>
+                Kitchen Island Build
+              </span>
+              <span class="widget-item-price">$4,200</span>
+            </div>
+            <div class="widget-item" style="border-bottom-color: rgba(255,255,255,0.06); opacity: 0.5;">
+              <span class="widget-item-name" style="display: flex; align-items: center; gap: 4px;">
+                <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--amber); animation: pulse 1s infinite;"></span>
+                Plumbing Fixtures Update
+                <span style="font-size: 0.55rem; color: var(--amber);">(pending)</span>
+              </span>
+              <span class="widget-item-price" style="color: var(--amber);">$2,800</span>
+            </div>
+
+            <!-- Screenshots captured -->
+            <div style="margin-top: 8px;">
+              <div style="font-size: 0.58rem; color: rgba(255,255,255,0.25); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; letter-spacing: 0.04em; display: flex; align-items: center; justify-content: space-between;">
+                <span>&#128248; Screenshots (4)</span>
+                <span style="font-size: 0.52rem; color: var(--primary); text-transform: none; font-weight: 500; cursor: pointer;">View All</span>
+              </div>
+              <div style="display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px;">
+                <div style="width: 52px; height: 38px; border-radius: 4px; background: linear-gradient(135deg, #334155, #1e293b); border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; position: relative; overflow: hidden; cursor: pointer;">
+                  <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: rgba(255,255,255,0.3);">&#127963;</div>
+                  <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1px 3px; background: rgba(0,0,0,0.7); font-size: 0.38rem; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden;">Kitchen overview</div>
+                </div>
+                <div style="width: 52px; height: 38px; border-radius: 4px; background: linear-gradient(135deg, #3f3f46, #27272a); border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; position: relative; overflow: hidden; cursor: pointer;">
+                  <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: rgba(255,255,255,0.3);">&#127963;</div>
+                  <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1px 3px; background: rgba(0,0,0,0.7); font-size: 0.38rem; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden;">Old cabinets</div>
+                </div>
+                <div style="width: 52px; height: 38px; border-radius: 4px; background: linear-gradient(135deg, #44403c, #292524); border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; position: relative; overflow: hidden; cursor: pointer;">
+                  <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: rgba(255,255,255,0.3);">&#127963;</div>
+                  <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1px 3px; background: rgba(0,0,0,0.7); font-size: 0.38rem; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden;">Counter damage</div>
+                </div>
+                <div style="width: 52px; height: 38px; border-radius: 4px; background: linear-gradient(135deg, #1e3a5f, #172554); border: 1px solid rgba(59,130,246,0.3); flex-shrink: 0; position: relative; overflow: hidden; cursor: pointer;">
+                  <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: rgba(255,255,255,0.3);">&#127963;</div>
+                  <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1px 3px; background: rgba(59,130,246,0.8); font-size: 0.38rem; color: #fff; white-space: nowrap; overflow: hidden;">&#10024; Just now</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat / feedback area -->
+          <div style="border-top: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.15);">
+            <!-- Chat thread -->
+            <div style="padding: 6px 10px; max-height: 80px; overflow-y: auto;">
+              <!-- Rep message -->
+              <div style="display: flex; gap: 6px; margin-bottom: 5px;">
+                <span style="font-size: 0.55rem; color: var(--primary); font-weight: 600; white-space: nowrap; padding-top: 1px;">You</span>
+                <span style="font-size: 0.6rem; color: rgba(255,255,255,0.6);">add demolition too, they'll need demo before cabinets</span>
+              </div>
+              <!-- System response -->
+              <div style="display: flex; gap: 6px; margin-bottom: 5px;">
+                <span style="font-size: 0.55rem; color: var(--purple); font-weight: 600; white-space: nowrap; padding-top: 1px;">&#129302;</span>
+                <span style="font-size: 0.6rem; color: rgba(255,255,255,0.45);">Added <strong style="color: rgba(255,255,255,0.65);">Kitchen Demolition ($3,500)</strong> as pending. Note saved: "demo before cabinets"</span>
+              </div>
+              <!-- Rep feedback on coach -->
+              <div style="display: flex; gap: 6px; margin-bottom: 5px;">
+                <span style="font-size: 0.55rem; color: var(--primary); font-weight: 600; white-space: nowrap; padding-top: 1px;">You</span>
+                <span style="font-size: 0.6rem; color: rgba(255,255,255,0.6);">good call on the countertop match, show me more like that</span>
+              </div>
+              <!-- System response -->
+              <div style="display: flex; gap: 6px;">
+                <span style="font-size: 0.55rem; color: var(--purple); font-weight: 600; white-space: nowrap; padding-top: 1px;">&#129302;</span>
+                <span style="font-size: 0.6rem; color: rgba(255,255,255,0.45);">Thanks! Prioritizing catalog matches. Listening for more material mentions...</span>
+              </div>
+            </div>
+            <!-- Input bar -->
+            <div style="padding: 6px 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <input type="text" placeholder="Type a command or note..." style="flex: 1; padding: 6px 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.65rem;" />
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer; flex-shrink: 0;">&#10148;</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer with total -->
+          <div style="padding: 8px 10px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-size: 0.72rem; font-weight: 600; color: #fff;">Running Total</span>
+              <span style="font-size: 1rem; font-weight: 700; color: #fff; font-family: monospace;">$34,000</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.58rem; color: rgba(255,255,255,0.3);">Budget: $35-45K · Headroom: ~$11K</span>
+              <span style="font-size: 0.58rem; color: var(--green);">&#10003; Within budget</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>Why this works:</strong> The rep sees coaching AND the growing estimate without switching tabs. The <strong>"Push to Customer" toolbar</strong> lets the rep tap an icon to instantly show content on the customer's screen — reviews, gallery, before &amp; after, trust badges, videos, FAQ, or the estimate. The <strong>screenshot button</strong> (&#128248;) captures the customer's video frame on tap — great for when they're showing their space on camera. Screenshots auto-attach to the estimate with labels, and show as a thumbnail strip in the estimate panel. They feed into the Page Builder as "before" photos too. The <strong>chat input</strong> handles estimate commands ("add demolition", "note: needs demo first") and coach feedback ("good match", "show more closers") to train the coach over time.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- Alternative layouts note (collapsed) -->
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px;">
+      <div style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 6px;">Alternative Layouts (Future Settings Option)</div>
+      <div style="font-size: 0.72rem; color: rgba(255,255,255,0.35); line-height: 1.6;">
+        Two other layouts could be offered as a preference toggle in Settings for different rep experience levels:<br>
+        <strong style="color: rgba(255,255,255,0.5);">Option B — Coach Full:</strong> Full coaching panel with estimate collapsed to a peek bar showing running total. Best for newer reps who need more guidance.<br>
+        <strong style="color: rgba(255,255,255,0.5);">Option C — Estimate Full:</strong> Full estimate panel with coach cards appearing as floating toast notifications. Best for experienced reps focused on pricing.
+      </div>
+    </div>
+
+    <!-- REMOVED: Full Variation B, C mockups and comparison table. Variation A (Split) is the chosen layout. -->
+    <!-- Keeping this note for reference: B = Coach Full + Estimate Peek Bar, C = Estimate Full + Coach Toasts -->
+
+    <div style="display: none;">
+    <!-- =========================================== -->
+    <!-- VARIATION B: Coach Full + Estimate Peek -->
+    <!-- =========================================== -->
+    <div style="margin-top: 16px; margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="padding: 3px 10px; border-radius: 10px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-size: 0.65rem; font-weight: 700;">OPTION B</span>
+        <span style="font-size: 1rem; font-weight: 600; color: #fff;">Coach Full + Estimate Peek Bar</span>
+      </div>
+      <div style="font-size: 0.82rem; color: var(--sidebar-text); margin-top: 4px;">Full coach panel with more room for cards. Estimate collapses to a running total bar at the bottom — tap to expand. Good when coaching is the priority and the rep is newer.</div>
+    </div>
+
+    <!-- Variation B: Just the side panel portion -->
+    <div style="max-width: 380px; margin: 0 auto;">
+      <div class="app-frame">
+        <div class="app-frame-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <div class="app-frame-url">Side Panel — Option B</div>
+        </div>
+        <div style="background: #111827; color: #fff; min-height: 420px; display: flex; flex-direction: column;">
+          <!-- Tabs -->
+          <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="flex: 1; padding: 9px; text-align: center; font-size: 0.68rem; font-weight: 600; color: #fff; border-bottom: 2px solid var(--purple); cursor: pointer;">&#129302; Coach</div>
+            <div style="flex: 1; padding: 9px; text-align: center; font-size: 0.68rem; font-weight: 500; color: rgba(255,255,255,0.35); cursor: pointer;">&#128483; Transcript</div>
+            <div style="flex: 1; padding: 9px; text-align: center; font-size: 0.68rem; font-weight: 500; color: rgba(255,255,255,0.35); cursor: pointer;">&#128221; Notes</div>
+          </div>
+
+          <!-- Full stage bar -->
+          <div class="stage-bar">
+            <div class="stage-pip done"></div>
+            <div class="stage-pip done"></div>
+            <div class="stage-pip done"></div>
+            <div class="stage-pip done"></div>
+            <div class="stage-pip active"></div>
+            <div class="stage-pip"></div>
+            <div class="stage-pip"></div>
+            <div class="stage-pip"></div>
+          </div>
+          <div class="stage-label">
+            <span>Stage 5/8</span>
+            <strong>Pricing Discussion</strong>
+          </div>
+
+          <!-- Full coach cards -->
+          <div style="flex: 1; overflow-y: auto;">
+            <div class="coach-card coach-card-blue">
+              <div class="coach-card-type">Stage Prompt</div>
+              <div class="coach-card-body"><strong>Pricing</strong> — Present value before numbers. Break down what's included. Anchor to their budget.</div>
+              <div class="coach-card-script">"Based on everything we discussed, here's what I'd recommend and the investment for each piece..."</div>
+              <div class="coach-card-actions">
+                <div class="coach-btn coach-btn-use">Use</div>
+                <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+                <div class="coach-btn coach-btn-more">More...</div>
+              </div>
+            </div>
+
+            <div class="coach-card coach-card-green">
+              <div class="coach-card-type">Service Match</div>
+              <div class="coach-card-body">Customer asked about <strong>"backsplash tile"</strong> — matches <strong>Tile Backsplash Install</strong> ($1,200) from your catalog.</div>
+              <div class="coach-card-actions">
+                <div class="coach-btn coach-btn-use">Add to Estimate</div>
+                <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+              </div>
+            </div>
+
+            <div class="coach-card coach-card-gray">
+              <div class="coach-card-type">Info</div>
+              <div class="coach-card-body">You've covered 4 of 6 services the customer mentioned. Still unaddressed: <strong>plumbing fixtures</strong>, <strong>lighting</strong>.</div>
+            </div>
+          </div>
+
+          <!-- Estimate peek bar (collapsed) -->
+          <div style="border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); padding: 10px 14px; cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.8rem;">&#128176;</span>
+                <span style="font-size: 0.72rem; font-weight: 600; color: #fff;">Estimate</span>
+                <span style="font-size: 0.6rem; color: rgba(255,255,255,0.3);">4 items</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 0.95rem; font-weight: 700; color: #fff; font-family: monospace;">$28,900</span>
+                <span style="font-size: 0.7rem; color: rgba(255,255,255,0.4);">&#9650;</span>
+              </div>
+            </div>
+            <div style="font-size: 0.55rem; color: rgba(255,255,255,0.25); margin-top: 2px;">Tap to expand · Budget: $35-45K · &#10003; Within range</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Best for:</strong> Newer reps who need more coaching guidance. The full panel gives room for 3+ cards with scripts. The estimate stays visible as a collapsed bar showing the running total — the rep taps to expand when they want to see or adjust line items.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- =========================================== -->
+    <!-- VARIATION C: Estimate Full + Coach Toasts -->
+    <!-- =========================================== -->
+    <div style="margin-top: 16px; margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="padding: 3px 10px; border-radius: 10px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-size: 0.65rem; font-weight: 700;">OPTION C</span>
+        <span style="font-size: 1rem; font-weight: 600; color: #fff;">Live Estimate Full + Coach Toasts</span>
+      </div>
+      <div style="font-size: 0.82rem; color: var(--sidebar-text); margin-top: 4px;">The estimate takes the full panel. Coach cards appear as floating toast notifications that slide in from the top and auto-dismiss. Good for experienced reps who mainly want to track pricing.</div>
+    </div>
+
+    <!-- Variation C: Just the side panel portion -->
+    <div style="max-width: 380px; margin: 0 auto;">
+      <div class="app-frame">
+        <div class="app-frame-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <div class="app-frame-url">Side Panel — Option C</div>
+        </div>
+        <div style="background: #111827; color: #fff; min-height: 420px; display: flex; flex-direction: column; position: relative;">
+          <!-- Tabs -->
+          <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="flex: 1; padding: 9px; text-align: center; font-size: 0.68rem; font-weight: 600; color: #fff; border-bottom: 2px solid var(--green); cursor: pointer;">&#128176; Live Estimate</div>
+            <div style="flex: 1; padding: 9px; text-align: center; font-size: 0.68rem; font-weight: 500; color: rgba(255,255,255,0.35); cursor: pointer;">&#128483; Transcript</div>
+            <div style="flex: 1; padding: 9px; text-align: center; font-size: 0.68rem; font-weight: 500; color: rgba(255,255,255,0.35); cursor: pointer;">&#128221; Notes</div>
+          </div>
+
+          <!-- Floating coach toast (overlaid) -->
+          <div style="position: absolute; top: 44px; left: 8px; right: 8px; z-index: 10; background: rgba(59,130,246,0.95); border-radius: 8px; padding: 8px 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: flex-start; gap: 8px;">
+            <span style="font-size: 0.7rem; margin-top: 1px;">&#129302;</span>
+            <div style="flex: 1;">
+              <div style="font-size: 0.6rem; font-weight: 600; color: rgba(255,255,255,0.8);">STAGE: NEEDS ASSESSMENT</div>
+              <div style="font-size: 0.65rem; color: rgba(255,255,255,0.9);">Ask about timeline and preferences</div>
+            </div>
+            <span style="font-size: 0.65rem; color: rgba(255,255,255,0.5); cursor: pointer;">&#10005;</span>
+          </div>
+
+          <!-- Voice command bar -->
+          <div style="display: flex; align-items: center; gap: 5px; margin: 8px 10px; padding: 5px 8px; background: rgba(124,58,237,0.1); border-radius: 6px; border: 1px solid rgba(124,58,237,0.2);">
+            <span style="font-size: 0.6rem;">&#127908;</span>
+            <span style="font-size: 0.55rem; color: #a78bfa;">Voice commands active</span>
+            <span style="font-size: 0.52rem; color: rgba(255,255,255,0.2); margin-left: auto;">"Add that" · "Include..."</span>
+          </div>
+
+          <!-- Estimate category -->
+          <div style="padding: 4px 12px;">
+            <div style="font-size: 0.58rem; color: rgba(255,255,255,0.25); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Kitchen Renovation — Auto-Detected</div>
+          </div>
+
+          <!-- Full estimate list -->
+          <div style="flex: 1; overflow-y: auto; padding: 0 10px;">
+            <div class="widget-item" style="border-bottom-color: rgba(255,255,255,0.06);">
+              <div>
+                <span class="widget-item-name" style="display: flex; align-items: center; gap: 4px;">
+                  <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--green);"></span>
+                  Cabinet Install - Shaker White
+                </span>
+                <div style="font-size: 0.55rem; color: rgba(255,255,255,0.25); padding-left: 9px;">Detected at 0:28 · From Service Catalog</div>
+              </div>
+              <span class="widget-item-price">$8,500</span>
+            </div>
+            <div class="widget-item" style="border-bottom-color: rgba(255,255,255,0.06);">
+              <div>
+                <span class="widget-item-name" style="display: flex; align-items: center; gap: 4px;">
+                  <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--green);"></span>
+                  Quartz Countertop (200 sq ft)
+                </span>
+                <div style="font-size: 0.55rem; color: rgba(255,255,255,0.25); padding-left: 9px;">Detected at 1:22 · $75/sq ft x 200</div>
+              </div>
+              <span class="widget-item-price">$15,000</span>
+            </div>
+            <div class="widget-item" style="border-bottom-color: rgba(255,255,255,0.06);">
+              <div>
+                <span class="widget-item-name" style="display: flex; align-items: center; gap: 4px;">
+                  <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--green);"></span>
+                  Kitchen Island Build
+                </span>
+                <div style="font-size: 0.55rem; color: rgba(255,255,255,0.25); padding-left: 9px;">Detected at 1:22 · From Service Catalog</div>
+              </div>
+              <span class="widget-item-price">$4,200</span>
+            </div>
+            <div class="widget-item" style="border-bottom-color: rgba(255,255,255,0.06); opacity: 0.5;">
+              <div>
+                <span class="widget-item-name" style="display: flex; align-items: center; gap: 4px;">
+                  <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--amber); animation: pulse 1s infinite;"></span>
+                  Plumbing Fixtures Update
+                  <span style="font-size: 0.52rem; color: var(--amber);">pending</span>
+                </span>
+                <div style="font-size: 0.55rem; color: rgba(255,255,255,0.25); padding-left: 9px;">Detected at 0:28 · Confirm to add</div>
+              </div>
+              <span class="widget-item-price" style="color: var(--amber);">$2,800</span>
+            </div>
+
+            <!-- Manual add area -->
+            <div style="margin-top: 8px; padding: 8px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 6px; text-align: center;">
+              <span style="font-size: 0.65rem; color: rgba(255,255,255,0.3);">+ Search catalog to add manually</span>
+            </div>
+          </div>
+
+          <!-- Footer with total -->
+          <div style="padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+              <span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">Subtotal (3 confirmed + 1 pending)</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.6); font-family: monospace;">$30,500</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.82rem; font-weight: 600; color: #fff;">Total</span>
+              <span style="font-size: 1.1rem; font-weight: 700; color: #fff; font-family: monospace;">$30,500</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <span style="font-size: 0.55rem; color: rgba(255,255,255,0.25);">Budget: $35-45K</span>
+              <span style="font-size: 0.55rem; color: var(--green);">&#10003; Within budget</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Best for:</strong> Experienced reps who know the sales process and mainly want to track what's been quoted. Coach guidance appears as non-intrusive toast notifications that slide in and auto-dismiss. The estimate is the star of the show.
+    </div>
+
+    </div><!-- end display:none for B and C -->
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- =========================================== -->
+    <!-- MOBILE VIEW -->
+    <!-- =========================================== -->
+    <div style="margin-top: 16px; margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="padding: 3px 10px; border-radius: 10px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-size: 0.65rem; font-weight: 700;">MOBILE</span>
+        <span style="font-size: 1rem; font-weight: 600; color: #fff;">Mobile / Tablet View</span>
+      </div>
+      <div style="font-size: 0.82rem; color: var(--sidebar-text); margin-top: 4px;">On smaller screens, the side panel becomes a bottom drawer with swipeable tabs. Video stays at the top, panel slides up from the bottom. Same content, stacked layout.</div>
+    </div>
+
+    <!-- Mobile mockup -->
+    <div style="max-width: 380px; margin: 0 auto;">
+      <div class="app-frame">
+        <div class="app-frame-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <div class="app-frame-url">Mobile View — 390 x 844</div>
+        </div>
+        <div style="background: #111827; color: #fff; display: flex; flex-direction: column; min-height: 520px;">
+          <!-- Video (small at top) -->
+          <div style="height: 200px; background: #0a0a0a; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <div class="call-timer" style="top: 8px; left: 8px;">12:18</div>
+            <div class="call-rec" style="top: 8px; right: 8px;"><div class="rec-dot"></div>REC</div>
+            <div class="person-icon" style="font-size: 36px;">&#128100;</div>
+            <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.6); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem;">John Smith</div>
+            <!-- PIP -->
+            <div style="position: absolute; bottom: 8px; right: 8px; width: 80px; height: 60px; background: #1a1a2e; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 16px; opacity: 0.3; color: #fff;">&#128100;</span>
+            </div>
+          </div>
+
+          <!-- Present to Customer toolbar (mobile) -->
+          <div style="padding: 5px 8px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; align-items: center; gap: 2px; overflow-x: auto;">
+              <span style="font-size: 0.45rem; color: rgba(255,255,255,0.2); text-transform: uppercase; font-weight: 600; white-space: nowrap; margin-right: 2px;">Push</span>
+              <div style="display: flex; gap: 2px; flex-wrap: nowrap;">
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 3px 5px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 36px; cursor: pointer;">
+                  <span style="font-size: 0.65rem;">&#11088;</span>
+                  <span style="font-size: 0.38rem; color: rgba(255,255,255,0.35);">Reviews</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 3px 5px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 36px; cursor: pointer;">
+                  <span style="font-size: 0.65rem;">&#127970;</span>
+                  <span style="font-size: 0.38rem; color: rgba(255,255,255,0.35);">About</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 3px 5px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 36px; cursor: pointer;">
+                  <span style="font-size: 0.65rem;">&#128247;</span>
+                  <span style="font-size: 0.38rem; color: rgba(255,255,255,0.35);">Gallery</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 3px 5px; border-radius: 5px; background: rgba(234,88,12,0.2); border: 1px solid rgba(234,88,12,0.4); min-width: 36px; cursor: pointer;">
+                  <span style="font-size: 0.65rem;">&#128260;</span>
+                  <span style="font-size: 0.38rem; color: #fb923c;">B&A</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 3px 5px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 36px; cursor: pointer;">
+                  <span style="font-size: 0.65rem;">&#128737;</span>
+                  <span style="font-size: 0.38rem; color: rgba(255,255,255,0.35);">Trust</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 3px 5px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 36px; cursor: pointer;">
+                  <span style="font-size: 0.65rem;">&#127909;</span>
+                  <span style="font-size: 0.38rem; color: rgba(255,255,255,0.35);">Video</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 3px 5px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 36px; cursor: pointer;">
+                  <span style="font-size: 0.65rem;">&#10067;</span>
+                  <span style="font-size: 0.38rem; color: rgba(255,255,255,0.35);">FAQ</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; padding: 3px 5px; border-radius: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); min-width: 36px; cursor: pointer;">
+                  <span style="font-size: 0.65rem;">&#128176;</span>
+                  <span style="font-size: 0.38rem; color: rgba(255,255,255,0.35);">Estimate</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active push indicator (mobile) -->
+          <div style="display: flex; align-items: center; gap: 5px; padding: 3px 10px; background: rgba(234,88,12,0.15); border-bottom: 1px solid rgba(234,88,12,0.3);">
+            <span style="width: 5px; height: 5px; border-radius: 50%; background: #fb923c; animation: pulse 1s infinite;"></span>
+            <span style="font-size: 0.52rem; color: #fb923c; font-weight: 500;">Pushing "Before &amp; After" to customer</span>
+            <span style="font-size: 0.5rem; color: rgba(255,255,255,0.3); margin-left: auto; cursor: pointer;">Stop &#10005;</span>
+          </div>
+
+          <!-- Call controls (compact) with screenshot button -->
+          <div style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 10px; background: rgba(0,0,0,0.4);">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff;">&#128263;</div>
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff;">&#128249;</div>
+            <!-- Screenshot button -->
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(59,130,246,0.25); border: 1px solid rgba(59,130,246,0.4); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff; position: relative;">
+              &#128248;
+              <span style="position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.42rem; font-weight: 700; display: flex; align-items: center; justify-content: center;">4</span>
+            </div>
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff;">&#128222;</div>
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff;">&#128187;</div>
+          </div>
+
+          <!-- Bottom drawer - tab bar -->
+          <div style="display: flex; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.06);">
+            <div style="flex: 1; padding: 8px; text-align: center; font-size: 0.65rem; font-weight: 600; color: #fff; border-bottom: 2px solid var(--purple);">&#129302; Coach</div>
+            <div style="flex: 1; padding: 8px; text-align: center; font-size: 0.65rem; color: rgba(255,255,255,0.35);">&#128176; Estimate</div>
+            <div style="flex: 1; padding: 8px; text-align: center; font-size: 0.65rem; color: rgba(255,255,255,0.35);">&#128483; Transcript</div>
+            <div style="flex: 1; padding: 8px; text-align: center; font-size: 0.65rem; color: rgba(255,255,255,0.35);">&#128221; Notes</div>
+          </div>
+
+          <!-- Bottom drawer content -->
+          <div style="flex: 1; overflow-y: auto;">
+            <!-- Stage bar -->
+            <div class="stage-bar" style="padding: 6px 10px;">
+              <div class="stage-pip done"></div>
+              <div class="stage-pip done"></div>
+              <div class="stage-pip active"></div>
+              <div class="stage-pip"></div>
+              <div class="stage-pip"></div>
+              <div class="stage-pip"></div>
+              <div class="stage-pip"></div>
+              <div class="stage-pip"></div>
+            </div>
+            <div class="stage-label" style="padding: 2px 10px 6px;">
+              <span>Stage 3/8</span>
+              <strong>Needs Assessment</strong>
+            </div>
+
+            <!-- Coach cards -->
+            <div class="coach-card coach-card-blue" style="margin: 6px 10px;">
+              <div class="coach-card-type">Stage Prompt</div>
+              <div class="coach-card-body">Ask about <strong>timeline</strong> and <strong>preferences</strong>.</div>
+              <div class="coach-card-script" style="font-size: 0.6rem;">"What's your ideal timeline for this project?"</div>
+              <div class="coach-card-actions">
+                <div class="coach-btn coach-btn-use">Use</div>
+                <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+              </div>
+            </div>
+
+            <div class="coach-card coach-card-green" style="margin: 6px 10px;">
+              <div class="coach-card-type">Service Match</div>
+              <div class="coach-card-body">Detected <strong>"quartz countertops"</strong> — <strong>Quartz Countertop Install</strong> ($75/sq ft)</div>
+              <div class="coach-card-actions">
+                <div class="coach-btn coach-btn-use">Add to Estimate</div>
+                <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat input (mobile) -->
+          <div style="border-top: 1px solid rgba(255,255,255,0.06); padding: 6px 10px; background: rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <input type="text" placeholder="Command or feedback..." style="flex: 1; padding: 5px 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.6rem;" />
+              <div style="width: 26px; height: 26px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; cursor: pointer; flex-shrink: 0;">&#10148;</div>
+            </div>
+          </div>
+
+          <!-- Estimate peek bar at very bottom -->
+          <div style="border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); padding: 8px 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.7rem;">&#128176;</span>
+                <span style="font-size: 0.68rem; font-weight: 500; color: rgba(255,255,255,0.5);">3 items</span>
+              </div>
+              <span style="font-size: 0.9rem; font-weight: 700; color: #fff; font-family: monospace;">$27,700</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-purple">
+      <strong>Mobile experience:</strong> On phones and tablets, the video shrinks to the top. The "Push to Customer" toolbar sits between the video and call controls — horizontally scrollable for all 8 content types. Below that, the bottom drawer has swipeable tabs (Coach, Estimate, Transcript, Notes). The active push indicator shows what the customer is currently seeing. Same presentation toolkit as desktop, touch-optimized layout.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- Summary comparison -->
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; margin-bottom: 16px;">
+      <div style="padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <div style="font-size: 0.9rem; font-weight: 600; color: #fff;">Quick Comparison</div>
+      </div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.72rem;">
+        <thead>
+          <tr style="background: rgba(255,255,255,0.03);">
+            <th style="text-align: left; padding: 8px 14px; color: rgba(255,255,255,0.4); font-size: 0.6rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.06);"></th>
+            <th style="text-align: center; padding: 8px 14px; color: var(--green); font-size: 0.6rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.06);">A: Split (Rec.)</th>
+            <th style="text-align: center; padding: 8px 14px; color: rgba(255,255,255,0.4); font-size: 0.6rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.06);">B: Coach Full</th>
+            <th style="text-align: center; padding: 8px 14px; color: rgba(255,255,255,0.4); font-size: 0.6rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.06);">C: Estimate Full</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 8px 14px; color: rgba(255,255,255,0.6);">Coach visible</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--green);">Always &#10003;</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--green);">Always &#10003;</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--amber);">Toast only</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 8px 14px; color: rgba(255,255,255,0.6);">Estimate visible</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--green);">Always &#10003;</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--amber);">Peek bar</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--green);">Always &#10003;</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 8px 14px; color: rgba(255,255,255,0.6);">Tab switching needed</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--green);">Minimal</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--amber);">For estimate</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--amber);">For coach</td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 8px 14px; color: rgba(255,255,255,0.6);">Best for</td>
+            <td style="padding: 8px 14px; text-align: center; color: rgba(255,255,255,0.5);">All reps</td>
+            <td style="padding: 8px 14px; text-align: center; color: rgba(255,255,255,0.5);">New reps</td>
+            <td style="padding: 8px 14px; text-align: center; color: rgba(255,255,255,0.5);">Senior reps</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 14px; color: rgba(255,255,255,0.6);">Voice commands</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--green);">&#10003;</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--green);">&#10003;</td>
+            <td style="padding: 8px 14px; text-align: center; color: var(--green);">&#10003;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>Recommendation:</strong> Ship <strong>Variation A (Split)</strong> as the default. It gives every rep both coaching AND live estimate visibility without any tab switching. For power users, add a Settings toggle to switch to B or C as their preferred layout. The mobile bottom-drawer layout works the same regardless of which desktop variation is chosen.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 4: CUSTOMER VIEW -->
+<!-- ============================================================ -->
+<div id="step-customer-view" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">4</div>
+      <div class="step-title">What the Customer Sees</div>
+      <div class="step-subtitle">When the rep clicks "Present to Customer," the customer's screen transitions from video-only to a branded estimate view with the call still visible at the top.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> The customer's browser — they're already on the public consultation page (<code>/c/[token]</code>). The video shrinks to the top and a branded estimate appears below. Company logo, colors, and trust badges all come from Brand Kit.
+    </div>
+
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">yourcompany.servicepro.app/c/abc-xyz-123</div>
+      </div>
+      <div class="customer-layout">
+        <!-- Small video at top -->
+        <div class="customer-video-small">
+          <div class="call-timer" style="top: 8px; left: 8px;">22:15</div>
+          <div class="person-icon" style="font-size: 32px;">&#128100;</div>
+          <div style="position: absolute; bottom: 10px; right: 10px; display: flex; gap: 6px;">
+            <div style="width: 80px; height: 55px; background: #1a1a2e; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0.3; color: #fff;">&#128100;</div>
+            <div style="width: 80px; height: 55px; background: #1a1a2e; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0.3; color: #fff;">&#128100;</div>
+          </div>
+        </div>
+
+        <!-- Estimate below -->
+        <div class="customer-estimate-area">
+          <div style="padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700;">A</div>
+            <div>
+              <div style="font-weight: 700; font-size: 0.95rem;">ABC Renovations</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">Your Estimate</div>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 12px; font-size: 0.7rem; color: var(--text-muted);">
+              <span>&#11088; 4.9 Rating</span>
+              <span>&#128737; Licensed</span>
+              <span>&#128188; 15 Yrs</span>
+            </div>
+          </div>
+          <div style="padding: 20px 24px; max-width: 600px; margin: 0 auto;">
+            <h2 style="font-size: 1.1rem; margin-bottom: 4px;">Kitchen Renovation Proposal</h2>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px;">Prepared for John Smith &bull; February 9, 2026</p>
+
+            <div style="font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 6px;">Primary Services</div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem;">
+              <span>Cabinet Installation - Shaker White</span>
+              <span style="font-family: monospace; font-weight: 600;">$8,500</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem;">
+              <span>Quartz Countertop (200 sq ft)</span>
+              <span style="font-family: monospace; font-weight: 600;">$15,000</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem;">
+              <span>Kitchen Island Build &amp; Install</span>
+              <span style="font-family: monospace; font-weight: 600;">$4,200</span>
+            </div>
+
+            <div style="padding: 12px 0; margin-top: 8px; border-top: 2px solid var(--text);">
+              <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.8rem; color: var(--text-muted);">
+                <span>Subtotal</span><span style="font-family: monospace;">$27,700</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.8rem; color: var(--text-muted);">
+                <span>Tax (8.5%)</span><span style="font-family: monospace;">$2,355</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 1.2rem; font-weight: 700;">
+                <span>Total</span><span style="font-family: monospace;">$30,055</span>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 20px; text-align: center; background: #f8fafc; border-top: 1px solid var(--border);">
+            <div style="margin-bottom: 8px; font-size: 0.8rem; color: var(--text-muted);">Ready to move forward?</div>
+            <div style="display: inline-block; padding: 12px 40px; border-radius: 8px; background: var(--green); color: #fff; font-size: 1rem; font-weight: 600;">&#10003; Approve &amp; Sign</div>
+            <div style="margin-top: 10px; font-size: 0.72rem; color: var(--text-muted); text-decoration: underline;">I'd like to review this later</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>"Approve &amp; Sign":</strong> Closes the deal right on the call. Creates the estimate record, marks it approved, and optionally triggers the "Book Job" flow. If the customer clicks "review later," the estimate gets emailed as a polished page.
+    </div>
+
+    <div class="annotation">
+      <strong>Company branding:</strong> Logo, primary color, trust badges, and company info all come from your existing Brand Kit settings. No separate configuration needed.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 5: POST-CALL -->
+<!-- ============================================================ -->
+<div id="step-post-call" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">5</div>
+      <div class="step-title">After the Call Ends</div>
+      <div class="step-subtitle">The rep sees a summary screen while the AI pipeline kicks off in the background. Recording uploads to Bunny, Daily.co transcribes, Claude analyzes.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>What happens:</strong> Daily.co fires a <code>recording.ready</code> webhook → our API route downloads the recording → uploads to Bunny Stream → Daily.co post-call transcription starts ($0.0043/min) → transcript sent to Claude for analysis → draft estimate + page created.
+    </div>
+
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/consultations/call/abc-123 — Call Ended</div>
+      </div>
+      <div class="postcall-overlay">
+        <div class="postcall-card">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--green-light); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px;">&#10003;</div>
+          <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 4px;">Call Ended</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Kitchen Renovation - John Smith &bull; 32 minutes</p>
+
+          <!-- Summary -->
+          <div style="background: #f8fafc; border-radius: 8px; padding: 14px; margin-bottom: 16px; text-align: left;">
+            <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 8px;">Call Summary</div>
+            <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.8rem;">
+              <span style="color: var(--text-muted);">Duration</span><span style="font-weight: 600;">32 min</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.8rem;">
+              <span style="color: var(--text-muted);">Recording</span><span style="font-weight: 600; color: var(--green);">&#10003; Saved</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.8rem;">
+              <span style="color: var(--text-muted);">In-Call Estimate</span><span style="font-weight: 600;">3 items &middot; $30,055</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.8rem;">
+              <span style="color: var(--text-muted);">Customer Action</span><span style="font-weight: 600; color: var(--amber);">Reviewing Later</span>
+            </div>
+          </div>
+
+          <!-- AI Pipeline progress -->
+          <div style="background: var(--primary-light); border-radius: 8px; padding: 14px; margin-bottom: 20px; text-align: left;">
+            <div style="font-size: 0.78rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">&#129302; AI Pipeline Starting...</div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 0.75rem; color: var(--text);">
+              <span style="color: var(--green);">&#10003;</span> Recording saved to Daily.co
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 0.75rem; color: var(--primary);">
+              <span style="animation: pulse 1.5s infinite;">&#9679;</span> Uploading to Bunny Stream...
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 0.75rem; color: var(--text-muted);">
+              <span>&#9675;</span> Transcription via Daily.co (~2-5 min)
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 0.75rem; color: var(--text-muted);">
+              <span>&#9675;</span> AI analysis &amp; estimate enhancement
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 0.75rem; color: var(--text-muted);">
+              <span>&#9675;</span> Generate estimate page from template
+            </div>
+            <div style="margin-top: 6px; font-size: 0.68rem; color: var(--primary);">You'll be notified when AI enhancement is complete (~10 min)</div>
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <span class="btn btn-green">Review Estimate Now</span>
+            <span class="btn btn-outline">Back to Dashboard</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Behind the scenes — the data flow:</strong>
+    </div>
+
+    <div class="flow-row">
+      <div class="flow-box" style="background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2);">Daily.co<br><span style="font-size: 0.6rem;">recording.ready webhook</span></div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-box" style="background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2);">/api/idl/webhook<br><span style="font-size: 0.6rem;">Download recording</span></div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-box" style="background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2);">Bunny Stream<br><span style="font-size: 0.6rem;">Upload + CDN</span></div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-box" style="background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2);">Daily.co<br><span style="font-size: 0.6rem;">Post-call transcription</span></div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-box" style="background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.2);">Claude AI<br><span style="font-size: 0.6rem;">Analyze + generate</span></div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="flow-box" style="background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2);">Supabase<br><span style="font-size: 0.6rem;">Draft estimate + page</span></div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>If the rep already built an in-call estimate:</strong> The AI doesn't start from scratch. It uses the existing line items as a foundation and adds anything the rep missed — like materials they discussed but didn't add, or demolition that was implied. The rep sees "AI enhanced your estimate — 3 items suggested" on the review page.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 6: REVIEW & APPROVE -->
+<!-- ============================================================ -->
+<div id="step-review" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">6</div>
+      <div class="step-title">Review &amp; Approve</div>
+      <div class="step-subtitle">The rep reviews the AI-generated estimate — call recording + transcript on the left, enhanced estimate + page preview on the right.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> Estimates list → click the consultation estimate → or arrive from post-call screen. This is a new view within the existing Estimate Detail page, activated when the estimate has a linked consultation.
+    </div>
+
+    <!-- Full review page -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/estimates/est-047</div>
+      </div>
+      <div style="background: #fff; min-height: 520px;">
+        <!-- Header -->
+        <div style="padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="color: var(--text-muted); cursor: pointer;">&#8592;</span>
+            <div>
+              <div style="font-size: 1rem; font-weight: 700;">Kitchen Renovation Estimate</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">EST-047 &bull; John Smith &bull; Feb 9 &bull; 32 min call</div>
+            </div>
+            <span class="ai-badge" style="font-size: 0.65rem;">&#10024; AI Generated</span>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <span class="badge badge-green"><span class="badge-dot" style="background: var(--green);"></span> Ready for Review</span>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div style="display: flex; align-items: center; gap: 0; padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid var(--border); overflow-x: auto;">
+          <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--green); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px;">&#10003;</span>
+            <span style="font-size: 0.7rem; color: var(--green); font-weight: 500;">Recorded</span>
+          </div>
+          <div style="width: 24px; height: 2px; background: var(--green); flex-shrink: 0;"></div>
+          <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--green); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px;">&#10003;</span>
+            <span style="font-size: 0.7rem; color: var(--green); font-weight: 500;">Uploaded</span>
+          </div>
+          <div style="width: 24px; height: 2px; background: var(--green); flex-shrink: 0;"></div>
+          <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--green); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px;">&#10003;</span>
+            <span style="font-size: 0.7rem; color: var(--green); font-weight: 500;">Transcribed</span>
+          </div>
+          <div style="width: 24px; height: 2px; background: var(--green); flex-shrink: 0;"></div>
+          <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--green); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px;">&#10003;</span>
+            <span style="font-size: 0.7rem; color: var(--green); font-weight: 500;">AI Analyzed</span>
+          </div>
+          <div style="width: 24px; height: 2px; background: var(--green); flex-shrink: 0;"></div>
+          <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+            <span style="width: 20px; height: 20px; border-radius: 50%; background: var(--primary); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; animation: pulse 1.5s infinite;">&#9998;</span>
+            <span style="font-size: 0.7rem; color: var(--primary); font-weight: 600;">Review</span>
+          </div>
+        </div>
+
+        <!-- Two column -->
+        <div class="review-grid" style="padding: 16px 20px;">
+          <!-- Left: Recording + Transcript -->
+          <div>
+            <div class="mock-card">
+              <div class="mock-card-header">
+                <span class="mock-card-title">Call Recording</span>
+                <span style="font-size: 0.65rem; color: var(--text-muted);">Bunny Stream</span>
+              </div>
+              <div style="background: #111; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; cursor: pointer;">&#9654;</div>
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 8px 12px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); display: flex; align-items: center; gap: 8px;">
+                  <span style="color: #fff; font-size: 0.65rem; font-family: monospace;">11:23</span>
+                  <div style="flex: 1; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; position: relative;">
+                    <div style="position: absolute; top: 0; left: 0; height: 100%; width: 35%; background: var(--primary); border-radius: 2px;"></div>
+                  </div>
+                  <span style="color: #fff; font-size: 0.65rem; font-family: monospace;">32:15</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mock-card">
+              <div class="mock-card-header">
+                <span class="mock-card-title">Transcript</span>
+                <span style="font-size: 0.65rem; color: var(--text-muted);">47 entries</span>
+              </div>
+              <div style="padding: 8px 12px; border-bottom: 1px solid var(--border);">
+                <input type="text" placeholder="Search transcript..." style="width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.72rem;" />
+              </div>
+              <div style="max-height: 180px; overflow-y: auto;">
+                <div style="padding: 8px 12px; border-bottom: 1px solid #f8fafc; display: flex; gap: 8px;">
+                  <span style="font-size: 0.6rem; color: var(--primary); font-family: monospace; white-space: nowrap;">00:12</span>
+                  <div>
+                    <div style="font-size: 0.65rem; font-weight: 600; color: var(--text);">You (Host)</div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted);">Hi John, today we're going over your <span style="background: var(--amber-light); padding: 0 2px; border-radius: 2px;">kitchen renovation</span> project.</div>
+                  </div>
+                </div>
+                <div style="padding: 8px 12px; border-bottom: 1px solid #f8fafc; display: flex; gap: 8px;">
+                  <span style="font-size: 0.6rem; color: var(--primary); font-family: monospace; white-space: nowrap;">00:28</span>
+                  <div>
+                    <div style="font-size: 0.65rem; font-weight: 600; color: var(--text);">John Smith</div>
+                    <div style="font-size: 0.72rem; color: var(--text-muted);">New <span style="background: var(--amber-light); padding: 0 2px; border-radius: 2px;">cabinets</span>, <span style="background: var(--amber-light); padding: 0 2px; border-radius: 2px;">countertops</span>, about <span style="background: var(--amber-light); padding: 0 2px; border-radius: 2px;">200 sq ft</span>.</div>
+                  </div>
+                </div>
+                <div style="padding: 10px 12px; text-align: center; font-size: 0.7rem; color: var(--text-muted);">... 45 more entries ...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Estimate + Page Preview -->
+          <div>
+            <div class="mock-card">
+              <div class="review-tabs">
+                <div class="review-tab active">&#10024; Estimate</div>
+                <div class="review-tab">&#128196; Page Preview</div>
+              </div>
+
+              <!-- AI enhancement banner -->
+              <div style="padding: 8px 14px; background: var(--primary-light); border-bottom: 1px solid var(--border); font-size: 0.72rem; color: var(--primary-dark); display: flex; align-items: center; gap: 6px;">
+                &#10024; AI enhanced your in-call estimate. <strong>3 items suggested</strong> (marked below).
+              </div>
+
+              <!-- Line items -->
+              <div style="padding: 8px 14px; font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border);">Primary Services</div>
+              <table class="mock-table">
+                <tbody>
+                  <tr><td>Cabinet Install - Shaker White</td><td style="text-align: right; font-family: monospace;">$8,500</td></tr>
+                  <tr><td>Quartz Countertop (200 sq ft)</td><td style="text-align: right; font-family: monospace;">$15,000</td></tr>
+                  <tr><td>Kitchen Island Build</td><td style="text-align: right; font-family: monospace;">$4,200</td></tr>
+                </tbody>
+              </table>
+              <div style="padding: 8px 14px; font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); border-top: 1px solid var(--border);">AI Suggested</div>
+              <table class="mock-table">
+                <tbody>
+                  <tr style="background: var(--purple-light);"><td>Demolition &amp; Debris <span class="ai-badge">&#10024; AI</span></td><td style="text-align: right; font-family: monospace;">$2,500</td></tr>
+                  <tr style="background: var(--purple-light);"><td>Undercabinet Lighting <span class="ai-badge">&#10024; AI</span></td><td style="text-align: right; font-family: monospace;">$1,800</td></tr>
+                  <tr style="background: var(--purple-light);"><td>Backsplash Tile (30 sq ft) <span class="ai-badge">&#10024; AI</span></td><td style="text-align: right; font-family: monospace;">$360</td></tr>
+                </tbody>
+              </table>
+
+              <!-- Totals -->
+              <div style="padding: 12px 14px; border-top: 2px solid var(--text);">
+                <div style="display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.8rem; color: var(--text-muted);">
+                  <span>Subtotal</span><span style="font-family: monospace;">$32,360</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.8rem; color: var(--text-muted);">
+                  <span>Tax (8.5%)</span><span style="font-family: monospace;">$2,751</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 1rem; font-weight: 700;">
+                  <span>Total</span><span style="font-family: monospace;">$35,111</span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div style="padding: 12px 14px; border-top: 1px solid var(--border); background: #f8fafc; display: flex; gap: 8px;">
+                <span class="btn btn-green btn-sm" style="flex: 1; justify-content: center;">&#10003; Accept &amp; Publish</span>
+                <span class="btn btn-outline btn-sm">&#8635; Regenerate</span>
+                <span class="btn btn-outline btn-sm">&#9998; Edit in Builder</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>Accept &amp; Publish:</strong> Saves the estimate with all line items (including accepted AI suggestions), creates the estimate page, and sends it to the customer. The rep can also click "Edit in Builder" to customize the page layout before publishing.
+    </div>
+
+    <div class="annotation annotation-purple">
+      <strong>AI suggestions are removable:</strong> Each AI-suggested line item has a dismiss button. The rep has full control — accept all, reject some, or modify prices. Nothing goes to the customer without the rep's approval.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 7: PAGE BUILDER -->
+<!-- ============================================================ -->
+<div id="step-builder" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">7</div>
+      <div class="step-title">AI-Populated Page Builder</div>
+      <div class="step-subtitle">When the rep clicks "Edit in Builder," they see the existing PageBuilder with sections pre-filled by AI from the call transcript.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> The existing Estimate PageBuilder (<code>/estimate-pages/[id]/builder</code>). No new builder — same PageBuilder you already use. The AI just pre-populates the sections with content extracted from the call.
+    </div>
+
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/estimate-pages/pg-047/builder</div>
+      </div>
+      <div class="mock-builder">
+        <div class="mock-builder-top">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="color: var(--text-muted);">&#8592;</span>
+            <span style="font-size: 0.9rem; font-weight: 600;">Page Builder</span>
+            <span class="ai-badge">&#10024; AI-Populated</span>
+            <span style="font-size: 0.65rem; color: var(--text-muted);">EST-047 &bull; John Smith</span>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <span class="btn btn-outline btn-sm">&#128065; Preview</span>
+            <span class="btn btn-outline btn-sm">Save</span>
+            <span class="btn btn-green btn-sm">Publish</span>
+          </div>
+        </div>
+        <div class="mock-builder-body">
+          <!-- Left sidebar -->
+          <div class="mock-builder-left">
+            <div style="font-size: 0.6rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); padding: 10px 8px 4px;">Sections</div>
+            <div class="section-item ai-pop selected"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#127968;</span><span style="flex: 1; font-size: 0.72rem;">Hero</span></div>
+            <div class="section-item"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#128737;</span><span style="flex: 1; font-size: 0.72rem;">Trust Badges</span></div>
+            <div class="section-item ai-pop"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#128203;</span><span style="flex: 1; font-size: 0.72rem;">Scope of Work</span></div>
+            <div class="section-item ai-pop"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#128176;</span><span style="flex: 1; font-size: 0.72rem;">Pricing</span></div>
+            <div class="section-item ai-pop"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#128197;</span><span style="flex: 1; font-size: 0.72rem;">Timeline</span></div>
+            <div class="section-item"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#128248;</span><span style="flex: 1; font-size: 0.72rem;">Gallery</span></div>
+            <div class="section-item"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#11088;</span><span style="flex: 1; font-size: 0.72rem;">Testimonials</span></div>
+            <div class="section-item ai-pop"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#10067;</span><span style="flex: 1; font-size: 0.72rem;">FAQ</span></div>
+            <div class="section-item"><span style="width: 16px; text-align: center; font-size: 0.7rem;">&#10003;</span><span style="flex: 1; font-size: 0.72rem;">Approval</span></div>
+            <div style="padding: 8px;">
+              <span class="btn btn-outline btn-sm" style="width: 100%; justify-content: center; font-size: 0.68rem;">+ Add Section</span>
+            </div>
+            <div style="padding: 4px 8px; display: flex; align-items: center; gap: 4px; font-size: 0.6rem; color: var(--text-muted);">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #7c3aed);"></div> AI-populated
+            </div>
+          </div>
+
+          <!-- Center preview -->
+          <div class="mock-builder-center">
+            <div style="width: 100%; max-width: 600px;">
+              <div class="preview-section ai-hl">
+                <div class="preview-ai-tag"><span class="ai-badge">&#10024; AI</span></div>
+                <div style="background: linear-gradient(135deg, #1e3a5f, #2563eb); color: #fff; padding: 28px 20px; text-align: center;">
+                  <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Your Kitchen Renovation Proposal</div>
+                  <div style="opacity: 0.8; font-size: 0.8rem;">A complete transformation for the Smith residence</div>
+                </div>
+              </div>
+              <div class="preview-section">
+                <div style="padding: 14px 20px; background: #f8fafc; display: flex; gap: 20px; justify-content: center; font-size: 0.72rem; color: var(--text-muted);">
+                  <span>&#11088; 4.9 Rating</span>
+                  <span>&#128737; Licensed</span>
+                  <span>&#128188; 15 Years</span>
+                </div>
+              </div>
+              <div class="preview-section ai-hl">
+                <div class="preview-ai-tag"><span class="ai-badge">&#10024; AI</span></div>
+                <div style="padding: 20px;">
+                  <div style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;">Scope of Work</div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;">Complete kitchen renovation of ~200 sq ft. New white shaker cabinets, quartz countertops with marble-look finish, custom center island, plumbing updates, undercabinet lighting, and subway tile backsplash.</div>
+                </div>
+              </div>
+              <div class="preview-section ai-hl">
+                <div class="preview-ai-tag"><span class="ai-badge">&#10024; AI</span></div>
+                <div style="padding: 20px; background: #f8fafc;">
+                  <div style="font-size: 1rem; font-weight: 700; margin-bottom: 10px;">Project Timeline</div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                      <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; flex-shrink: 0;">1</div>
+                      <div><div style="font-size: 0.78rem; font-weight: 600;">Demo &amp; Prep (Week 1)</div></div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                      <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; flex-shrink: 0;">2</div>
+                      <div><div style="font-size: 0.78rem; font-weight: 600;">Cabinets &amp; Island (Week 2)</div></div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                      <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; flex-shrink: 0;">3</div>
+                      <div><div style="font-size: 0.78rem; font-weight: 600;">Finishing (Week 3)</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right panel -->
+          <div class="mock-builder-right">
+            <div style="padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 0.8rem; font-weight: 600;">Hero Section</span>
+              <span class="ai-badge">&#10024; AI</span>
+            </div>
+            <div style="padding: 10px 12px;">
+              <div style="margin-bottom: 10px;">
+                <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 3px;">Title</div>
+                <input type="text" value="Your Kitchen Renovation Proposal" style="width: 100%; padding: 6px 8px; border: 1px solid var(--primary); border-radius: 6px; font-size: 0.75rem; background: var(--primary-light);" />
+              </div>
+              <div style="margin-bottom: 10px;">
+                <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 3px;">Subtitle</div>
+                <input type="text" value="A complete transformation for the Smith residence" style="width: 100%; padding: 6px 8px; border: 1px solid var(--primary); border-radius: 6px; font-size: 0.75rem; background: var(--primary-light);" />
+              </div>
+              <div style="margin-bottom: 10px;">
+                <div style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 3px;">Background</div>
+                <select style="width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.75rem;">
+                  <option>Primary gradient</option>
+                </select>
+              </div>
+            </div>
+            <div style="padding: 10px 12px; border-top: 1px solid var(--border); margin-top: 8px;">
+              <div style="font-size: 0.62rem; color: var(--text-muted); margin-bottom: 6px;">Blue-bordered fields = AI generated. Edit freely.</div>
+              <span class="btn btn-outline btn-sm" style="width: 100%; justify-content: center; font-size: 0.68rem;">&#8635; Regenerate Section</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>Same PageBuilder, AI-populated:</strong> Hero title/subtitle, Scope of Work, Timeline, FAQ — all extracted from the call transcript by Claude. Template sections like Trust Badges, Gallery, and Testimonials come from the company's Brand Kit. The rep can edit, rearrange, add, or remove any section just like they normally would.
+    </div>
+
+    <div class="annotation">
+      <strong>Sections populated by AI:</strong> Hero (title, subtitle from project description), Scope of Work (extracted from discussion), Timeline (inferred from call), FAQ (actual Q&amp;A from the conversation), Pricing (from estimate line items). <strong>Sections from template:</strong> Trust Badges, Gallery, Testimonials, Approval (from Brand Kit / company defaults).
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 8: SETTINGS -->
+<!-- ============================================================ -->
+<div id="step-settings" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">8</div>
+      <div class="step-title">IDL Settings</div>
+      <div class="step-subtitle">Company-level configuration for the AI Document Layer — toggles, defaults, and AI context sources.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> Settings sidebar, under a new "AI Document Layer" item in the Integrations section — alongside Tech Portal, API Keys, and Consultations.
+    </div>
+
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/settings/ai-document-layer</div>
+      </div>
+      <div class="mock-app">
+        <div class="mock-sidebar">
+          <div class="mock-sidebar-logo">
+            <div class="mock-logo-icon">S</div>
+            <div class="mock-logo-text">ServicePro</div>
+          </div>
+          <div class="mock-nav">
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#127968;</span> Dashboard</div>
+            <div class="mock-nav-section">Sales</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128196;</span> Estimates</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128195;</span> Estimate Pages</div>
+            <div class="mock-nav-section">Operations</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128295;</span> Jobs</div>
+            <div class="mock-nav-section" style="margin-top: auto;"></div>
+            <div class="mock-nav-item active"><span class="mock-nav-icon">&#9881;</span> Settings</div>
+          </div>
+        </div>
+        <div class="mock-main">
+          <div class="mock-settings-layout">
+            <div class="mock-settings-sidebar">
+              <div class="mock-settings-header">Settings</div>
+              <div class="mock-settings-nav">
+                <div class="mock-settings-section-label">General</div>
+                <div class="mock-settings-item"><span class="s-icon">&#127970;</span> Company Profile</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128101;</span> Team Members</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128101;</span> Crews</div>
+
+                <div class="mock-settings-section-label">Business</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128176;</span> Service Catalog</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128230;</span> Materials</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128196;</span> Estimate Builder</div>
+
+                <div class="mock-settings-section-label">Customization</div>
+                <div class="mock-settings-item"><span class="s-icon">&#127912;</span> Brand Kit</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128279;</span> Universal Blocks</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128196;</span> Contracts</div>
+
+                <div class="mock-settings-section-label">Integrations</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128249;</span> Consultations</div>
+                <div class="mock-settings-item active" style="font-weight: 600; animation: pulseBox 2s infinite;">
+                  <span class="s-icon">&#129302;</span> AI Document Layer
+                </div>
+                <div class="mock-settings-item"><span class="s-icon">&#128241;</span> Tech Portal</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128273;</span> API Keys</div>
+              </div>
+            </div>
+
+            <div class="mock-settings-content">
+              <div class="mock-page-title">AI Document Layer</div>
+              <div class="mock-page-desc">Configure how AI processes consultation recordings to generate estimates and pages.</div>
+
+              <div style="margin-top: 4px;">
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Enable IDL Pipeline</h4><p>Automatically process recordings through AI after calls</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Auto-Record Consultations</h4><p>Automatically record all consultation calls via Daily.co</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Live Transcription</h4><p>Show real-time transcript during calls ($0.0059/min)</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Auto-Generate Estimate</h4><p>Create draft estimate from transcript after call ends</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Auto-Populate Page</h4><p>Fill estimate page sections from transcript + template</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Enable Live Estimate Widget</h4><p>Allow reps to build and present estimates during calls</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Allow Live Approval</h4><p>Customers can approve &amp; sign during the call</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Default Page Template</h4><p>Template for AI-generated estimate pages</p></div>
+                  <select class="select-field"><option>Executive Professional</option><option>Clean &amp; Modern</option><option>Full Landing Page</option></select>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Default Pricing Model</h4><p>How AI structures estimate pricing</p></div>
+                  <select class="select-field"><option>Flat Rate</option><option>Hourly</option><option>Per Service</option></select>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Notify When Ready</h4><p>Send notification when AI estimate is complete</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+              </div>
+
+              <!-- AI Sales Coach section -->
+              <div style="margin-top: 24px; padding-top: 20px; border-top: 2px solid var(--border);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                  <span style="font-size: 1rem;">&#129302;</span>
+                  <div style="font-size: 1rem; font-weight: 700; color: var(--text);">AI Sales Coach</div>
+                  <span style="padding: 2px 8px; border-radius: 10px; background: var(--purple-light); color: var(--purple); font-size: 0.6rem; font-weight: 700;">NEW</span>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">Real-time coaching cards that guide reps through the sales process during calls. Only visible to the host.</div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Enable AI Coach</h4><p>Show the Coach tab in the side panel during consultation calls</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Stage Detection</h4><p>Auto-detect sales stages from transcript keywords</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Service Matching</h4><p>Match transcript mentions to your Service &amp; Materials Catalogs</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Objection Detection</h4><p>Surface counter-argument scripts when objections are detected</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Closing Scripts</h4><p>Show closing technique scripts when entering the closing stage</p></div>
+                  <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Max Visible Cards</h4><p>Maximum coaching cards shown at once</p></div>
+                  <select class="select-field" style="min-width: 100px;"><option>3</option><option>2</option><option>4</option><option>5</option></select>
+                </div>
+                <div class="setting-row">
+                  <div class="setting-info"><h4>Card Auto-Dismiss</h4><p>Time before unread cards automatically dismiss</p></div>
+                  <select class="select-field" style="min-width: 100px;"><option>2 minutes</option><option>1 minute</option><option>5 minutes</option><option>Never</option></select>
+                </div>
+              </div>
+
+              <!-- AI Context Sources -->
+              <div style="margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border);">
+                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">AI Context Sources</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 10px;">The AI uses these to match transcript content to your actual services and pricing.</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  <span class="badge badge-green"><span class="badge-dot" style="background: var(--green);"></span> Service Catalog (12 services)</span>
+                  <span class="badge badge-green"><span class="badge-dot" style="background: var(--green);"></span> Materials Catalog (8 items)</span>
+                  <span class="badge badge-green"><span class="badge-dot" style="background: var(--green);"></span> Brand Kit</span>
+                  <span class="badge badge-green"><span class="badge-dot" style="background: var(--green);"></span> Estimate Settings</span>
+                  <span class="badge badge-green"><span class="badge-dot" style="background: var(--green);"></span> Auto Fees</span>
+                </div>
+              </div>
+
+              <!-- Cost estimate -->
+              <div style="margin-top: 16px; padding: 16px; background: var(--primary-light); border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);">
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 4px;">Estimated Cost per Call</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">Based on a typical 30-minute consultation with 2 participants.</div>
+                <div style="display: flex; gap: 16px; font-size: 0.78rem;">
+                  <div><span style="color: var(--text-muted);">Daily.co transcription:</span> <strong>~$0.35</strong></div>
+                  <div><span style="color: var(--text-muted);">Claude AI analysis:</span> <strong>~$0.15</strong></div>
+                  <div><span style="color: var(--text-muted);">Bunny storage:</span> <strong>~$0.01</strong></div>
+                  <div style="border-left: 1px solid var(--border); padding-left: 16px;"><span style="color: var(--primary-dark); font-weight: 700;">Total: ~$0.51/call</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>Everything connects to existing features:</strong> Service Catalog feeds the quick-add chips and AI matching. Materials Catalog provides material pricing. Brand Kit supplies company logo, colors, and trust badges. Estimate Settings provides pricing model defaults and auto-fees. No new data entry — IDL reads what you've already configured.
+    </div>
+
+    <div class="annotation annotation-amber">
+      <strong>Cost transparency:</strong> The settings page shows estimated per-call costs so the company knows exactly what they're paying. At ~$0.51/call, a company doing 100 consultations/month pays ~$51 for AI-generated estimates. Compare that to 15+ minutes of manual work per estimate.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 9: AI COACH DEEP DIVE -->
+<!-- ============================================================ -->
+<div id="step-ai-coach" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">9</div>
+      <div class="step-title">AI Sales Coach — How It Works</div>
+      <div class="step-subtitle">A real-time coaching assistant that reads the live transcript and guides your rep through a structured closing process. Only the rep sees it — the customer never knows.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>The concept:</strong> The AI Coach monitors every transcript message as it arrives during a live consultation call. It detects what <strong>sales stage</strong> you're in based on keywords, matches mentions against your <strong>Service Catalog</strong>, detects <strong>objections</strong>, and surfaces coaching cards with talking points, scripts, and suggested next steps. Phase 1 is entirely client-side — zero API calls, zero cost, zero latency.
+    </div>
+
+    <!-- ===== SECTION 1: Sales Stage Pipeline ===== -->
+    <div style="margin-top: 32px; margin-bottom: 8px;">
+      <div style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px;">The 8-Stage Sales Pipeline</div>
+      <div style="font-size: 0.85rem; color: var(--sidebar-text);">Every consultation call flows through these stages. The coach auto-detects where you are based on what's being said.</div>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px 12px; margin-bottom: 20px;">
+      <div class="stage-flow">
+        <div class="stage-box">&#128075; Greeting</div>
+        <div class="stage-arrow">&#8594;</div>
+        <div class="stage-box">&#128269; Discovery</div>
+        <div class="stage-arrow">&#8594;</div>
+        <div class="stage-box active-stage">&#128203; Needs Assessment</div>
+        <div class="stage-arrow">&#8594;</div>
+        <div class="stage-box">&#128161; Solution Presentation</div>
+        <div class="stage-arrow">&#8594;</div>
+        <div class="stage-box">&#128176; Pricing</div>
+        <div class="stage-arrow">&#8594;</div>
+        <div class="stage-box">&#128165; Objection Handling</div>
+        <div class="stage-arrow">&#8594;</div>
+        <div class="stage-box">&#129309; Closing</div>
+        <div class="stage-arrow">&#8594;</div>
+        <div class="stage-box">&#128588; Wrap Up</div>
+      </div>
+    </div>
+
+    <!-- Stage details table -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; margin-bottom: 20px;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.75rem;">
+        <thead>
+          <tr style="background: rgba(255,255,255,0.04);">
+            <th style="text-align: left; padding: 10px 14px; color: rgba(255,255,255,0.5); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid rgba(255,255,255,0.06);">Stage</th>
+            <th style="text-align: left; padding: 10px 14px; color: rgba(255,255,255,0.5); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid rgba(255,255,255,0.06);">What's Happening</th>
+            <th style="text-align: left; padding: 10px 14px; color: rgba(255,255,255,0.5); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid rgba(255,255,255,0.06);">Trigger Keywords</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 10px 14px; color: #fff; font-weight: 500;">&#128075; Greeting</td>
+            <td style="padding: 10px 14px; color: rgba(255,255,255,0.5);">Opening rapport, introductions</td>
+            <td style="padding: 10px 14px;"><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">thanks for joining</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">how are you</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem;">first 60 seconds</span></td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 10px 14px; color: #fff; font-weight: 500;">&#128269; Discovery</td>
+            <td style="padding: 10px 14px; color: rgba(255,255,255,0.5);">Understanding the customer's situation</td>
+            <td style="padding: 10px 14px;"><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">tell me about</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">what brings you</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem;">looking for</span></td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 10px 14px; color: #fff; font-weight: 500;">&#128203; Needs Assessment</td>
+            <td style="padding: 10px 14px; color: rgba(255,255,255,0.5);">Qualifying scope, specifics, dimensions</td>
+            <td style="padding: 10px 14px;"><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">how many</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">square feet</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem;">timeline</span></td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 10px 14px; color: #fff; font-weight: 500;">&#128161; Solution Presentation</td>
+            <td style="padding: 10px 14px; color: rgba(255,255,255,0.5);">Presenting your services and process</td>
+            <td style="padding: 10px 14px;"><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">we offer</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">our process</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem;">what we do</span></td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 10px 14px; color: #fff; font-weight: 500;">&#128176; Pricing Discussion</td>
+            <td style="padding: 10px 14px; color: rgba(255,255,255,0.5);">Costs, value, budget conversation</td>
+            <td style="padding: 10px 14px;"><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">price</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">cost</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">budget</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem;">how much</span></td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 10px 14px; color: #fff; font-weight: 500;">&#128165; Objection Handling</td>
+            <td style="padding: 10px 14px; color: rgba(255,255,255,0.5);">Addressing concerns and hesitations</td>
+            <td style="padding: 10px 14px;"><span style="padding: 2px 6px; background: rgba(245,158,11,0.15); border-radius: 4px; color: #fbbf24; font-size: 0.65rem; margin-right: 4px;">too expensive</span><span style="padding: 2px 6px; background: rgba(245,158,11,0.15); border-radius: 4px; color: #fbbf24; font-size: 0.65rem; margin-right: 4px;">think about it</span><span style="padding: 2px 6px; background: rgba(245,158,11,0.15); border-radius: 4px; color: #fbbf24; font-size: 0.65rem;">other company</span></td>
+          </tr>
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <td style="padding: 10px 14px; color: #fff; font-weight: 500;">&#129309; Closing</td>
+            <td style="padding: 10px 14px; color: rgba(255,255,255,0.5);">Moving toward commitment</td>
+            <td style="padding: 10px 14px;"><span style="padding: 2px 6px; background: rgba(34,197,94,0.15); border-radius: 4px; color: #4ade80; font-size: 0.65rem; margin-right: 4px;">get started</span><span style="padding: 2px 6px; background: rgba(34,197,94,0.15); border-radius: 4px; color: #4ade80; font-size: 0.65rem; margin-right: 4px;">schedule</span><span style="padding: 2px 6px; background: rgba(34,197,94,0.15); border-radius: 4px; color: #4ade80; font-size: 0.65rem;">move forward</span></td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 14px; color: #fff; font-weight: 500;">&#128588; Wrap Up</td>
+            <td style="padding: 10px 14px; color: rgba(255,255,255,0.5);">Ending the call, next steps</td>
+            <td style="padding: 10px 14px;"><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">thank you</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem; margin-right: 4px;">next steps</span><span style="padding: 2px 6px; background: rgba(59,130,246,0.15); border-radius: 4px; color: #60a5fa; font-size: 0.65rem;">follow up</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="annotation">
+      <strong>Detection is simple and fast:</strong> Every new transcript message is scanned for these keyword patterns. The last 5 messages are weighted most heavily. The stage only advances forward (never jumps back to Greeting from Pricing). This keeps it predictable and useful.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- ===== SECTION 2: Coaching Card Types ===== -->
+    <div style="margin-top: 16px; margin-bottom: 8px;">
+      <div style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px;">5 Types of Coaching Cards</div>
+      <div style="font-size: 0.85rem; color: var(--sidebar-text);">Each card type serves a different purpose. Cards auto-appear based on what's happening in the conversation (max 3 visible at once).</div>
+    </div>
+
+    <div class="card-type-grid">
+      <!-- 1. Stage Prompt -->
+      <div class="card-type-example">
+        <div class="card-type-header" style="color: #60a5fa;">
+          <span style="width: 8px; height: 8px; border-radius: 2px; background: var(--primary); display: inline-block;"></span>
+          1. Stage Prompt (Blue)
+        </div>
+        <div class="coach-card coach-card-blue" style="margin: 0;">
+          <div class="coach-card-type">Stage Prompt</div>
+          <div class="coach-card-body">
+            <strong>Discovery</strong> — Ask open-ended questions. Let the customer describe their situation in their own words.
+          </div>
+          <div class="coach-card-script">"Tell me about the project you have in mind. What got you thinking about this?"</div>
+          <div class="coach-card-actions">
+            <div class="coach-btn coach-btn-use">Use</div>
+            <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+            <div class="coach-btn coach-btn-more">More...</div>
+          </div>
+        </div>
+        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 8px; line-height: 1.4;">Appears when you enter a new stage. Provides talking points and a suggested script. "Use" copies the script text. "More" shows alternative phrasings.</div>
+      </div>
+
+      <!-- 2. Service Suggestion -->
+      <div class="card-type-example">
+        <div class="card-type-header" style="color: #4ade80;">
+          <span style="width: 8px; height: 8px; border-radius: 2px; background: var(--green); display: inline-block;"></span>
+          2. Service Suggestion (Green)
+        </div>
+        <div class="coach-card coach-card-green" style="margin: 0;">
+          <div class="coach-card-type">Service Match</div>
+          <div class="coach-card-body">
+            Customer mentioned <strong>"deep clean"</strong> — matches <strong>Deep Cleaning Package</strong> ($350) from your Service Catalog.
+          </div>
+          <div class="coach-card-actions">
+            <div class="coach-btn coach-btn-use">Add to Estimate</div>
+            <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+          </div>
+        </div>
+        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 8px; line-height: 1.4;">Appears when transcript keywords match items in your Service Catalog or Materials Catalog. "Add to Estimate" pushes it directly to the Estimate tab.</div>
+      </div>
+
+      <!-- 3. Objection Response -->
+      <div class="card-type-example">
+        <div class="card-type-header" style="color: #fbbf24;">
+          <span style="width: 8px; height: 8px; border-radius: 2px; background: var(--amber); display: inline-block;"></span>
+          3. Objection Response (Amber)
+        </div>
+        <div class="coach-card coach-card-amber" style="margin: 0;">
+          <div class="coach-card-type">Objection Detected</div>
+          <div class="coach-card-body">
+            Customer said <strong>"that seems expensive"</strong> — Price objection detected.
+          </div>
+          <div class="coach-card-script">"I completely understand. Let me break down exactly what's included and the value you're getting. Many of our clients find that..."</div>
+          <div class="coach-card-actions">
+            <div class="coach-btn coach-btn-use">Use</div>
+            <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+            <div class="coach-btn coach-btn-more">More...</div>
+          </div>
+        </div>
+        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 8px; line-height: 1.4;">Appears when the customer uses objection language (too expensive, need to think, comparing competitors). Provides counter-arguments and reframing scripts.</div>
+      </div>
+
+      <!-- 4. Closing Script -->
+      <div class="card-type-example">
+        <div class="card-type-header" style="color: #a78bfa;">
+          <span style="width: 8px; height: 8px; border-radius: 2px; background: var(--purple); display: inline-block;"></span>
+          4. Closing Script (Purple)
+        </div>
+        <div class="coach-card coach-card-purple" style="margin: 0;">
+          <div class="coach-card-type">Closing Technique</div>
+          <div class="coach-card-body">
+            <strong>Assumptive Close</strong> — The customer sounds ready. Guide them to next steps.
+          </div>
+          <div class="coach-card-script">"Great, so let's get this on the schedule. I can have the team out as early as next Tuesday. Would morning or afternoon work better for you?"</div>
+          <div class="coach-card-actions">
+            <div class="coach-btn coach-btn-use">Use</div>
+            <div class="coach-btn coach-btn-dismiss">Dismiss</div>
+            <div class="coach-btn coach-btn-more">More...</div>
+          </div>
+        </div>
+        <div style="font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 8px; line-height: 1.4;">Appears during the Closing stage. Offers specific closing techniques (assumptive, urgency, summary) with ready-to-use scripts.</div>
+      </div>
+    </div>
+
+    <!-- 5. Info Alert (full width) -->
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 16px; margin-bottom: 20px;">
+      <div class="card-type-header" style="color: #94a3b8;">
+        <span style="width: 8px; height: 8px; border-radius: 2px; background: #475569; display: inline-block;"></span>
+        5. Info Alert (Gray)
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
+        <div class="coach-card coach-card-gray" style="margin: 0;">
+          <div class="coach-card-type">Info</div>
+          <div class="coach-card-body">Customer mentioned a competitor: <strong>"ABC Services"</strong>. They may be comparing quotes.</div>
+        </div>
+        <div class="coach-card coach-card-gray" style="margin: 0;">
+          <div class="coach-card-type">Info</div>
+          <div class="coach-card-body">Budget mentioned: <strong>$35,000 - $45,000</strong>. Current estimate total: <strong>$27,700</strong>. Headroom: ~$17,300.</div>
+        </div>
+      </div>
+      <div style="font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 8px; line-height: 1.4;">Contextual facts extracted from the conversation — competitor mentions, budget figures, timeline references. No action needed, just awareness.</div>
+    </div>
+
+    <div class="annotation annotation-green">
+      <strong>Card lifecycle:</strong> Cards auto-appear when triggered (max 3 visible). They auto-dismiss after 2 minutes if not interacted with. The rep can "Use" (copy script text), "Dismiss" (fade out), or "More" (show alternate phrasings). Cards never interrupt the rep — they slide in gently in the side panel.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- ===== SECTION 3: How Detection Works (Flow) ===== -->
+    <div style="margin-top: 16px; margin-bottom: 8px;">
+      <div style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px;">How Detection Works</div>
+      <div style="font-size: 0.85rem; color: var(--sidebar-text);">The coach processes every transcript message through three detection engines running in parallel — all client-side, all instant.</div>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 24px 16px; margin-bottom: 20px;">
+      <!-- Flow: transcript message in -->
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); border-radius: 8px;">
+          <span style="font-size: 1rem;">&#128483;</span>
+          <span style="font-size: 0.8rem; font-weight: 600; color: #60a5fa;">New Transcript Message Arrives</span>
+        </div>
+      </div>
+
+      <div style="text-align: center; color: #475569; margin-bottom: 16px;">&#8595;</div>
+
+      <!-- Three parallel engines -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 0.85rem; margin-bottom: 4px;">&#128269;</div>
+          <div style="font-size: 0.72rem; font-weight: 600; color: #60a5fa; margin-bottom: 4px;">detectStage()</div>
+          <div style="font-size: 0.62rem; color: rgba(255,255,255,0.4);">Scans last 5 messages for stage keywords. Updates current stage.</div>
+        </div>
+        <div style="background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 0.85rem; margin-bottom: 4px;">&#128218;</div>
+          <div style="font-size: 0.72rem; font-weight: 600; color: #4ade80; margin-bottom: 4px;">matchServices()</div>
+          <div style="font-size: 0.62rem; color: rgba(255,255,255,0.4);">Compares words against Service Catalog + Materials Catalog items.</div>
+        </div>
+        <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 0.85rem; margin-bottom: 4px;">&#9888;</div>
+          <div style="font-size: 0.72rem; font-weight: 600; color: #fbbf24; margin-bottom: 4px;">detectObjections()</div>
+          <div style="font-size: 0.62rem; color: rgba(255,255,255,0.4);">Matches objection patterns (price, timing, competitor, trust).</div>
+        </div>
+      </div>
+
+      <div style="text-align: center; color: #475569; margin-bottom: 16px;">&#8595;</div>
+
+      <!-- Output -->
+      <div style="text-align: center;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); border-radius: 8px;">
+          <span style="font-size: 1rem;">&#129302;</span>
+          <span style="font-size: 0.8rem; font-weight: 600; color: #a78bfa;">Coaching Cards Surface in Coach Tab</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-purple">
+      <strong>Phase 1 is free:</strong> All detection runs in the browser using simple keyword matching. The Service Catalog loads once when the call starts. No API calls, no token costs, no latency. This makes it safe to ship, test, and iterate without worrying about per-call AI costs.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- ===== SECTION 4: Objection Handling Deep Dive ===== -->
+    <div style="margin-top: 16px; margin-bottom: 8px;">
+      <div style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px;">Objection Handling Patterns</div>
+      <div style="font-size: 0.85rem; color: var(--sidebar-text);">Pre-built responses for the 4 most common objection categories in service businesses.</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+      <!-- Price objection -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px;">
+        <div style="font-size: 0.78rem; font-weight: 600; color: #fbbf24; margin-bottom: 6px;">&#128176; Price Objection</div>
+        <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); margin-bottom: 8px;">Triggers: "too expensive", "over budget", "cheaper", "can't afford"</div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5); font-style: italic; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; line-height: 1.4;">
+          "I understand price is important. Let me walk you through what's included — we find that when customers compare apples to apples, our value really stands out. Plus, we offer flexible payment options..."
+        </div>
+      </div>
+
+      <!-- Timing objection -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px;">
+        <div style="font-size: 0.78rem; font-weight: 600; color: #fbbf24; margin-bottom: 6px;">&#9202; Timing Objection</div>
+        <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); margin-bottom: 8px;">Triggers: "think about it", "not ready", "maybe later", "need time"</div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5); font-style: italic; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; line-height: 1.4;">
+          "Of course, take whatever time you need. Just so you know, our schedule fills up fast during this season. If I can hold a spot for you this week, that gives you time to decide without risking the timeline..."
+        </div>
+      </div>
+
+      <!-- Competitor objection -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px;">
+        <div style="font-size: 0.78rem; font-weight: 600; color: #fbbf24; margin-bottom: 6px;">&#127919; Competitor Objection</div>
+        <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); margin-bottom: 8px;">Triggers: "other company", "got another quote", "comparing", "shopping around"</div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5); font-style: italic; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; line-height: 1.4;">
+          "Smart to compare options — I'd do the same. A few things that set us apart: we're fully licensed and insured, we have a 4.9 rating, and we include a satisfaction guarantee. Let me show you some before-and-after photos..."
+        </div>
+      </div>
+
+      <!-- Trust objection -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px;">
+        <div style="font-size: 0.78rem; font-weight: 600; color: #fbbf24; margin-bottom: 6px;">&#128737; Trust Objection</div>
+        <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35); margin-bottom: 8px;">Triggers: "how do I know", "references", "guarantee", "been burned before"</div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5); font-style: italic; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; line-height: 1.4;">
+          "I completely get that — choosing the right company is a big decision. We have over 200 verified reviews, and I'm happy to connect you with a past client in your area. We also offer a written guarantee on all our work..."
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Customizable:</strong> In Phase 3, companies can customize these objection responses in Settings to match their own voice, value props, and common scenarios. Start with the built-in library, then refine based on what works.
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- ===== SECTION 5: Evolution Phases ===== -->
+    <div style="margin-top: 16px; margin-bottom: 8px;">
+      <div style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 4px;">Evolution Roadmap</div>
+      <div style="font-size: 0.85rem; color: var(--sidebar-text);">Start simple, test, refine. Each phase builds on the last.</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+      <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; padding: 16px;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <span style="padding: 2px 8px; border-radius: 10px; background: var(--primary); color: #fff; font-size: 0.6rem; font-weight: 700;">PHASE 1</span>
+          <span style="font-size: 0.78rem; font-weight: 600; color: #60a5fa;">Keyword Detection</span>
+        </div>
+        <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5); line-height: 1.5;">
+          Client-side keyword matching. Static coaching library with pre-written scripts. Service catalog matching. Zero cost per call.
+        </div>
+        <div style="margin-top: 8px; font-size: 0.65rem; color: rgba(255,255,255,0.3);">Ship first, learn what works.</div>
+      </div>
+
+      <div style="background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); border-radius: 10px; padding: 16px;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <span style="padding: 2px 8px; border-radius: 10px; background: var(--purple); color: #fff; font-size: 0.6rem; font-weight: 700;">PHASE 2</span>
+          <span style="font-size: 0.78rem; font-weight: 600; color: #a78bfa;">Claude-Powered Coaching</span>
+        </div>
+        <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5); line-height: 1.5;">
+          Send batched transcript chunks to Claude every 30-60 seconds. Get contextual, conversation-aware coaching. ~$0.30-0.60 per 30-min call.
+        </div>
+        <div style="margin-top: 8px; font-size: 0.65rem; color: rgba(255,255,255,0.3);">Smarter cards, higher close rates.</div>
+      </div>
+
+      <div style="background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 10px; padding: 16px;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <span style="padding: 2px 8px; border-radius: 10px; background: var(--green); color: #fff; font-size: 0.6rem; font-weight: 700;">PHASE 3</span>
+          <span style="font-size: 0.78rem; font-weight: 600; color: #4ade80;">Custom Scripts</span>
+        </div>
+        <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5); line-height: 1.5;">
+          Companies define their own objection responses, stage scripts, and closing techniques in Settings. Train the coach to sound like your best rep.
+        </div>
+        <div style="margin-top: 8px; font-size: 0.65rem; color: rgba(255,255,255,0.3);">Your voice, your process.</div>
+      </div>
+
+      <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 10px; padding: 16px;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <span style="padding: 2px 8px; border-radius: 10px; background: var(--amber); color: #fff; font-size: 0.6rem; font-weight: 700;">PHASE 4</span>
+          <span style="font-size: 0.78rem; font-weight: 600; color: #fbbf24;">Analytics Dashboard</span>
+        </div>
+        <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5); line-height: 1.5;">
+          Track which coaching suggestions lead to closes. Close rate with/without coach. Most-used scripts. Common objections. Average stage durations.
+        </div>
+        <div style="margin-top: 8px; font-size: 0.65rem; color: rgba(255,255,255,0.3);">Data-driven sales improvement.</div>
+      </div>
+    </div>
+
+    <div class="annotation annotation-amber">
+      <strong>Start simple, iterate fast:</strong> Phase 1 ships with zero per-call cost and gives reps immediate value — structured talking points and objection responses they can read right off the screen. As we collect data on which cards get "Used" vs "Dismissed," we refine the library. Phase 2 (Claude-powered) only gets added after Phase 1 proves the concept works.
+    </div>
+  </div>
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('step-' + id).classList.add('active');
+  // Find matching button
+  const steps = ['overview','start-call','live-call','customer-view','post-call','review','builder','settings','ai-coach'];
+  const idx = steps.indexOf(id);
+  if (idx >= 0) document.querySelectorAll('.step-btn')[idx].classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>

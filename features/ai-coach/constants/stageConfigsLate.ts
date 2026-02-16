@@ -1,0 +1,85 @@
+import type { StageConfig } from '../types'
+
+export const STAGE_CONFIGS_LATE: StageConfig[] = [
+  {
+    stage: 'pricing_discussion',
+    label: 'Pricing',
+    description: 'Discussing costs and value',
+    keywords: [
+      ['price'],
+      ['cost'],
+      ['budget'],
+      ['how much'],
+      ['investment'],
+      ['quote'],
+      ['estimate'],
+      ['rate'],
+    ],
+    talkingPoints: [
+      'Present pricing confidently — anchor high',
+      'Break down what is included in the price',
+      'Emphasize value over cost',
+      'Mention financing options if available',
+    ],
+  },
+  {
+    stage: 'objection_handling',
+    label: 'Objections',
+    description: 'Addressing concerns',
+    keywords: [
+      ['too expensive'],
+      ['think about it'],
+      ['not sure'],
+      ['other company'],
+      ['other quotes'],
+      ['let me talk to'],
+      ['need to discuss'],
+    ],
+    talkingPoints: [
+      'Acknowledge their concern — don\'t dismiss it',
+      'Ask clarifying questions to understand the real issue',
+      'Reframe the value proposition',
+      'Use social proof (reviews, past results)',
+    ],
+  },
+  {
+    stage: 'closing',
+    label: 'Closing',
+    description: 'Moving to commitment',
+    keywords: [
+      ['get started'],
+      ['schedule'],
+      ['deposit'],
+      ['move forward'],
+      ['sign up'],
+      ['book'],
+      ['ready to'],
+      ['let\'s do'],
+    ],
+    talkingPoints: [
+      'Use an assumptive close — "When would you like us to start?"',
+      'Offer a limited-time incentive if appropriate',
+      'Make the next step clear and easy',
+      'Handle any last-minute hesitation with confidence',
+    ],
+  },
+  {
+    stage: 'wrap_up',
+    label: 'Wrap Up',
+    description: 'Ending the call',
+    keywords: [
+      ['thank you'],
+      ['next steps'],
+      ['follow up'],
+      ['send over'],
+      ['email you'],
+      ['great talking'],
+    ],
+    talkingPoints: [
+      'Summarize what was agreed upon',
+      'Confirm the next steps and timeline',
+      'Thank them for their time',
+      'Set clear follow-up expectations',
+    ],
+  },
+]

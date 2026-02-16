@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Template 4: Quick Quote (Minimal)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <!-- Quick Quote Card -->
+  <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold">Quick Quote</h1>
+          <p class="text-blue-200 text-sm">Estimate #EST-0042</p>
+        </div>
+        <button class="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm">
+          <i class="fas fa-expand mr-1"></i> Full View
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6">
+      <!-- Customer & Status Row -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-gray-500"></i>
+          </div>
+          <div>
+            <p class="font-semibold">John Smith</p>
+            <p class="text-sm text-gray-500">House Cleaning</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+          <i class="fas fa-circle text-[8px] mr-1"></i> Draft
+        </span>
+      </div>
+
+      <!-- Quick Info -->
+      <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+        <div class="flex items-center gap-2 text-gray-600">
+          <i class="far fa-calendar w-5 text-gray-400"></i>
+          <span>Feb 20, 2026</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-600">
+          <i class="far fa-clock w-5 text-gray-400"></i>
+          <span>9:00 AM - 12:00 PM</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-600 col-span-2">
+          <i class="fas fa-map-marker-alt w-5 text-gray-400"></i>
+          <span>456 Oak Ave, Mesa, AZ 85201</span>
+        </div>
+      </div>
+
+      <!-- Services List -->
+      <div class="border border-gray-200 rounded-xl overflow-hidden mb-6">
+        <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+          <span class="text-sm font-medium text-gray-700">Services</span>
+        </div>
+        <div class="divide-y divide-gray-100">
+          <div class="flex justify-between items-center px-4 py-3">
+            <span>Deep cleaning - 3BR/2BA</span>
+            <span class="font-medium">$250.00</span>
+          </div>
+          <div class="flex justify-between items-center px-4 py-3">
+            <span>Window cleaning (interior)</span>
+            <span class="font-medium">$75.00</span>
+          </div>
+          <div class="flex justify-between items-center px-4 py-3">
+            <span>Carpet shampooing</span>
+            <span class="font-medium">$150.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="space-y-2 mb-6">
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-500">Subtotal</span>
+          <span>$475.00</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-500">Tax (0%)</span>
+          <span>$0.00</span>
+        </div>
+        <div class="flex justify-between text-xl font-bold pt-3 border-t border-gray-200">
+          <span>Total</span>
+          <span class="text-blue-600">$475.00</span>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-6">
+        <p class="text-sm text-blue-800">
+          <i class="fas fa-tag mr-1"></i>
+          First-time customer discount applied
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3">
+        <button class="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition">
+          <i class="far fa-edit mr-2"></i>
+          Edit
+        </button>
+        <button class="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition">
+          <i class="far fa-copy mr-2"></i>
+          Duplicate
+        </button>
+        <button class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition">
+          <i class="far fa-paper-plane mr-2"></i>
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

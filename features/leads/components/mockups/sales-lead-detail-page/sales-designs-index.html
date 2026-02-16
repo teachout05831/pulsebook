@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Component - Design Concepts</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .concept-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen">
+  <div class="max-w-6xl mx-auto px-6 py-12">
+
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-white mb-4">Sales Component Redesign</h1>
+      <p class="text-xl text-slate-300">5 Design Concepts for ServicePro CRM</p>
+      <p class="text-slate-400 mt-2">Click any card to open the full mockup in a new tab</p>
+    </div>
+
+    <!-- Concept Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Concept A -->
+      <a href="sales-concept-a.html" target="_blank" class="concept-card bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300">
+        <div class="h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+          <div class="text-center text-white">
+            <div class="text-6xl font-bold mb-2">A</div>
+            <i class="fa-regular fa-comments text-4xl opacity-50"></i>
+          </div>
+        </div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-2">Communication-First Layout</h2>
+          <p class="text-gray-600 text-sm mb-4">Prioritizes the message composer at the top with communication tabs. Activity timeline below, information sidebar on the right.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">Compose First</span>
+            <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Timeline Feed</span>
+            <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">Right Sidebar</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Concept B -->
+      <a href="sales-concept-b.html" target="_blank" class="concept-card bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300">
+        <div class="h-48 bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center">
+          <div class="text-center text-white">
+            <div class="text-6xl font-bold mb-2">B</div>
+            <i class="fa-solid fa-bullseye text-4xl opacity-50"></i>
+          </div>
+        </div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-2">Action-Oriented Layout</h2>
+          <p class="text-gray-600 text-sm mb-4">Customer header always visible. Horizontal pipeline tracker, prominent quick action buttons, vertical timeline with date groupings.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Pipeline View</span>
+            <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">Action Buttons</span>
+            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">Full Width</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Concept C -->
+      <a href="sales-concept-c.html" target="_blank" class="concept-card bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300">
+        <div class="h-48 bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+          <div class="text-center text-white">
+            <div class="text-6xl font-bold mb-2">C</div>
+            <i class="fa-solid fa-columns text-4xl opacity-50"></i>
+          </div>
+        </div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-2">Split Panel Layout</h2>
+          <p class="text-gray-600 text-sm mb-4">50/50 split view. Left: chat-style messaging with compose at bottom. Right: dark-themed lead details panel.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">Chat Style</span>
+            <span class="px-2 py-1 bg-gray-800 text-white rounded text-xs">Dark Theme</span>
+            <span class="px-2 py-1 bg-pink-100 text-pink-700 rounded text-xs">Split View</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Concept D -->
+      <a href="sales-concept-d.html" target="_blank" class="concept-card bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300">
+        <div class="h-48 bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+          <div class="text-center text-white">
+            <div class="text-6xl font-bold mb-2">D</div>
+            <i class="fa-solid fa-grip text-4xl opacity-50"></i>
+          </div>
+        </div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-2">Dashboard Cards Layout</h2>
+          <p class="text-gray-600 text-sm mb-4">Modern card-based design with gradient accents. Stats cards, horizontal action bar, activity feed with sidebar details.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs">Card Based</span>
+            <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs">Gradient Accents</span>
+            <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">Modern UI</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Concept E -->
+      <a href="sales-concept-e.html" target="_blank" class="concept-card bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300">
+        <div class="h-48 bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center">
+          <div class="text-center text-white">
+            <div class="text-6xl font-bold mb-2">E</div>
+            <i class="fa-solid fa-table-columns text-4xl opacity-50"></i>
+          </div>
+        </div>
+        <div class="p-6">
+          <h2 class="text-xl font-bold text-gray-900 mb-2">Compact CRM Layout</h2>
+          <p class="text-gray-600 text-sm mb-4">Clean, minimal design closest to your original screenshot. Improved UX with inline dropdowns, compact activity feed, organized sidebar.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs">Familiar</span>
+            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">Compact</span>
+            <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Improved UX</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Overview Card -->
+      <div class="bg-slate-800 rounded-2xl overflow-hidden shadow-lg border border-slate-700">
+        <div class="h-48 flex items-center justify-center">
+          <i class="fa-solid fa-lightbulb text-6xl text-yellow-400"></i>
+        </div>
+        <div class="p-6 text-white">
+          <h2 class="text-xl font-bold mb-2">Key Design Principles</h2>
+          <ul class="text-slate-300 text-sm space-y-2">
+            <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Communication tabs: Note, Email, Call, Text</li>
+            <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Generic info sidebar (not moving-specific)</li>
+            <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Custom fields per service type</li>
+            <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Activity timeline with filters</li>
+            <li><i class="fa-solid fa-check text-green-400 mr-2"></i>Embedded texting system ready</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-12 text-center text-slate-400 text-sm">
+      <p>ServicePro CRM • Sales Component Redesign Mockups</p>
+      <p class="mt-2">All designs include Tailwind CSS and are ready for React implementation</p>
+    </div>
+
+  </div>
+</body>
+</html>

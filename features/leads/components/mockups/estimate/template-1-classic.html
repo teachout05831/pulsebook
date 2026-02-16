@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Template 1: Classic Three-Column</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: #f1f1f1; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-4">
+        <button class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-xl font-bold text-gray-900">Estimate - #67550</h1>
+            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+              <i class="fas fa-circle text-[8px] mr-1"></i> Opportunity
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg border">
+          <i class="far fa-clock"></i>
+        </button>
+        <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg border">
+          <i class="far fa-copy"></i>
+        </button>
+        <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg border">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+          <i class="far fa-paper-plane"></i>
+          Send Estimate
+          <i class="fas fa-chevron-down text-xs"></i>
+        </button>
+      </div>
+    </div>
+    <!-- Sub Navigation -->
+    <div class="flex gap-6 px-4 border-t border-gray-100">
+      <a href="#" class="py-2 text-sm text-gray-500 hover:text-gray-700">Sales</a>
+      <a href="#" class="py-2 text-sm text-blue-600 border-b-2 border-blue-600 font-medium">Estimate</a>
+      <a href="#" class="py-2 text-sm text-gray-500 hover:text-gray-700">Files & Photos</a>
+      <a href="#" class="py-2 text-sm text-gray-500 hover:text-gray-700">Accounting</a>
+      <a href="#" class="py-2 text-sm text-gray-500 hover:text-gray-700">Claims <span class="ml-1 px-1.5 py-0.5 text-xs bg-green-500 text-white rounded">NEW</span></a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex h-[calc(100vh-100px)]">
+    <!-- Left Column - Quote Info -->
+    <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto scrollbar-thin flex-shrink-0">
+      <div class="p-4">
+        <!-- Quote Info Section -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <i class="far fa-info-circle text-gray-400"></i>
+            <span class="font-medium text-gray-700">Quote Info</span>
+          </div>
+          <span class="flex items-center gap-1 text-green-600 text-sm">
+            <i class="fas fa-circle text-[8px]"></i> Opportunity
+          </span>
+        </div>
+
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Number</span>
+            <span class="font-medium">67550</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Type</span>
+            <span class="text-blue-600 cursor-pointer">Local <i class="fas fa-chevron-down text-xs"></i></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Source</span>
+            <span class="text-blue-600 cursor-pointer">Equate Media <i class="fas fa-chevron-down text-xs"></i></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Sales</span>
+            <span class="text-blue-600 cursor-pointer">Daniela <i class="fas fa-chevron-down text-xs"></i></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Estimator</span>
+            <span class="text-blue-600 cursor-pointer">Unassigned <i class="fas fa-chevron-down text-xs"></i></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Branch</span>
+            <span class="text-blue-600 cursor-pointer">ARM Moving <i class="fas fa-chevron-down text-xs"></i></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Region</span>
+            <span class="text-blue-600 cursor-pointer">None <i class="fas fa-chevron-down text-xs"></i></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Tags</span>
+            <span class="text-blue-600 cursor-pointer"><i class="fas fa-plus text-xs"></i></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Lead Status</span>
+            <span class="text-blue-600 cursor-pointer">None <i class="fas fa-chevron-down text-xs"></i></span>
+          </div>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="mt-6 pt-4 border-t border-gray-200">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-tasks text-gray-400"></i>
+              <span class="font-medium text-gray-700">Tasks</span>
+            </div>
+            <button class="text-blue-600 hover:text-blue-700">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <div class="text-center py-4">
+            <p class="text-gray-500 text-sm font-medium">No Tasks Added</p>
+            <a href="#" class="text-blue-600 text-sm hover:underline">Add your first task</a>
+          </div>
+        </div>
+
+        <!-- Estimates/Deliveries Section -->
+        <div class="mt-6 pt-4 border-t border-gray-200">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <i class="far fa-calendar text-gray-400"></i>
+              <span class="font-medium text-gray-700">Estimates/Deliveries</span>
+            </div>
+            <button class="text-blue-600 hover:text-blue-700">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <div class="text-center py-4">
+            <p class="text-gray-500 text-sm font-medium">No Events Added</p>
+            <a href="#" class="text-blue-600 text-sm hover:underline">Add your first event</a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center Column - Jobs & Notes -->
+    <div class="flex-1 overflow-y-auto scrollbar-thin p-4">
+      <!-- Jobs Section -->
+      <div class="bg-white rounded-lg border border-gray-200 mb-4">
+        <div class="flex items-center justify-between p-4 border-b border-gray-100">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-truck text-gray-400"></i>
+            <span class="font-medium text-gray-700">Jobs</span>
+          </div>
+          <button class="text-blue-600 hover:text-blue-700">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+
+        <!-- Job Card -->
+        <div class="p-4">
+          <div class="border border-gray-200 rounded-lg p-3 hover:border-blue-300 cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div>
+                  <span class="text-xs text-gray-500">Job 67550-1</span>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded">Unscheduled</span>
+                    <span class="flex items-center gap-1 text-sm">
+                      <i class="fas fa-check text-green-500 text-xs"></i>
+                      Moving <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-sm text-gray-600">February 1, 2026 @ Custom Check Notes</div>
+                <div class="text-sm text-blue-600">+ Add End Date</div>
+              </div>
+              <div class="font-bold text-gray-900">$425.00</div>
+              <button class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+          </div>
+          <div class="text-center mt-3">
+            <a href="#" class="text-blue-600 text-sm hover:underline">+ Add pick-up/delivery spread</a>
+          </div>
+        </div>
+
+        <!-- Stops Section -->
+        <div class="px-4 pb-4">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-map-marker-alt text-blue-500"></i>
+              <span class="font-medium text-gray-700">Stops</span>
+              <a href="#" class="text-blue-600 text-sm hover:underline">Map</a>
+            </div>
+            <div class="flex items-center gap-4 text-xs text-gray-500">
+              <span><strong>RT</strong> <i class="far fa-clock"></i> 59m / 40.79mi</span>
+              <span><strong>O → D</strong> <i class="far fa-clock"></i> 16m / 11.13mi</span>
+              <span><strong>Travel</strong> <i class="far fa-clock"></i> 43m / 29.66mi</span>
+              <button class="text-blue-600"><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+
+          <!-- Stop Items -->
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 py-2">
+              <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span class="w-24 text-sm text-gray-500">Office</span>
+              <span class="text-sm">1237 S Val Vista Dr, Mesa, AZ 85204</span>
+            </div>
+            <div class="flex items-center gap-3 py-2">
+              <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span class="w-24 text-sm text-blue-600 font-medium">Origin</span>
+              <span class="text-sm font-medium">Chandler, Arizona 85225</span>
+              <span class="ml-auto text-sm text-gray-500">House • Other</span>
+            </div>
+            <div class="flex items-center gap-3 py-2">
+              <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span class="w-24 text-sm text-blue-600 font-medium">Destination</span>
+              <span class="text-sm font-medium">Phoenix, Arizona 85044</span>
+              <span class="ml-auto text-sm text-gray-500">House • Other <i class="far fa-trash-alt text-red-400 ml-2 cursor-pointer"></i></span>
+            </div>
+            <div class="flex items-center gap-3 py-2">
+              <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span class="w-24 text-sm text-gray-500">Office</span>
+              <span class="text-sm">1237 S Val Vista Dr, Mesa, AZ 85204</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes Tabs -->
+        <div class="border-t border-gray-200">
+          <div class="flex border-b border-gray-200">
+            <button class="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600">Internal</button>
+            <button class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 relative">
+              Customer
+              <span class="absolute -top-1 -right-1 w-2 h-2 bg-orange-500 rounded-full"></span>
+            </button>
+            <button class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 relative">
+              Crew Notes
+              <i class="far fa-comment-dots ml-1 text-gray-400"></i>
+            </button>
+            <button class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700">Crew Feedback</button>
+          </div>
+          <div class="p-4">
+            <p class="text-sm text-gray-500 mb-2">Note (Visible to office only)</p>
+            <textarea
+              class="w-full h-32 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Please click to edit"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Pricing -->
+    <aside class="w-80 bg-white border-l border-gray-200 overflow-y-auto scrollbar-thin flex-shrink-0">
+      <div class="p-4">
+        <!-- Recalculate -->
+        <div class="flex items-center justify-between mb-4">
+          <button class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 font-medium">
+            Recalculate
+          </button>
+          <div class="flex items-center gap-2">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" class="sr-only peer">
+              <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+            <button class="text-gray-400 hover:text-gray-600">
+              <i class="far fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Property Info -->
+        <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-blue-600 hover:underline cursor-pointer">1 Bedroom Apartment (600 - 800 SQFT)</p>
+              <a href="#" class="text-xs text-blue-600 hover:underline">+ Add additional rooms</a>
+            </div>
+            <div class="text-right">
+              <span class="text-lg font-bold">432</span>
+              <span class="text-sm text-gray-500">CuFT</span>
+              <span class="text-lg font-bold ml-2">3024</span>
+              <span class="text-sm text-gray-500">lb</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory -->
+        <div class="mb-4 p-3 border border-gray-200 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-medium text-gray-700">Inventory is Empty</span>
+            <div class="flex items-center gap-2">
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked class="sr-only peer">
+                <div class="w-9 h-5 bg-blue-600 rounded-full peer after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
+              </label>
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+          </div>
+          <a href="#" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
+            Add your first item <i class="fas fa-external-link-alt text-xs"></i>
+          </a>
+        </div>
+
+        <!-- Crew Info -->
+        <div class="flex items-center justify-between mb-4 text-sm">
+          <div class="flex items-center gap-1">
+            <i class="fas fa-truck text-gray-400"></i>
+            <span>1</span>
+            <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+          </div>
+          <div class="flex items-center gap-1">
+            <i class="fas fa-users text-gray-400"></i>
+            <span>2</span>
+            <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="font-medium">2h</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">$150.00/hr</span>
+          </div>
+        </div>
+
+        <!-- Estimate Type -->
+        <div class="grid grid-cols-2 gap-4 mb-4 text-xs">
+          <div>
+            <span class="text-gray-500 uppercase tracking-wide">Estimate Type</span>
+            <div class="text-blue-600 cursor-pointer mt-1">Hourly <i class="fas fa-chevron-down"></i></div>
+          </div>
+          <div>
+            <span class="text-gray-500 uppercase tracking-wide">Binding Type</span>
+            <div class="text-blue-600 cursor-pointer mt-1">Non-Binding <i class="fas fa-chevron-down"></i></div>
+          </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-blue-600 hover:underline cursor-pointer flex items-center gap-1">
+              Moving Services <span class="px-1.5 py-0.5 bg-green-100 text-green-800 rounded text-xs">fs</span>
+            </span>
+            <span class="font-medium">$300.00</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-blue-600 hover:underline cursor-pointer">Materials</span>
+            <span class="text-gray-400">-</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-blue-600 hover:underline cursor-pointer">Additional Services</span>
+            <span class="text-gray-400">-</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-blue-600 hover:underline cursor-pointer flex items-center gap-1">
+              Trip Fee <span class="px-1.5 py-0.5 bg-green-100 text-green-800 rounded text-xs">fs</span>
+            </span>
+            <span class="font-medium">$125.00</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-gray-100">
+            <span class="text-blue-600 hover:underline cursor-pointer">Valuation</span>
+            <span class="text-gray-400">-</span>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="mt-4 space-y-2 text-sm">
+          <div class="flex justify-between py-1">
+            <span class="font-medium">Subtotal</span>
+            <span class="font-medium">$425.00</span>
+          </div>
+          <div class="flex justify-between py-1">
+            <span class="text-blue-600 hover:underline cursor-pointer">Discount (15.0%)</span>
+            <span class="text-red-500">-$171.94</span>
+          </div>
+          <div class="flex justify-between py-1">
+            <span class="text-blue-600 hover:underline cursor-pointer">Sales Tax</span>
+            <span class="text-gray-400">-</span>
+          </div>
+          <div class="flex justify-between py-1">
+            <span class="text-blue-600 hover:underline cursor-pointer">CC Fee</span>
+            <span>$25.35</span>
+          </div>
+          <div class="flex justify-between py-2 border-t border-gray-200 font-medium">
+            <span>Estimated Total</span>
+            <span>$425.00</span>
+          </div>
+          <div class="flex justify-between py-1">
+            <span class="text-blue-600 hover:underline cursor-pointer">Payments</span>
+            <span class="text-green-600">$999.66</span>
+          </div>
+          <div class="flex justify-between py-2 border-t border-gray-200 font-bold">
+            <span>Balance</span>
+            <span class="text-red-500">-$502.56</span>
+          </div>
+        </div>
+
+        <!-- Total Banner -->
+        <div class="mt-4 bg-blue-600 text-white rounded-lg p-4">
+          <div class="flex justify-between items-center mb-2">
+            <span>Moving</span>
+            <span>$425.00</span>
+          </div>
+          <div class="flex justify-between items-center text-lg font-bold">
+            <span>Estimated Price:</span>
+            <span>$425.00</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>

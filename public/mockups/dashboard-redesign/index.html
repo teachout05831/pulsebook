@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Redesign - 5 Design Concepts</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-900 min-h-screen">
+
+  <!-- Header -->
+  <div class="bg-slate-900 border-b border-slate-700 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-6">
+      <h1 class="text-3xl font-bold text-white">ServicePro Dashboard Redesign</h1>
+      <p class="text-slate-400 mt-1">5 design concepts — open each in a new tab to preview. All are mobile-responsive.</p>
+    </div>
+  </div>
+
+  <!-- Design Cards Grid -->
+  <div class="max-w-6xl mx-auto px-6 py-10">
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+      <!-- Design 1 -->
+      <a href="design-1-activity-feed.html" target="_blank" class="group block bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-blue-500 transition-all hover:shadow-xl hover:shadow-blue-500/10">
+        <div class="h-48 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-4 left-4 right-4 h-8 bg-white/20 rounded-lg"></div>
+            <div class="absolute top-16 left-4 w-2/3 space-y-2">
+              <div class="h-16 bg-white/20 rounded-lg"></div>
+              <div class="h-16 bg-white/20 rounded-lg"></div>
+              <div class="h-16 bg-white/20 rounded-lg"></div>
+            </div>
+            <div class="absolute top-16 right-4 w-1/4 space-y-2">
+              <div class="h-20 bg-white/20 rounded-lg"></div>
+              <div class="h-20 bg-white/20 rounded-lg"></div>
+            </div>
+          </div>
+          <span class="text-6xl">📰</span>
+        </div>
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">DESIGN 1</span>
+            <span class="text-slate-400 text-xs">Social + Business</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">Activity Feed</h3>
+          <p class="text-slate-400 text-sm mt-2">Social media feed meets business dashboard. Scrollable activity feed of recent events as customer cards with sales leaders and referrals on the side.</p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Feed-Based</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Card-Rich</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Familiar UX</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Design 2 -->
+      <a href="design-2-pipeline-cards.html" target="_blank" class="group block bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-purple-500 transition-all hover:shadow-xl hover:shadow-purple-500/10">
+        <div class="h-48 bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-4 left-4 right-4 h-8 bg-white/20 rounded-lg"></div>
+            <div class="absolute top-16 left-4 right-4 flex gap-2">
+              <div class="flex-1 space-y-2">
+                <div class="h-6 bg-white/30 rounded"></div>
+                <div class="h-12 bg-white/20 rounded"></div>
+                <div class="h-12 bg-white/20 rounded"></div>
+              </div>
+              <div class="flex-1 space-y-2">
+                <div class="h-6 bg-white/30 rounded"></div>
+                <div class="h-12 bg-white/20 rounded"></div>
+              </div>
+              <div class="flex-1 space-y-2">
+                <div class="h-6 bg-white/30 rounded"></div>
+                <div class="h-12 bg-white/20 rounded"></div>
+              </div>
+              <div class="flex-1 space-y-2">
+                <div class="h-6 bg-white/30 rounded"></div>
+                <div class="h-12 bg-white/20 rounded"></div>
+              </div>
+            </div>
+          </div>
+          <span class="text-6xl">🔄</span>
+        </div>
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded">DESIGN 2</span>
+            <span class="text-slate-400 text-xs">CRM-Forward</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">Pipeline & Cards</h3>
+          <p class="text-slate-400 text-sm mt-2">CRM-forward, sales-focused. Horizontal lead pipeline with customer cards flowing through stages. Booked jobs and revenue below.</p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Kanban Pipeline</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Sales-Focused</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Visual Flow</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Design 3 -->
+      <a href="design-3-bento-grid.html" target="_blank" class="group block bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-emerald-500 transition-all hover:shadow-xl hover:shadow-emerald-500/10">
+        <div class="h-48 bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 opacity-20 p-4 grid grid-cols-3 grid-rows-3 gap-2">
+            <div class="bg-white/20 rounded-xl"></div>
+            <div class="bg-white/20 rounded-xl"></div>
+            <div class="bg-white/20 rounded-xl"></div>
+            <div class="bg-white/20 rounded-xl col-span-2"></div>
+            <div class="bg-white/20 rounded-xl"></div>
+            <div class="bg-white/20 rounded-xl"></div>
+            <div class="bg-white/20 rounded-xl col-span-2"></div>
+          </div>
+          <span class="text-6xl">🧩</span>
+        </div>
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded">DESIGN 3</span>
+            <span class="text-slate-400 text-xs">Modern SaaS</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">Bento Grid</h3>
+          <p class="text-slate-400 text-sm mt-2">Modern SaaS dashboard with iOS widget-like tiles. Modular grid of widgets, each section a tile. Compact but informative.</p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Widget Tiles</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Modular</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Clean</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Design 4 -->
+      <a href="design-4-mobile-timeline.html" target="_blank" class="group block bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-amber-500 transition-all hover:shadow-xl hover:shadow-amber-500/10">
+        <div class="h-48 bg-gradient-to-br from-amber-600 to-amber-800 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 w-48 h-8 bg-white/20 rounded-full"></div>
+            <div class="absolute top-16 left-1/2 w-0.5 h-48 bg-white/30"></div>
+            <div class="absolute top-20 left-1/2 ml-4 w-32 h-12 bg-white/20 rounded-lg"></div>
+            <div class="absolute top-36 left-1/2 ml-4 w-32 h-12 bg-white/20 rounded-lg"></div>
+            <div class="absolute top-52 left-1/2 ml-4 w-32 h-12 bg-white/20 rounded-lg"></div>
+            <div class="absolute top-20 left-1/2 -translate-x-1 w-3 h-3 bg-white/40 rounded-full"></div>
+            <div class="absolute top-36 left-1/2 -translate-x-1 w-3 h-3 bg-white/40 rounded-full"></div>
+            <div class="absolute top-52 left-1/2 -translate-x-1 w-3 h-3 bg-white/40 rounded-full"></div>
+          </div>
+          <span class="text-6xl">📱</span>
+        </div>
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded">DESIGN 4</span>
+            <span class="text-slate-400 text-xs">Mobile-Native</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">Mobile-First Timeline</h3>
+          <p class="text-slate-400 text-sm mt-2">Designed for phone use. Vertical timeline of today's activity with customer cards inline. Stats float at top. Chat-app meets dashboard.</p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Timeline</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Phone-First</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Scrollable</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Design 5 -->
+      <a href="design-5-command-center.html" target="_blank" class="group block bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-red-500 transition-all hover:shadow-xl hover:shadow-red-500/10">
+        <div class="h-48 bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-4 left-4 right-4 h-8 bg-white/30 rounded-lg"></div>
+            <div class="absolute top-16 left-4 w-3/5 bottom-4 bg-white/20 rounded-lg"></div>
+            <div class="absolute top-16 right-4 w-1/3 bottom-4 space-y-2">
+              <div class="h-16 bg-white/20 rounded-lg"></div>
+              <div class="h-16 bg-white/20 rounded-lg"></div>
+              <div class="h-20 bg-white/20 rounded-lg"></div>
+            </div>
+          </div>
+          <span class="text-6xl">🎛️</span>
+        </div>
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">DESIGN 5</span>
+            <span class="text-slate-400 text-xs">Operations</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-red-400 transition-colors">Command Center</h3>
+          <p class="text-slate-400 text-sm mt-2">Split-panel design. Live activity on the left, metrics and charts on the right. Dense information, everything visible at once.</p>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Split-Panel</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">Dense</span>
+            <span class="bg-slate-700 text-slate-300 text-xs px-2 py-1 rounded">All-in-View</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Game Plan Link -->
+      <div class="bg-slate-800/50 rounded-2xl border border-dashed border-slate-600 flex items-center justify-center p-8">
+        <div class="text-center">
+          <span class="text-4xl mb-3 block">📋</span>
+          <h3 class="text-lg font-bold text-white">Game Plan</h3>
+          <p class="text-slate-400 text-sm mt-2">Full implementation plan, data sources, file structure, and phasing in DASHBOARD-REDESIGN.md</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison Notes -->
+    <div class="mt-12 bg-slate-800 rounded-2xl border border-slate-700 p-8">
+      <h2 class="text-xl font-bold text-white mb-4">Quick Comparison</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-700">
+              <th class="text-left text-slate-400 py-3 pr-4">Feature</th>
+              <th class="text-center text-blue-400 py-3 px-3">1. Feed</th>
+              <th class="text-center text-purple-400 py-3 px-3">2. Pipeline</th>
+              <th class="text-center text-emerald-400 py-3 px-3">3. Bento</th>
+              <th class="text-center text-amber-400 py-3 px-3">4. Timeline</th>
+              <th class="text-center text-red-400 py-3 px-3">5. Command</th>
+            </tr>
+          </thead>
+          <tbody class="text-slate-300">
+            <tr class="border-b border-slate-700/50">
+              <td class="py-3 pr-4 text-white font-medium">Mobile Experience</td>
+              <td class="text-center py-3 px-3">Great</td>
+              <td class="text-center py-3 px-3">Good</td>
+              <td class="text-center py-3 px-3">Great</td>
+              <td class="text-center py-3 px-3">Best</td>
+              <td class="text-center py-3 px-3">Good</td>
+            </tr>
+            <tr class="border-b border-slate-700/50">
+              <td class="py-3 pr-4 text-white font-medium">Customer Cards</td>
+              <td class="text-center py-3 px-3">Rich</td>
+              <td class="text-center py-3 px-3">Rich</td>
+              <td class="text-center py-3 px-3">Compact</td>
+              <td class="text-center py-3 px-3">Rich</td>
+              <td class="text-center py-3 px-3">Rich</td>
+            </tr>
+            <tr class="border-b border-slate-700/50">
+              <td class="py-3 pr-4 text-white font-medium">Lead Pipeline</td>
+              <td class="text-center py-3 px-3">Mini</td>
+              <td class="text-center py-3 px-3">Hero</td>
+              <td class="text-center py-3 px-3">Tile</td>
+              <td class="text-center py-3 px-3">In Feed</td>
+              <td class="text-center py-3 px-3">Section</td>
+            </tr>
+            <tr class="border-b border-slate-700/50">
+              <td class="py-3 pr-4 text-white font-medium">Info Density</td>
+              <td class="text-center py-3 px-3">Medium</td>
+              <td class="text-center py-3 px-3">Medium</td>
+              <td class="text-center py-3 px-3">High</td>
+              <td class="text-center py-3 px-3">Low</td>
+              <td class="text-center py-3 px-3">Highest</td>
+            </tr>
+            <tr class="border-b border-slate-700/50">
+              <td class="py-3 pr-4 text-white font-medium">Best For</td>
+              <td class="text-center py-3 px-3">Daily check-in</td>
+              <td class="text-center py-3 px-3">Sales teams</td>
+              <td class="text-center py-3 px-3">Quick overview</td>
+              <td class="text-center py-3 px-3">On-the-go</td>
+              <td class="text-center py-3 px-3">Office managers</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Common Features -->
+    <div class="mt-8 bg-slate-800 rounded-2xl border border-slate-700 p-8">
+      <h2 class="text-xl font-bold text-white mb-4">All Designs Include</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Booked Jobs</strong> — Customer cards with name, service, date, price, tech</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Lead Pipeline</strong> — Visual flow of leads through sales stages</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Quotes</strong> — Recent estimates with status</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Cancellations</strong> — Cancelled jobs with reasons</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Sales Leaders</strong> — Team ranked by jobs/revenue this month</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Top Referrals</strong> — Lead sources ranked by volume</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Revenue Chart</strong> — 12-month bar visualization</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Click-to-Detail</strong> — Popup/modal on every card</span>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-green-400 mt-0.5">&#10003;</span>
+          <span class="text-slate-300"><strong class="text-white">Mobile Responsive</strong> — Works on phone, tablet, desktop</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center text-slate-500 text-sm mt-8 pb-8">
+      ServicePro Dashboard Redesign Mockups — Open each HTML file in a browser to preview
+    </div>
+  </div>
+
+</body>
+</html>

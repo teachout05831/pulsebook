@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Component - Concept E: Compact CRM Layout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .tab-active { border-color: #3b82f6; color: #3b82f6; background-color: white; }
+    .activity-row:hover { background-color: #f8fafc; }
+    .expandable-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .expandable-content.expanded { max-height: 500px; }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Main Container -->
+  <div class="min-h-screen">
+
+    <!-- Header Bar - Fixed -->
+    <div class="bg-white border-b sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex items-center justify-between h-14">
+          <div class="flex items-center gap-4">
+            <nav class="flex text-sm">
+              <a href="#" class="px-3 py-1 text-gray-500 hover:text-gray-700">Sales</a>
+              <a href="#" class="px-3 py-1 text-blue-600 font-medium border-b-2 border-blue-600">Estimate</a>
+              <a href="#" class="px-3 py-1 text-gray-500 hover:text-gray-700">Storage</a>
+              <a href="#" class="px-3 py-1 text-gray-500 hover:text-gray-700">Files & Photos</a>
+              <a href="#" class="px-3 py-1 text-gray-500 hover:text-gray-700">Accounting</a>
+              <a href="#" class="px-3 py-1 text-gray-500 hover:text-gray-700">Claims</a>
+              <a href="#" class="px-3 py-1 text-green-600 hover:text-green-700 font-medium">NEW</a>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <div class="flex gap-6">
+
+        <!-- Main Content -->
+        <div class="flex-1">
+
+          <!-- Page Title Row -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <h1 class="text-xl font-bold text-gray-900">Sales - #67550</h1>
+              <button class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-teal-700 bg-teal-50 rounded-full hover:bg-teal-100">
+                <i class="fa-regular fa-clock"></i>
+                Create Follow-up
+              </button>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 flex items-center gap-2">
+                Send Estimate
+                <i class="fa-solid fa-caret-down"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Communication Composer (Compact) -->
+          <div class="bg-white rounded-lg border mb-4">
+            <div class="flex border-b">
+              <button class="flex-1 py-3 px-4 text-sm font-medium border-b-2 border-transparent hover:bg-gray-50 flex items-center justify-center gap-2">
+                <i class="fa-regular fa-sticky-note text-gray-400"></i>
+                Note
+              </button>
+              <button class="flex-1 py-3 px-4 text-sm font-medium border-b-2 border-transparent hover:bg-gray-50 flex items-center justify-center gap-2">
+                <i class="fa-regular fa-envelope text-gray-400"></i>
+                Email
+              </button>
+              <button class="flex-1 py-3 px-4 text-sm font-medium border-b-2 border-transparent hover:bg-gray-50 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-phone text-gray-400"></i>
+                Call
+              </button>
+              <button class="flex-1 py-3 px-4 text-sm font-medium border-b-2 border-blue-600 text-blue-600 bg-blue-50 flex items-center justify-center gap-2">
+                <i class="fa-regular fa-comment text-blue-600"></i>
+                Text
+              </button>
+            </div>
+            <div class="p-4">
+              <div class="flex gap-3">
+                <textarea
+                  class="flex-1 border rounded-lg px-3 py-2 text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  rows="2"
+                  placeholder="Type your message..."
+                ></textarea>
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 self-end">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </div>
+              <div class="flex items-center justify-between mt-3">
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                  <i class="fa-solid fa-mobile-screen-button"></i>
+                  <span>Sending to: (414) 899-9920</span>
+                </div>
+                <div class="flex gap-2">
+                  <button class="text-sm text-gray-500 hover:text-gray-700 px-2">
+                    <i class="fa-solid fa-paperclip"></i>
+                  </button>
+                  <button class="text-sm text-gray-500 hover:text-gray-700 px-2">
+                    <i class="fa-regular fa-face-smile"></i>
+                  </button>
+                  <button class="text-sm text-gray-500 hover:text-gray-700 px-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Templates
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stats Row -->
+          <div class="flex gap-4 mb-4 text-sm">
+            <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border">
+              <i class="fa-solid fa-phone text-blue-500"></i>
+              <span class="font-medium">3 Calls</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border">
+              <i class="fa-regular fa-comment text-purple-500"></i>
+              <span class="font-medium">0 Texts</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border">
+              <i class="fa-regular fa-envelope text-green-500"></i>
+              <span class="font-medium">5 Emails</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border">
+              <i class="fa-regular fa-calendar text-amber-500"></i>
+              <span class="font-medium">0 Days Until Move</span>
+            </div>
+          </div>
+
+          <!-- Activity Section -->
+          <div class="bg-white rounded-lg border">
+            <div class="flex items-center justify-between px-4 py-3 border-b">
+              <h2 class="font-semibold text-gray-900">Activity</h2>
+              <div class="flex gap-1 text-sm">
+                <button class="px-3 py-1 bg-blue-600 text-white rounded-md">All</button>
+                <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-md">Notes</button>
+                <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-md">Emails</button>
+                <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-md">Calls</button>
+                <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-md">Texts</button>
+                <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-md">Follow-ups</button>
+              </div>
+            </div>
+
+            <!-- Activity List -->
+            <div class="divide-y">
+              <!-- Month Header -->
+              <div class="px-4 py-2 bg-gray-50 text-sm font-medium text-gray-500">
+                February, 2026
+              </div>
+
+              <!-- Email Item -->
+              <div class="activity-row">
+                <div class="px-4 py-3">
+                  <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <i class="fa-regular fa-envelope text-green-600 text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between">
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span class="font-medium text-gray-900">Email</span>
+                          </div>
+                          <p class="text-sm text-gray-500 mt-0.5">
+                            You sent a tracked email to <span class="text-blue-600">lacymobilenotary@gmail.com</span>
+                          </p>
+                          <p class="text-xs text-green-600 mt-1">Delivered 02/02/2026 @ 2:51 PM</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-400 flex-shrink-0">
+                          <button class="hover:text-gray-600"><i class="fa-solid fa-reply"></i></button>
+                          <span>02/02/2026 @ 2:51 PM</span>
+                          <button class="hover:text-gray-600"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        </div>
+                      </div>
+                      <div class="mt-3 p-3 bg-gray-50 rounded-lg border-l-4 border-green-400">
+                        <p class="font-medium text-gray-900 text-sm">Lock In Your Date & Save This Week</p>
+                        <p class="text-sm text-gray-600 mt-1">Hi Keajuana! Daniela with <strong>Arizona Reliable Movers</strong> checking in 🚚 Just wanted to follow up on the moving estimate we sent over. We've been helping families across Arizona for <strong>over 8 years</strong>, and we'd love to take great care of you as well.</p>
+                      </div>
+                      <button class="text-sm text-blue-600 mt-2 hover:text-blue-700">Expand</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Call Item -->
+              <div class="activity-row">
+                <div class="px-4 py-3">
+                  <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <i class="fa-solid fa-phone text-blue-600 text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between">
+                        <div>
+                          <span class="font-medium text-gray-900">Call</span>
+                          <p class="text-sm text-gray-500 mt-0.5">
+                            You made a phone call to Keajuana Lacy <span class="text-blue-600">(414) 899-9920</span> via RingCentral
+                          </p>
+                          <div class="mt-2">
+                            <span class="text-sm font-medium text-gray-700">Call Outcome: </span>
+                            <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-sm">Left Voicemail</span>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-400 flex-shrink-0">
+                          <span>02/02/2026 @ 2:50 PM</span>
+                          <button class="hover:text-gray-600"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Month Header -->
+              <div class="px-4 py-2 bg-gray-50 text-sm font-medium text-gray-500">
+                January, 2026
+              </div>
+
+              <!-- System Email Item -->
+              <div class="activity-row">
+                <div class="px-4 py-3">
+                  <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <i class="fa-regular fa-envelope text-green-600 text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between">
+                        <div>
+                          <span class="font-medium text-gray-900">Email</span>
+                          <p class="text-sm text-gray-500 mt-0.5">
+                            Tracked System Email sent to Keajuana Lacy <span class="text-blue-600">lacymobilenotary@gmail.com</span>
+                          </p>
+                          <p class="text-xs text-blue-600 mt-1">Opened at 01/30/2026 @ 9:41 AM</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-400 flex-shrink-0">
+                          <button class="hover:text-gray-600"><i class="fa-solid fa-reply"></i></button>
+                          <span>01/30/2026 @ 9:30 AM</span>
+                          <button class="hover:text-gray-600"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                        </div>
+                      </div>
+                      <div class="mt-3 p-3 bg-gray-50 rounded-lg border-l-4 border-blue-400">
+                        <p class="font-medium text-gray-900 text-sm">Your Moving Estimate</p>
+                      </div>
+                      <button class="text-sm text-blue-600 mt-2 hover:text-blue-700">Expand</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="w-72 flex-shrink-0 space-y-4">
+
+          <!-- Information Section -->
+          <div class="bg-white rounded-lg border">
+            <div class="px-4 py-3 border-b flex items-center gap-2">
+              <i class="fa-solid fa-circle-info text-gray-400"></i>
+              <h3 class="font-semibold text-gray-900">Information</h3>
+            </div>
+            <div class="p-4 space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Quote Number</span>
+                <span class="font-medium">67550</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500">Service Type</span>
+                <select class="text-sm font-medium border rounded px-2 py-1 bg-white text-right">
+                  <option selected>Moving</option>
+                  <option>Cleaning</option>
+                  <option>Handyman</option>
+                </select>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Service Date</span>
+                <span class="font-medium">2/1/2026</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500">Lead Status</span>
+                <select class="text-sm font-medium border rounded px-2 py-1 bg-white">
+                  <option>New</option>
+                  <option>Contacted</option>
+                  <option selected>Qualified</option>
+                  <option>Proposal Sent</option>
+                </select>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500">Assigned To</span>
+                <select class="text-sm font-medium text-blue-600 border rounded px-2 py-1 bg-white">
+                  <option selected>Daniela</option>
+                  <option>John</option>
+                  <option>Maria</option>
+                </select>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Estimator</span>
+                <span class="text-gray-400">Unassigned</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500">Source</span>
+                <select class="text-sm font-medium border rounded px-2 py-1 bg-white">
+                  <option selected>Equate Media</option>
+                  <option>Google Ads</option>
+                  <option>Referral</option>
+                </select>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Outstanding Balance</span>
+                <span class="text-gray-400">--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Section -->
+          <div class="bg-white rounded-lg border">
+            <div class="px-4 py-3 border-b flex items-center gap-2">
+              <i class="fa-solid fa-location-dot text-gray-400"></i>
+              <h3 class="font-semibold text-gray-900">Service Location</h3>
+            </div>
+            <div class="p-4 text-sm">
+              <div class="mb-3">
+                <div class="text-xs text-gray-400 uppercase mb-1">Address</div>
+                <div class="font-medium">123 Main Street</div>
+                <div class="text-blue-600">Chandler, Arizona 85225</div>
+                <div class="text-gray-500 text-xs mt-1">House • 0 flights of stairs</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Fields Section -->
+          <div class="bg-white rounded-lg border">
+            <div class="px-4 py-3 border-b flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-gray-400"></i>
+                <h3 class="font-semibold text-gray-900">Custom Fields</h3>
+              </div>
+              <button class="text-xs text-blue-600 hover:text-blue-700">+ Add</button>
+            </div>
+            <div class="p-4 space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Move Size</span>
+                <span class="font-medium">1 Bedroom Apt (600-800 SQFT)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Branch</span>
+                <span class="font-medium">ARM Moving</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Opportunity Type</span>
+                <span class="font-medium">Local</span>
+              </div>
+            </div>
+            <div class="px-4 py-2 border-t bg-gray-50">
+              <p class="text-xs text-gray-400 italic">Custom fields can be configured per service type in Settings</p>
+            </div>
+          </div>
+
+          <!-- Raw Lead Data -->
+          <div class="bg-white rounded-lg border">
+            <div class="px-4 py-3 border-b flex items-center gap-2">
+              <i class="fa-solid fa-code text-gray-400"></i>
+              <h3 class="font-semibold text-gray-900">Inbound Lead Raw Body</h3>
+            </div>
+            <div class="p-4">
+              <button class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                View Inbound Lead Raw Body
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Concept Label -->
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm shadow-lg">
+      <strong>Concept E:</strong> Compact CRM Layout — Clean, minimal design closely matching original with improved UX
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Detail + Approval Flow Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; margin: 0; color: #1e293b; }
+    .card { background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; }
+    .card-pad { padding: 1rem 1.25rem; }
+    .fi { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0; font-size: 0.8125rem; }
+    .fi-label { color: #64748b; font-weight: 500; }
+    .fi select { border: none; background: none; color: #2563eb; font-size: 0.8125rem; font-weight: 500; cursor: pointer; text-align: right; }
+    .fi-val { font-weight: 500; }
+    .btn-sm { font-size: 0.75rem; font-weight: 500; padding: 0.375rem 0.75rem; border-radius: 0.375rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.375rem; transition: all 0.15s; border: none; }
+    .btn-blue { background: #2563eb; color: white; }
+    .btn-blue:hover { background: #1d4ed8; }
+    .btn-green { background: #16a34a; color: white; }
+    .btn-green:hover { background: #15803d; }
+    .btn-amber { background: #f59e0b; color: white; }
+    .btn-out { background: white; color: #475569; border: 1px solid #e2e8f0 !important; }
+    .btn-out:hover { background: #f1f5f9; }
+    .btn-ghost { background: none; border: none; color: #2563eb; cursor: pointer; font-size: 0.8125rem; font-weight: 500; padding: 0; }
+    .ico-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: white; cursor: pointer; }
+    .ico-btn:hover { background: #f1f5f9; }
+    .sdot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .pr { display: flex; justify-content: space-between; padding: 0.375rem 0; font-size: 0.8125rem; }
+    .pr .dash { color: #cbd5e1; }
+    .fade-in { animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Lifecycle */
+    .lc-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; font-weight: 700; flex-shrink: 0; cursor: pointer; transition: all 0.15s; }
+    .lc-dot.done { background: #16a34a; color: white; }
+    .lc-dot.active { background: #2563eb; color: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
+    .lc-dot.pending { background: #f1f5f9; color: #94a3b8; }
+    .lc-label { font-size: 0.625rem; font-weight: 500; text-align: center; margin-top: 4px; white-space: nowrap; }
+    .lc-label.done { color: #16a34a; }
+    .lc-label.active { color: #2563eb; font-weight: 600; }
+    .lc-label.pending { color: #94a3b8; }
+    .lc-line { width: 32px; height: 2px; flex-shrink: 0; }
+    .lc-line.done { background: #16a34a; }
+    .lc-line.pending { background: #e2e8f0; }
+    .lc-col { display: flex; flex-direction: column; align-items: center; }
+
+    /* View toggle */
+    .view-btn { padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; color: #94a3b8; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .view-btn.on { color: #2563eb; border-bottom-color: #2563eb; }
+
+    /* Status badge */
+    .status { font-size: 0.6875rem; padding: 2px 8px; border-radius: 9999px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+
+    /* Timeline */
+    .tl-item { display: flex; gap: 0.75rem; position: relative; padding-bottom: 1rem; }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-item::before { content: ''; position: absolute; left: 4px; top: 20px; bottom: 0; width: 1px; background: #e2e8f0; }
+    .tl-item:last-child::before { display: none; }
+    .tl-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+    @media (max-width: 1024px) {
+      .layout-main { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- VIEW SELECTOR -->
+  <div style="background:white;border-bottom:2px solid #e2e8f0;position:sticky;top:0;z-index:10;">
+    <div style="max-width:1400px;margin:0 auto;padding:0 1.5rem;display:flex;gap:0;">
+      <button class="view-btn on" id="vb-job" onclick="showView('job')">Job Detail View</button>
+      <button class="view-btn" id="vb-approval" onclick="showView('approval')">Approval Flow</button>
+      <button class="view-btn" id="vb-compare" onclick="showView('compare')">Current vs New</button>
+    </div>
+  </div>
+
+  <!-- ============================================= -->
+  <!-- VIEW 1: JOB DETAIL (REDESIGNED)               -->
+  <!-- ============================================= -->
+  <div class="view-content fade-in" id="v-job">
+
+    <!-- Customer bar -->
+    <div style="background:white;border-bottom:1px solid #e2e8f0;">
+      <div style="max-width:1400px;margin:0 auto;padding:0.75rem 1.5rem;">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <a href="#" style="color:#64748b;font-size:0.8125rem;text-decoration:none;">&larr;</a>
+            <div style="width:36px;height:36px;border-radius:50%;background:#2563eb;color:white;display:flex;align-items:center;justify-content:center;font-weight:700;">J</div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span style="font-size:1rem;font-weight:700;">John</span>
+                <span class="status" style="background:#dbeafe;color:#2563eb;">Lead</span>
+              </div>
+              <div style="font-size:0.6875rem;color:#64748b;">6029030482 &bull; teachout05@gmail.com</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lifecycle + Job Header -->
+    <div style="background:white;border-bottom:1px solid #e2e8f0;">
+      <div style="max-width:1400px;margin:0 auto;padding:0.75rem 1.5rem;">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <!-- Breadcrumb -->
+          <div style="font-size:0.8125rem;display:flex;align-items:center;gap:0.5rem;">
+            <a href="#" style="color:#2563eb;text-decoration:none;">Estimates</a>
+            <span style="color:#cbd5e1;">/</span>
+            <a href="#" style="color:#2563eb;text-decoration:none;">EST-001</a>
+            <span style="color:#cbd5e1;">/</span>
+            <span style="font-weight:600;">Job EST-001-1</span>
+          </div>
+
+          <!-- Lifecycle -->
+          <div style="display:flex;align-items:center;gap:0;">
+            <div class="lc-col"><div class="lc-dot done">&#10003;</div><div class="lc-label done">Estimate</div></div>
+            <div class="lc-line done"></div>
+            <div class="lc-col"><div class="lc-dot done">&#10003;</div><div class="lc-label done">Page</div></div>
+            <div class="lc-line done"></div>
+            <div class="lc-col"><div class="lc-dot done">&#10003;</div><div class="lc-label done">Approved</div></div>
+            <div class="lc-line done"></div>
+            <div class="lc-col"><div class="lc-dot active">4</div><div class="lc-label active">Job</div></div>
+            <div class="lc-line pending"></div>
+            <div class="lc-col"><div class="lc-dot pending">5</div><div class="lc-label pending">Contract</div></div>
+            <div class="lc-line pending"></div>
+            <div class="lc-col"><div class="lc-dot pending">6</div><div class="lc-label pending">Invoice</div></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center gap-2">
+            <button class="btn-sm btn-out">Edit</button>
+            <button class="btn-sm btn-green">Dispatch</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Content -->
+    <div style="max-width:1400px;margin:0 auto;padding:1.25rem 1.5rem;">
+
+      <!-- Job Title Bar -->
+      <div class="card" style="padding:1rem 1.25rem;margin-bottom:1rem;">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h1 style="font-size:1.25rem;font-weight:700;margin:0;">Job EST-001-1</h1>
+              <span class="status" style="background:#dbeafe;color:#1e40af;">Scheduled</span>
+            </div>
+            <div style="font-size:0.8125rem;color:#64748b;">
+              <span style="font-weight:500;">Feb 27, 2026</span> at <span style="font-weight:500;">8:00 AM</span>
+              &bull; Est. 2-3 hours &bull; Local Move
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div style="text-align:right;">
+              <div style="font-size:0.6875rem;color:#64748b;">From Estimate</div>
+              <a href="#" style="color:#2563eb;font-size:0.875rem;font-weight:600;text-decoration:none;">EST-001 — $425.00</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Column Layout -->
+      <div class="layout-main" style="display:grid;grid-template-columns:240px 1fr 280px;gap:1rem;align-items:start;">
+
+        <!-- LEFT: Schedule & Assignment -->
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <!-- Schedule Card -->
+          <div class="card card-pad">
+            <div style="font-size:0.8125rem;font-weight:600;margin-bottom:0.75rem;">Schedule</div>
+            <div class="fi"><span class="fi-label">Date</span><span class="fi-val" style="color:#2563eb;">Feb 27, 2026</span></div>
+            <div class="fi"><span class="fi-label">Time</span><span class="fi-val">8:00 AM</span></div>
+            <div class="fi"><span class="fi-label">Duration</span><span class="fi-val">2-3 hrs</span></div>
+            <div class="fi"><span class="fi-label">Type</span><select><option selected>Local Move</option></select></div>
+            <div class="fi"><span class="fi-label">Status</span>
+              <select style="color:#2563eb;">
+                <option selected>Scheduled</option>
+                <option>In Progress</option>
+                <option>Completed</option>
+                <option>Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Crew Card -->
+          <div class="card card-pad">
+            <div style="font-size:0.8125rem;font-weight:600;margin-bottom:0.75rem;">Crew Assignment</div>
+            <div class="fi"><span class="fi-label">Crew</span><select><option selected>Crew A</option><option>Crew B</option></select></div>
+            <div class="fi"><span class="fi-label">Lead</span><span class="fi-val">Mike T.</span></div>
+
+            <div style="margin-top:0.75rem;">
+              <div style="font-size:0.6875rem;color:#64748b;text-transform:uppercase;font-weight:600;margin-bottom:0.5rem;">Team Members</div>
+              <div style="display:flex;flex-direction:column;gap:0.375rem;">
+                <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;">
+                  <div style="width:24px;height:24px;border-radius:50%;background:#3b82f6;color:white;display:flex;align-items:center;justify-content:center;font-size:0.5rem;font-weight:700;">MT</div>
+                  <span>Mike T.</span>
+                  <span style="font-size:0.625rem;color:#64748b;margin-left:auto;">Lead</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;">
+                  <div style="width:24px;height:24px;border-radius:50%;background:#8b5cf6;color:white;display:flex;align-items:center;justify-content:center;font-size:0.5rem;font-weight:700;">JR</div>
+                  <span>James R.</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:0.75rem;">
+              <div class="fi"><span class="fi-label">Truck</span><span class="fi-val">Truck #3 (26ft)</span></div>
+              <div class="fi"><span class="fi-label">Dispatch</span>
+                <span class="status" style="background:#fef3c7;color:#92400e;">Not Dispatched</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="card card-pad">
+            <div class="flex items-center justify-between">
+              <span style="font-size:0.8125rem;font-weight:600;">Tags</span>
+              <button class="btn-ghost" style="font-size:0.75rem;">+</button>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.375rem;margin-top:0.5rem;">
+              <span style="font-size:0.6875rem;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:9999px;">Apartment</span>
+              <span style="font-size:0.6875rem;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:9999px;">2nd Floor</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: Addresses, Items, Notes, Photos -->
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+
+          <!-- Addresses -->
+          <div class="card card-pad">
+            <div class="flex items-center justify-between mb-3">
+              <span style="font-size:0.875rem;font-weight:600;">Addresses</span>
+              <div class="flex items-center gap-2">
+                <button class="btn-ghost" style="font-size:0.75rem;">Map</button>
+                <span style="font-size:0.6875rem;color:#64748b;"><b>RT</b> 1h 6m / 57mi</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.625rem 0;border-bottom:1px solid #f1f5f9;">
+              <span class="sdot" style="background:#3b82f6;margin-top:4px;"></span>
+              <div>
+                <div style="font-size:0.8125rem;font-weight:500;color:#2563eb;">Origin</div>
+                <div style="font-size:0.8125rem;">Phoenix, Arizona 85015</div>
+                <div style="font-size:0.6875rem;color:#64748b;">Apartment &bull; 1st floor &bull; Elevator: No</div>
+              </div>
+              <a href="#" style="margin-left:auto;font-size:0.6875rem;color:#2563eb;text-decoration:none;">Navigate</a>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.625rem 0;">
+              <span class="sdot" style="background:#16a34a;margin-top:4px;"></span>
+              <div>
+                <div style="font-size:0.8125rem;font-weight:500;color:#2563eb;">Destination</div>
+                <div style="font-size:0.8125rem;">Phoenix, Arizona 85041</div>
+                <div style="font-size:0.6875rem;color:#64748b;">Apartment &bull; 2nd floor &bull; Elevator: No</div>
+              </div>
+              <a href="#" style="margin-left:auto;font-size:0.6875rem;color:#2563eb;text-decoration:none;">Navigate</a>
+            </div>
+          </div>
+
+          <!-- Line Items (from estimate) -->
+          <div class="card card-pad">
+            <div class="flex items-center justify-between mb-2">
+              <span style="font-size:0.875rem;font-weight:600;">Line Items</span>
+              <span style="font-size:0.6875rem;color:#64748b;">from EST-001</span>
+            </div>
+            <div class="pr"><span>Moving Services (2 movers &times; 2 hrs &times; $150/hr)</span><span style="font-weight:500;">$300.00</span></div>
+            <div class="pr"><span>Trip Fee</span><span style="font-weight:500;">$125.00</span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="pr"><span style="font-weight:600;">Total</span><span style="font-weight:600;">$425.00</span></div>
+            <div class="pr"><span style="color:#16a34a;">Deposit Paid</span><span style="color:#16a34a;">-$100.00</span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="pr"><span style="font-weight:700;">Balance Due</span><span style="font-weight:700;color:#dc2626;">$325.00</span></div>
+          </div>
+
+          <!-- Notes -->
+          <div class="card">
+            <div style="display:flex;border-bottom:1px solid #e2e8f0;">
+              <div class="view-btn on" style="font-size:0.8125rem;padding:0.625rem 1rem;">Crew Notes</div>
+              <div class="view-btn" style="font-size:0.8125rem;padding:0.625rem 1rem;">Internal</div>
+              <div class="view-btn" style="font-size:0.8125rem;padding:0.625rem 1rem;">Customer</div>
+            </div>
+            <div style="padding:1rem 1.25rem;">
+              <div style="background:#f8fafc;border-radius:0.5rem;padding:0.75rem;font-size:0.8125rem;color:#475569;line-height:1.6;">
+                2 bedroom apartment move, 1st to 2nd floor. No appliances. Boxes and furniture only. Narrow staircase at destination — bring extra blankets and use furniture sliders.
+              </div>
+            </div>
+          </div>
+
+          <!-- Photos -->
+          <div class="card card-pad">
+            <div class="flex items-center justify-between mb-3">
+              <span style="font-size:0.875rem;font-weight:600;">Job Photos</span>
+              <button class="btn-sm btn-out">+ Upload</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;">
+              <div style="background:#e2e8f0;border-radius:0.5rem;aspect-ratio:1;display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:0.6875rem;color:#94a3b8;">Before</span>
+              </div>
+              <div style="background:#e2e8f0;border-radius:0.5rem;aspect-ratio:1;display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:0.6875rem;color:#94a3b8;">Before</span>
+              </div>
+              <div style="border:2px dashed #e2e8f0;border-radius:0.5rem;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <span style="font-size:1.5rem;color:#cbd5e1;">+</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Contracts, Timeline, Actions -->
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+
+          <!-- Contracts -->
+          <div class="card card-pad">
+            <div class="flex items-center justify-between mb-3">
+              <span style="font-size:0.8125rem;font-weight:600;">Contracts</span>
+              <button class="btn-sm btn-out" style="font-size:0.6875rem;">+ Create</button>
+            </div>
+            <div style="border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;margin-bottom:0.5rem;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+              <div class="flex items-center justify-between mb-1">
+                <span style="font-size:0.8125rem;font-weight:500;">Hourly Contract</span>
+                <span class="status" style="background:#fef3c7;color:#92400e;">Sent</span>
+              </div>
+              <div style="font-size:0.6875rem;color:#64748b;">Sent Jan 17 &bull; Awaiting signature</div>
+            </div>
+            <div style="border:1px dashed #e2e8f0;border-radius:0.5rem;padding:0.625rem;text-align:center;">
+              <span style="font-size:0.75rem;color:#94a3b8;">+ Add contract from template</span>
+            </div>
+          </div>
+
+          <!-- Financial Summary -->
+          <div class="card card-pad">
+            <div style="font-size:0.8125rem;font-weight:600;margin-bottom:0.75rem;">Financial</div>
+            <div class="fi"><span class="fi-label">Estimate</span><span class="fi-val">$425.00</span></div>
+            <div class="fi"><span class="fi-label">Deposit</span><span class="fi-val" style="color:#16a34a;">$100.00 paid</span></div>
+            <div class="fi"><span class="fi-label">Balance</span><span class="fi-val" style="color:#dc2626;">$325.00</span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="fi"><span class="fi-label">Invoice</span><span style="color:#94a3b8;font-size:0.8125rem;">Not created</span></div>
+            <button class="btn-sm btn-out" style="width:100%;justify-content:center;margin-top:0.5rem;">Create Invoice</button>
+          </div>
+
+          <!-- Timeline -->
+          <div class="card card-pad">
+            <div style="font-size:0.8125rem;font-weight:600;margin-bottom:0.75rem;">Activity</div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#16a34a;"></div>
+              <div><div style="font-size:0.8125rem;">Estimate created</div><div style="font-size:0.6875rem;color:#94a3b8;">Jan 15 &bull; Daniela</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#3b82f6;"></div>
+              <div><div style="font-size:0.8125rem;">Estimate page sent</div><div style="font-size:0.6875rem;color:#94a3b8;">Jan 15 &bull; Daniela</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#8b5cf6;"></div>
+              <div><div style="font-size:0.8125rem;">Customer viewed page</div><div style="font-size:0.6875rem;color:#94a3b8;">Jan 15</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#16a34a;"></div>
+              <div><div style="font-size:0.8125rem;"><b>Customer approved</b></div><div style="font-size:0.6875rem;color:#94a3b8;">Jan 16 &bull; $100 deposit</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#16a34a;"></div>
+              <div><div style="font-size:0.8125rem;">Job created</div><div style="font-size:0.6875rem;color:#94a3b8;">Jan 16 &bull; Auto</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#f59e0b;"></div>
+              <div><div style="font-size:0.8125rem;">Contract sent</div><div style="font-size:0.6875rem;color:#94a3b8;">Jan 17 &bull; Daniela</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#e2e8f0;"></div>
+              <div style="color:#94a3b8;"><div style="font-size:0.8125rem;">Awaiting dispatch</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================= -->
+  <!-- VIEW 2: APPROVAL FLOW                         -->
+  <!-- ============================================= -->
+  <div class="view-content fade-in" id="v-approval" style="display:none;">
+    <div style="max-width:900px;margin:0 auto;padding:2rem 1.5rem;">
+
+      <h2 style="font-size:1.25rem;font-weight:700;text-align:center;margin:0 0 0.5rem;">Approval Flow — What Happens When the Customer Says Yes</h2>
+      <p style="text-align:center;color:#64748b;font-size:0.875rem;margin:0 0 2rem;">Two paths — online or over the phone</p>
+
+      <!-- Path A: Online -->
+      <div class="card" style="margin-bottom:1.5rem;overflow:hidden;">
+        <div style="background:#2563eb;color:white;padding:0.75rem 1.25rem;font-weight:600;">Path A: Customer Approves Online (Self-Service)</div>
+        <div style="padding:1.25rem;">
+          <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
+
+            <!-- Step 1 -->
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.75rem;color:#2563eb;font-weight:600;margin-bottom:0.5rem;">1. CUSTOMER OPENS LINK</div>
+              <div class="card card-pad" style="text-align:center;">
+                <div style="font-size:2rem;margin-bottom:0.25rem;">📧</div>
+                <div style="font-size:0.8125rem;">Gets email/text with estimate page link</div>
+                <div style="font-size:0.6875rem;color:#64748b;margin-top:0.25rem;">yoursite.com/e/abc123</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;padding-top:2rem;color:#cbd5e1;font-size:1.25rem;">&rarr;</div>
+
+            <!-- Step 2 -->
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.75rem;color:#2563eb;font-weight:600;margin-bottom:0.5rem;">2. REVIEWS ESTIMATE PAGE</div>
+              <div class="card card-pad" style="text-align:center;">
+                <div style="font-size:2rem;margin-bottom:0.25rem;">👀</div>
+                <div style="font-size:0.8125rem;">Sees hero, pricing, trust badges, testimonials</div>
+                <div style="font-size:0.6875rem;color:#64748b;margin-top:0.25rem;">Status: "Viewed"</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;padding-top:2rem;color:#cbd5e1;font-size:1.25rem;">&rarr;</div>
+
+            <!-- Step 3 -->
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.75rem;color:#16a34a;font-weight:600;margin-bottom:0.5rem;">3. CLICKS APPROVE</div>
+              <div class="card card-pad" style="text-align:center;border-color:#16a34a;">
+                <div style="font-size:2rem;margin-bottom:0.25rem;">✅</div>
+                <div style="font-size:0.8125rem;">Signs + pays deposit ($100)</div>
+                <div style="font-size:0.6875rem;color:#64748b;margin-top:0.25rem;">Signature + payment captured</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What triggers -->
+          <div style="margin-top:1.25rem;background:#f0fdf4;border-radius:0.5rem;padding:1rem;">
+            <div style="font-size:0.8125rem;font-weight:600;color:#166534;margin-bottom:0.5rem;">System automatically does:</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.8125rem;">
+              <div style="display:flex;gap:0.375rem;"><span style="color:#16a34a;">&#10003;</span> Estimate status → "Approved"</div>
+              <div style="display:flex;gap:0.375rem;"><span style="color:#16a34a;">&#10003;</span> Estimate page status → "Approved"</div>
+              <div style="display:flex;gap:0.375rem;"><span style="color:#16a34a;">&#10003;</span> Job auto-created with estimate data</div>
+              <div style="display:flex;gap:0.375rem;"><span style="color:#16a34a;">&#10003;</span> Estimate.jobId → linked to new job</div>
+              <div style="display:flex;gap:0.375rem;"><span style="color:#16a34a;">&#10003;</span> Deposit recorded as payment</div>
+              <div style="display:flex;gap:0.375rem;"><span style="color:#16a34a;">&#10003;</span> Notification sent to rep</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Path B: Phone -->
+      <div class="card" style="margin-bottom:1.5rem;overflow:hidden;">
+        <div style="background:#16a34a;color:white;padding:0.75rem 1.25rem;font-weight:600;">Path B: Rep Books It (Phone / In-Person)</div>
+        <div style="padding:1.25rem;">
+          <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;">
+
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.75rem;color:#16a34a;font-weight:600;margin-bottom:0.5rem;">1. CUSTOMER SAYS YES</div>
+              <div class="card card-pad" style="text-align:center;">
+                <div style="font-size:2rem;margin-bottom:0.25rem;">📞</div>
+                <div style="font-size:0.8125rem;">Over the phone, in person, or via text</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;padding-top:2rem;color:#cbd5e1;font-size:1.25rem;">&rarr;</div>
+
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.75rem;color:#16a34a;font-weight:600;margin-bottom:0.5rem;">2. REP CLICKS "BOOK"</div>
+              <div class="card card-pad" style="text-align:center;">
+                <div style="font-size:2rem;margin-bottom:0.25rem;">📋</div>
+                <div style="font-size:0.8125rem;">On the estimate detail, clicks Book button</div>
+                <div style="font-size:0.6875rem;color:#64748b;margin-top:0.25rem;">Confirms schedule, assignment</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;padding-top:2rem;color:#cbd5e1;font-size:1.25rem;">&rarr;</div>
+
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.75rem;color:#16a34a;font-weight:600;margin-bottom:0.5rem;">3. JOB CREATED</div>
+              <div class="card card-pad" style="text-align:center;border-color:#16a34a;">
+                <div style="font-size:2rem;margin-bottom:0.25rem;">🎯</div>
+                <div style="font-size:0.8125rem;">Same result — estimate → approved, job created</div>
+                <div style="font-size:0.6875rem;color:#64748b;margin-top:0.25rem;">Rep can take deposit manually</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:1.25rem;background:#eff6ff;border-radius:0.5rem;padding:1rem;">
+            <div style="font-size:0.8125rem;font-weight:600;color:#1e40af;margin-bottom:0.5rem;">Same outcome, different trigger:</div>
+            <div style="font-size:0.8125rem;color:#1e40af;">Both paths end with: estimate marked approved, job created and linked, ready for dispatch. The only difference is who initiates it — the customer online or the rep manually.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- After approval -->
+      <div class="card card-pad">
+        <div style="font-size:0.9375rem;font-weight:700;margin-bottom:1rem;text-align:center;">After Approval — What's Next</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+          <div style="text-align:center;padding:1rem;background:#f8fafc;border-radius:0.5rem;">
+            <div style="font-size:1.5rem;margin-bottom:0.5rem;">📋</div>
+            <div style="font-size:0.875rem;font-weight:600;margin-bottom:0.25rem;">Create Contract</div>
+            <div style="font-size:0.75rem;color:#64748b;">Attach an hourly or flat-rate contract to the job for signing</div>
+          </div>
+          <div style="text-align:center;padding:1rem;background:#f8fafc;border-radius:0.5rem;">
+            <div style="font-size:1.5rem;margin-bottom:0.5rem;">🚚</div>
+            <div style="font-size:0.875rem;font-weight:600;margin-bottom:0.25rem;">Dispatch Crew</div>
+            <div style="font-size:0.75rem;color:#64748b;">Assign crew, push to tech portal, they see it on their schedule</div>
+          </div>
+          <div style="text-align:center;padding:1rem;background:#f8fafc;border-radius:0.5rem;">
+            <div style="font-size:1.5rem;margin-bottom:0.5rem;">💰</div>
+            <div style="font-size:0.875rem;font-weight:600;margin-bottom:0.25rem;">Invoice</div>
+            <div style="font-size:0.75rem;color:#64748b;">After job completes, create invoice for remaining balance</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================= -->
+  <!-- VIEW 3: CURRENT vs NEW COMPARISON              -->
+  <!-- ============================================= -->
+  <div class="view-content fade-in" id="v-compare" style="display:none;">
+    <div style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem;">
+
+      <h2 style="font-size:1.25rem;font-weight:700;text-align:center;margin:0 0 2rem;">Current Job Page vs Proposed Redesign</h2>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;">
+        <!-- Current -->
+        <div>
+          <div style="text-align:center;margin-bottom:1rem;">
+            <span class="status" style="background:#fee2e2;color:#dc2626;font-size:0.75rem;padding:4px 12px;">Current Design</span>
+          </div>
+          <div class="card card-pad">
+            <div style="font-size:0.875rem;font-weight:600;margin-bottom:1rem;">JobFormEdit.tsx (153 lines)</div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;font-size:0.8125rem;">
+              <div style="background:#f8fafc;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">Header</div>
+                <div style="color:#64748b;">Back button + title + status badge + delete</div>
+              </div>
+              <div style="background:#f8fafc;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">2-Column Form Grid</div>
+                <div style="color:#64748b;">Title, Status, Date, Time, Duration, Assigned To — all form inputs in a basic grid</div>
+              </div>
+              <div style="background:#f8fafc;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">Full-Width Fields</div>
+                <div style="color:#64748b;">Address, Description, Notes — stacked textareas</div>
+              </div>
+              <div style="background:#f8fafc;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">Tags + Custom Fields + Recurrence</div>
+                <div style="color:#64748b;">Appended at bottom</div>
+              </div>
+              <div style="background:#f8fafc;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">Contracts Tab</div>
+                <div style="color:#64748b;">Separate tab, hides everything else</div>
+              </div>
+            </div>
+            <div style="margin-top:1rem;padding:0.75rem;background:#fee2e2;border-radius:0.375rem;font-size:0.8125rem;color:#dc2626;">
+              <b>Issues:</b> No lifecycle context. No pricing visible. No connection to estimate. No timeline. Basic form layout — doesn't match the estimate V3 quality.
+            </div>
+          </div>
+        </div>
+
+        <!-- New -->
+        <div>
+          <div style="text-align:center;margin-bottom:1rem;">
+            <span class="status" style="background:#dcfce7;color:#166534;font-size:0.75rem;padding:4px 12px;">Proposed Design</span>
+          </div>
+          <div class="card card-pad">
+            <div style="font-size:0.875rem;font-weight:600;margin-bottom:1rem;">3-Column Layout (matches Estimate V3)</div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;font-size:0.8125rem;">
+              <div style="background:#f0fdf4;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">Lifecycle Bar</div>
+                <div style="color:#166534;">Data-driven progress: Estimate ✓ → Page ✓ → Approved ✓ → <b>Job</b> → Contract → Invoice</div>
+              </div>
+              <div style="background:#f0fdf4;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">Left Column (240px)</div>
+                <div style="color:#166534;">Schedule card, Crew Assignment card (with member avatars), Tags</div>
+              </div>
+              <div style="background:#f0fdf4;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">Center Column (flex)</div>
+                <div style="color:#166534;">Addresses (with navigate links), Line Items (from estimate, with deposit/balance), Crew Notes, Job Photos</div>
+              </div>
+              <div style="background:#f0fdf4;padding:0.75rem;border-radius:0.375rem;">
+                <div style="font-weight:500;margin-bottom:0.5rem;">Right Column (280px)</div>
+                <div style="color:#166534;">Contracts card, Financial Summary, Activity Timeline</div>
+              </div>
+            </div>
+            <div style="margin-top:1rem;padding:0.75rem;background:#dcfce7;border-radius:0.375rem;font-size:0.8125rem;color:#166534;">
+              <b>Benefits:</b> Full lifecycle visible. Pricing + balance shown. Connected to estimate via breadcrumb + link. Timeline shows full history. Contracts visible without tab switch. Same visual language as estimate V3.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function showView(view) {
+      document.querySelectorAll('.view-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('on'));
+      document.getElementById('v-' + view).style.display = 'block';
+      document.getElementById('vb-' + view).classList.add('on');
+      document.getElementById('v-' + view).classList.remove('fade-in');
+      void document.getElementById('v-' + view).offsetWidth;
+      document.getElementById('v-' + view).classList.add('fade-in');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>

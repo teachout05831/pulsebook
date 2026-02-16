@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Inventory / Checklist - Mobile Dispatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: #0f172a;
+      min-height: 100vh;
+    }
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      background: #1e293b;
+      border-radius: 40px;
+      border: 8px solid #334155;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .notch {
+      width: 150px;
+      height: 30px;
+      background: #334155;
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+    }
+    .scroll-container {
+      height: calc(100% - 120px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-container::-webkit-scrollbar { display: none; }
+    .checkbox-custom {
+      transition: all 0.2s;
+    }
+    .checkbox-custom.checked {
+      background: #10b981;
+      border-color: #10b981;
+    }
+    .item-row {
+      transition: all 0.2s;
+    }
+    .item-row.checked {
+      opacity: 0.5;
+    }
+    .item-row.checked .item-text {
+      text-decoration: line-through;
+    }
+    .category-section {
+      transition: max-height 0.3s ease-out;
+      overflow: hidden;
+    }
+    .category-section.collapsed {
+      max-height: 0;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-8">
+
+  <div class="phone-frame">
+    <!-- Notch -->
+    <div class="notch"></div>
+
+    <!-- Header -->
+    <div class="bg-slate-800 px-4 py-3 flex items-center justify-between border-b border-slate-700">
+      <div class="flex items-center gap-2">
+        <button class="p-2 hover:bg-slate-700 rounded-lg">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <span class="text-white font-semibold">Inventory</span>
+      </div>
+      <button class="flex items-center gap-1 px-3 py-1.5 bg-blue-600/20 text-blue-400 rounded-lg text-sm hover:bg-blue-600/30">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Photo
+      </button>
+    </div>
+
+    <!-- Job Info Bar -->
+    <div class="bg-slate-800/50 px-4 py-2 border-b border-slate-700/50">
+      <p class="text-slate-400 text-sm">Johnson Move • 42 items</p>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="scroll-container bg-slate-900 px-4 py-4">
+
+      <!-- Category 1: Living Room - Complete -->
+      <div class="mb-4">
+        <button class="w-full flex items-center justify-between p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl mb-2" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="text-left">
+              <p class="text-white font-medium">Living Room</p>
+              <p class="text-emerald-400 text-sm">8/8 items loaded</p>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div class="category-section collapsed space-y-1 pl-4">
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">Sofa (3-seater)</span>
+          </div>
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">Loveseat</span>
+          </div>
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">Coffee Table</span>
+          </div>
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">TV Stand</span>
+          </div>
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">55" TV</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category 2: Master Bedroom - In Progress -->
+      <div class="mb-4">
+        <button class="w-full flex items-center justify-between p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl mb-2" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <span class="text-blue-400 font-bold text-sm">5</span>
+            </div>
+            <div class="text-left">
+              <p class="text-white font-medium">Master Bedroom</p>
+              <p class="text-blue-400 text-sm">5/12 items loaded</p>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div class="category-section space-y-1 pl-4">
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">King Bed Frame</span>
+          </div>
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">King Mattress</span>
+          </div>
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">Box Spring</span>
+          </div>
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">Nightstand (Left)</span>
+          </div>
+          <div class="item-row checked flex items-center gap-3 p-2 rounded-lg">
+            <div class="checkbox-custom checked w-6 h-6 rounded-md border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-slate-400 text-sm">Nightstand (Right)</span>
+          </div>
+
+          <!-- Unchecked items -->
+          <div class="item-row flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 cursor-pointer" onclick="this.classList.toggle('checked'); this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-slate-600 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-white text-sm">Dresser (antique) ⚠️</span>
+          </div>
+          <div class="item-row flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 cursor-pointer" onclick="this.classList.toggle('checked'); this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-slate-600 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-white text-sm">Mirror</span>
+          </div>
+          <div class="item-row flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 cursor-pointer" onclick="this.classList.toggle('checked'); this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-slate-600 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-white text-sm">Boxes (6)</span>
+          </div>
+          <div class="item-row flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 cursor-pointer" onclick="this.classList.toggle('checked'); this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-slate-600 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <span class="item-text text-white text-sm">Lamp (Bedside)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category 3: Kitchen - Not Started -->
+      <div class="mb-4">
+        <button class="w-full flex items-center justify-between p-3 bg-slate-800 border border-slate-700 rounded-xl mb-2" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center">
+              <span class="text-slate-400 font-bold text-sm">0</span>
+            </div>
+            <div class="text-left">
+              <p class="text-white font-medium">Kitchen</p>
+              <p class="text-slate-400 text-sm">0/10 items loaded</p>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div class="category-section collapsed space-y-1 pl-4">
+          <div class="item-row flex items-center gap-3 p-2">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-slate-600"></div>
+            <span class="item-text text-white text-sm">Dining Table</span>
+          </div>
+          <div class="item-row flex items-center gap-3 p-2">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-slate-600"></div>
+            <span class="item-text text-white text-sm">Dining Chairs (6)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category 4: Garage - Not Started -->
+      <div class="mb-4">
+        <button class="w-full flex items-center justify-between p-3 bg-slate-800 border border-slate-700 rounded-xl mb-2" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center">
+              <span class="text-slate-400 font-bold text-sm">0</span>
+            </div>
+            <div class="text-left">
+              <p class="text-white font-medium">Garage</p>
+              <p class="text-slate-400 text-sm">0/6 items loaded</p>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div class="category-section collapsed"></div>
+      </div>
+
+      <!-- Special Handling Items -->
+      <div class="mb-4">
+        <button class="w-full flex items-center justify-between p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl mb-2" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div class="text-left">
+              <p class="text-amber-400 font-medium">Special Handling</p>
+              <p class="text-amber-400/70 text-sm">0/2 items loaded</p>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div class="category-section space-y-1 pl-4">
+          <div class="item-row flex items-center gap-3 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg hover:bg-amber-500/10 cursor-pointer" onclick="this.classList.toggle('checked'); this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-amber-500/50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <span class="item-text text-white text-sm font-medium">Baby Grand Piano</span>
+              <p class="text-amber-400/70 text-xs">Needs 4 people, use piano board</p>
+            </div>
+            <button class="p-2 hover:bg-amber-500/20 rounded-lg">
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="item-row flex items-center gap-3 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg hover:bg-amber-500/10 cursor-pointer" onclick="this.classList.toggle('checked'); this.querySelector('.checkbox-custom').classList.toggle('checked')">
+            <div class="checkbox-custom w-6 h-6 rounded-md border-2 border-amber-500/50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <span class="item-text text-white text-sm font-medium">Antique Dresser</span>
+              <p class="text-amber-400/70 text-xs">Extra padding, fragile</p>
+            </div>
+            <button class="p-2 hover:bg-amber-500/20 rounded-lg">
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Item Button -->
+      <button class="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-dashed border-slate-600 text-slate-400 py-4 rounded-xl transition-colors mb-4">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Add Item
+      </button>
+
+      <div class="h-4"></div>
+    </div>
+
+    <!-- Bottom Progress Bar -->
+    <div class="bg-slate-800 px-4 py-3 border-t border-slate-700">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-slate-400 text-sm">Loading Progress</span>
+        <span class="text-white font-medium">13/42 items</span>
+      </div>
+      <div class="h-3 bg-slate-700 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all" style="width: 31%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back link -->
+  <a href="index.html" class="fixed bottom-8 left-8 text-slate-400 hover:text-white flex items-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Back to mockups
+  </a>
+
+</body>
+</html>

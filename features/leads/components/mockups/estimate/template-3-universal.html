@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Template 3: Universal Service (HVAC/Plumbing/etc)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="flex items-center justify-between px-6 py-4">
+      <div class="flex items-center gap-4">
+        <button class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold text-gray-900">Estimate #12345</h1>
+            <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
+              Draft
+            </span>
+          </div>
+          <p class="text-gray-500">HVAC Repair • John Smith</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+          <i class="far fa-eye mr-2"></i>
+          Preview
+        </button>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <i class="far fa-paper-plane mr-2"></i>
+          Send
+        </button>
+        <button class="p-2 text-gray-400 hover:text-gray-600">
+          <i class="fas fa-ellipsis-v"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex max-w-7xl mx-auto p-6 gap-6">
+    <!-- Left Sidebar -->
+    <aside class="w-72 flex-shrink-0 space-y-4">
+      <!-- Customer Info Card -->
+      <div class="bg-white rounded-xl shadow-sm p-5">
+        <h3 class="font-semibold text-gray-700 mb-4">Customer Info</h3>
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-blue-600"></i>
+          </div>
+          <div>
+            <p class="font-semibold">John Smith</p>
+            <p class="text-sm text-gray-500">Customer since 2022</p>
+          </div>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-2 text-gray-600">
+            <i class="fas fa-phone w-5 text-gray-400"></i>
+            <span>(555) 123-4567</span>
+          </div>
+          <div class="flex items-center gap-2 text-gray-600">
+            <i class="fas fa-envelope w-5 text-gray-400"></i>
+            <span>john.smith@email.com</span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Service Address</p>
+          <p class="text-sm">123 Main Street</p>
+          <p class="text-sm text-gray-600">Phoenix, AZ 85001</p>
+          <button class="mt-2 text-sm text-blue-600 hover:underline">
+            <i class="fas fa-map-marker-alt mr-1"></i> View Map
+          </button>
+        </div>
+      </div>
+
+      <!-- Quote Details Card -->
+      <div class="bg-white rounded-xl shadow-sm p-5">
+        <h3 class="font-semibold text-gray-700 mb-4">Quote Details</h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Type</span>
+            <span class="text-blue-600">Flat Rate</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Source</span>
+            <span>Website</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Assigned Tech</span>
+            <span>Mike Johnson</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Created</span>
+            <span>Jan 15, 2026</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Valid Until</span>
+            <span>Feb 14, 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Previous Jobs Card -->
+      <div class="bg-white rounded-xl shadow-sm p-5">
+        <h3 class="font-semibold text-gray-700 mb-4">Previous Jobs</h3>
+        <div class="space-y-3">
+          <div class="p-3 bg-gray-50 rounded-lg">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-medium text-sm">AC Maintenance</p>
+                <p class="text-xs text-gray-500">June 2024</p>
+              </div>
+              <span class="text-sm font-medium text-green-600">$150</span>
+            </div>
+          </div>
+          <div class="p-3 bg-gray-50 rounded-lg">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-medium text-sm">System Installation</p>
+                <p class="text-xs text-gray-500">March 2023</p>
+              </div>
+              <span class="text-sm font-medium text-green-600">$4,500</span>
+            </div>
+          </div>
+        </div>
+        <button class="w-full mt-3 text-sm text-blue-600 hover:underline">
+          View All History
+        </button>
+      </div>
+
+      <!-- Tasks Card -->
+      <div class="bg-white rounded-xl shadow-sm p-5">
+        <h3 class="font-semibold text-gray-700 mb-4">Tasks</h3>
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="text-sm">Schedule technician</span>
+          </label>
+          <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+            <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="text-sm">Order parts</span>
+          </label>
+          <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+            <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <span class="text-sm text-gray-400 line-through">Send estimate</span>
+          </label>
+        </div>
+        <button class="w-full mt-3 py-2 border border-dashed border-gray-300 text-gray-500 rounded-lg text-sm hover:border-blue-500 hover:text-blue-600">
+          <i class="fas fa-plus mr-1"></i> Add Task
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 space-y-6">
+      <!-- Service Details Card -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
+          <h3 class="font-semibold text-gray-700">Service Details</h3>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Service Type</p>
+              <p class="font-semibold text-lg">HVAC Repair</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Scheduled</p>
+              <p class="font-semibold text-lg">Feb 15, 2026 at 9:00 AM</p>
+            </div>
+          </div>
+
+          <div class="mt-6 p-4 bg-blue-50 rounded-lg flex items-center gap-4">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-map-marker-alt text-blue-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium">123 Main Street, Phoenix, AZ 85001</p>
+              <p class="text-sm text-gray-600">Single Family Home • Front door access • Code #1234</p>
+            </div>
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm hover:bg-gray-50">
+              View Map
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Fields Card -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="font-semibold text-gray-700">Custom Fields</h3>
+          <button class="text-sm text-blue-600 hover:underline">
+            <i class="fas fa-edit mr-1"></i> Edit
+          </button>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Unit Make/Model</p>
+              <p class="font-medium">Carrier 24ACC636A003</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Issue Reported</p>
+              <p class="font-medium">AC not cooling, making noise</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Warranty Status</p>
+              <p class="font-medium">Out of warranty</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Last Service Date</p>
+              <p class="font-medium">June 2024</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work to be Performed Card -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="font-semibold text-gray-700">Work to be Performed</h3>
+          <button class="text-sm text-blue-600 hover:underline">
+            <i class="fas fa-plus mr-1"></i> Add Item
+          </button>
+        </div>
+        <div class="p-6">
+          <table class="w-full">
+            <thead>
+              <tr class="text-left text-sm text-gray-500 border-b">
+                <th class="pb-3 font-medium">Description</th>
+                <th class="pb-3 font-medium text-right">Price</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr>
+                <td class="py-4">
+                  <div class="flex items-center gap-3">
+                    <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-blue-600">
+                    <span>Diagnose AC issue</span>
+                  </div>
+                </td>
+                <td class="py-4 text-right font-medium">$89.00</td>
+              </tr>
+              <tr>
+                <td class="py-4">
+                  <div class="flex items-center gap-3">
+                    <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-blue-600">
+                    <span>Replace capacitor (if needed)</span>
+                  </div>
+                </td>
+                <td class="py-4 text-right font-medium">$185.00</td>
+              </tr>
+              <tr>
+                <td class="py-4">
+                  <div class="flex items-center gap-3">
+                    <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-blue-600">
+                    <span>Refrigerant recharge (estimated)</span>
+                  </div>
+                </td>
+                <td class="py-4 text-right font-medium">$250.00</td>
+              </tr>
+              <tr>
+                <td class="py-4">
+                  <div class="flex items-center gap-3">
+                    <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-blue-600">
+                    <span>Labor (2 hours estimated)</span>
+                  </div>
+                </td>
+                <td class="py-4 text-right font-medium">$180.00</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Totals -->
+          <div class="mt-6 pt-4 border-t border-gray-200">
+            <div class="flex justify-end">
+              <div class="w-64 space-y-2">
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-500">Subtotal</span>
+                  <span>$704.00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-500">Tax (8.6%)</span>
+                  <span>$60.54</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
+                  <span>Estimated Total</span>
+                  <span class="text-blue-600">$764.54</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-4 text-sm text-gray-500 italic">
+            * Final price may vary based on diagnostic findings
+          </p>
+        </div>
+      </div>
+
+      <!-- Notes Card -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-100">
+          <h3 class="font-semibold text-gray-700">Notes</h3>
+        </div>
+        <div class="p-6">
+          <!-- Tabs -->
+          <div class="flex gap-1 mb-4 bg-gray-100 p-1 rounded-lg w-fit">
+            <button class="px-4 py-2 bg-white text-blue-600 rounded-md text-sm font-medium shadow-sm">
+              Internal
+            </button>
+            <button class="px-4 py-2 text-gray-600 rounded-md text-sm font-medium hover:bg-gray-50">
+              Customer
+            </button>
+            <button class="px-4 py-2 text-gray-600 rounded-md text-sm font-medium hover:bg-gray-50">
+              Tech Notes
+            </button>
+          </div>
+
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p class="text-sm text-gray-700">Customer mentioned unit is 12 years old. May need to discuss replacement options if repair costs exceed $500.</p>
+            <p class="text-xs text-gray-500 mt-2">Added by Sarah M. • Jan 15, 2026</p>
+          </div>
+
+          <textarea
+            class="w-full mt-4 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            rows="3"
+            placeholder="Add a note..."
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

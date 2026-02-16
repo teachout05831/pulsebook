@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Blocks — Visual Walkthrough</title>
+  <style>
+    :root {
+      --sidebar-bg: #0f172a;
+      --sidebar-border: #1e293b;
+      --sidebar-text: #94a3b8;
+      --sidebar-active: rgba(37,99,235,0.2);
+      --sidebar-active-text: #fff;
+      --sidebar-active-border: #3b82f6;
+      --main-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --primary-light: rgba(59,130,246,0.1);
+      --green: #22c55e;
+      --green-light: rgba(34,197,94,0.1);
+      --amber: #f59e0b;
+      --amber-light: rgba(245,158,11,0.1);
+      --red: #ef4444;
+      --destructive: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 48px 32px;
+      text-align: center;
+      border-bottom: 1px solid var(--sidebar-border);
+    }
+    .page-header h1 {
+      font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 8px;
+    }
+    .page-header p { color: var(--sidebar-text); font-size: 1rem; max-width: 540px; margin: 0 auto; }
+    .step-badge {
+      display: inline-block; padding: 3px 12px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 16px;
+      background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3);
+    }
+
+    /* ===== STEP NAV ===== */
+    .step-nav {
+      display: flex; justify-content: center; gap: 4px;
+      padding: 14px 20px; background: #1e293b;
+      border-bottom: 1px solid #334155;
+      position: sticky; top: 0; z-index: 100; flex-wrap: wrap;
+    }
+    .step-btn {
+      padding: 7px 18px; border: 1px solid transparent; border-radius: 8px;
+      background: transparent; color: var(--sidebar-text); font-size: 0.8rem;
+      font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .step-btn:hover { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+    .step-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* ===== STEP CONTENT ===== */
+    .step { display: none; }
+    .step.active { display: block; }
+    .step-inner { max-width: 1100px; margin: 0 auto; padding: 40px 24px 60px; }
+
+    /* Step title area */
+    .step-title-area {
+      text-align: center; margin-bottom: 36px;
+    }
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--primary); color: #fff; font-size: 0.9rem;
+      font-weight: 700; margin-bottom: 12px;
+    }
+    .step-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .step-subtitle { color: var(--sidebar-text); font-size: 0.95rem; }
+
+    /* Annotation callouts */
+    .annotation {
+      background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 10px; padding: 14px 18px; margin: 20px 0;
+      font-size: 0.85rem; color: #cbd5e1;
+    }
+    .annotation strong { color: #60a5fa; }
+
+    .annotation-green {
+      background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2);
+    }
+    .annotation-green strong { color: #4ade80; }
+
+    .annotation-amber {
+      background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2);
+    }
+    .annotation-amber strong { color: #fbbf24; }
+
+    /* ===== APP MOCKUP FRAME ===== */
+    .app-frame {
+      background: var(--main-bg); border-radius: 12px; overflow: hidden;
+      border: 1px solid #334155; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .app-frame-bar {
+      background: #1e293b; padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ef4444; }
+    .dot-y { background: #f59e0b; }
+    .dot-g { background: #22c55e; }
+    .app-frame-url {
+      flex: 1; text-align: center; font-size: 0.7rem; color: #64748b;
+      font-family: monospace;
+    }
+
+    /* ===== SIDEBAR MOCKUP ===== */
+    .mock-app { display: flex; min-height: 520px; }
+    .mock-sidebar {
+      width: 220px; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border);
+      padding: 0; flex-shrink: 0; display: flex; flex-direction: column;
+    }
+    .mock-sidebar-logo {
+      padding: 14px 16px; border-bottom: 1px solid var(--sidebar-border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .mock-logo-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 0.8rem;
+    }
+    .mock-logo-text { color: #fff; font-size: 0.95rem; font-weight: 600; }
+    .mock-nav { padding: 12px 8px; flex: 1; overflow-y: auto; }
+    .mock-nav-section {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #475569; padding: 12px 10px 4px;
+    }
+    .mock-nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 8px; font-size: 0.8rem;
+      color: var(--sidebar-text); cursor: default;
+      border-left: 3px solid transparent; margin-bottom: 1px;
+    }
+    .mock-nav-item.active {
+      background: var(--sidebar-active); color: var(--sidebar-active-text);
+      border-left-color: var(--sidebar-active-border);
+    }
+    .mock-nav-icon { font-size: 0.85rem; width: 18px; text-align: center; }
+
+    /* ===== MAIN CONTENT MOCKUP ===== */
+    .mock-main {
+      flex: 1; background: var(--main-bg); overflow: hidden;
+    }
+    .mock-content {
+      padding: 24px 32px;
+    }
+    .mock-page-title { font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .mock-page-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; }
+
+    /* ===== SETTINGS LAYOUT MOCKUP ===== */
+    .mock-settings-layout { display: flex; min-height: 520px; }
+    .mock-settings-sidebar {
+      width: 220px; background: #fff; border-right: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .mock-settings-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      font-size: 1rem; font-weight: 700; color: var(--text);
+    }
+    .mock-settings-nav { padding: 16px 10px; }
+    .mock-settings-section-label {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted); padding: 10px 10px 4px;
+    }
+    .mock-settings-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 8px; font-size: 0.8rem;
+      color: #334155; cursor: default; margin-bottom: 1px;
+    }
+    .mock-settings-item.active {
+      background: rgba(59,130,246,0.08); color: var(--primary-dark);
+      font-weight: 500;
+    }
+    .mock-settings-item .s-icon { font-size: 0.8rem; width: 18px; text-align: center; }
+    .mock-settings-content {
+      flex: 1; padding: 28px 36px; overflow-y: auto;
+    }
+
+    /* ===== BUILDER MOCKUP ===== */
+    .mock-builder { display: flex; flex-direction: column; height: 540px; }
+    .mock-builder-top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+    .mock-builder-top-left { display: flex; align-items: center; gap: 10px; }
+    .mock-builder-top-right { display: flex; align-items: center; gap: 8px; }
+    .mock-builder-title { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .mock-builder-body { display: flex; flex: 1; overflow: hidden; }
+    .mock-builder-left {
+      width: 230px; border-right: 1px solid var(--border);
+      background: #fff; display: flex; flex-direction: column;
+    }
+    .mock-builder-center {
+      flex: 1; background: #f1f5f9; padding: 16px; overflow-y: auto;
+      display: flex; justify-content: center;
+    }
+    .mock-builder-right {
+      width: 280px; border-left: 1px solid var(--border);
+      background: #fff; overflow-y: auto;
+    }
+    .mock-section-label {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted); padding: 12px 12px 6px;
+    }
+    .mock-section-list { flex: 1; padding: 0 8px; overflow-y: auto; }
+    .mock-section-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 8px; border-radius: 6px; font-size: 0.78rem;
+      color: var(--text); cursor: default; margin-bottom: 2px;
+      border: 1px solid transparent;
+    }
+    .mock-section-item:hover { background: #f1f5f9; }
+    .mock-section-item.selected {
+      background: #f1f5f9; border-color: rgba(59,130,246,0.3);
+    }
+    .mock-section-item .grip { color: #cbd5e1; font-size: 0.7rem; }
+    .mock-section-item .name { flex: 1; }
+    .mock-section-item .actions { display: flex; gap: 2px; opacity: 0.4; font-size: 0.7rem; }
+    .mock-section-item:hover .actions { opacity: 1; }
+    .mock-connected-badge {
+      font-size: 0.55rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--primary); background: var(--primary-light);
+      padding: 1px 5px; border-radius: 3px;
+    }
+    .mock-section-bottom {
+      padding: 8px; border-top: 1px solid var(--border);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 6px; font-size: 0.78rem;
+      font-weight: 500; border: 1px solid; cursor: default; white-space: nowrap;
+    }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-outline { background: #fff; color: var(--text); border-color: var(--border); }
+    .btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
+    .btn-sm { padding: 4px 10px; font-size: 0.72rem; }
+    .btn-destructive { background: #fff; color: var(--destructive); border-color: var(--border); }
+
+    /* Preview blocks */
+    .preview-card {
+      background: #fff; border-radius: 8px; border: 1px solid var(--border);
+      padding: 20px; margin-bottom: 12px; width: 100%; max-width: 640px;
+    }
+    .preview-card.selected { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59,130,246,0.2); }
+    .preview-card.connected { border-color: var(--primary); position: relative; }
+    .preview-card .universal-tag {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 0.55rem; font-weight: 700; text-transform: uppercase;
+      color: var(--primary); background: var(--primary-light);
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .preview-label {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px;
+    }
+
+    /* Right panel banner */
+    .connected-banner {
+      background: var(--primary-light); border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 8px; padding: 12px; margin: 12px; margin-bottom: 4px;
+    }
+    .connected-banner-title {
+      font-size: 0.78rem; font-weight: 600; color: var(--primary-dark);
+      display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+    }
+    .connected-banner-desc { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px; }
+    .connected-banner-actions { display: flex; gap: 6px; }
+
+    /* Dialog mockup */
+    .mock-dialog-overlay {
+      position: relative; background: rgba(0,0,0,0.04); border-radius: 8px;
+      padding: 40px 20px; display: flex; justify-content: center;
+      margin: 16px 0;
+    }
+    .mock-dialog {
+      background: #fff; border-radius: 12px; border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12); width: 100%; max-width: 480px;
+      overflow: hidden;
+    }
+    .mock-dialog-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    .mock-dialog-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .mock-dialog-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .mock-dialog-body { padding: 16px 20px; }
+    .mock-dialog-footer {
+      padding: 12px 20px; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+
+    /* Form fields */
+    .mock-field { margin-bottom: 14px; }
+    .mock-label { font-size: 0.75rem; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .mock-input {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 0.8rem; color: var(--text);
+      background: #fff;
+    }
+    .mock-select { composes: mock-input; appearance: none; }
+
+    /* Grid for block library */
+    .block-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+    .block-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; cursor: default; transition: border-color 0.15s;
+    }
+    .block-card:hover { border-color: var(--primary); }
+    .block-card-type {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      color: var(--text-muted); letter-spacing: 0.04em; margin-bottom: 4px;
+    }
+    .block-card-name { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .block-card-meta { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 10px; }
+    .block-card-actions { display: flex; gap: 6px; }
+
+    /* Context menu */
+    .mock-context-menu {
+      background: #fff; border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1); padding: 4px; width: 200px;
+      position: absolute; z-index: 10;
+    }
+    .mock-context-item {
+      padding: 7px 10px; border-radius: 4px; font-size: 0.78rem;
+      color: var(--text); display: flex; align-items: center; gap: 8px;
+    }
+    .mock-context-item:hover { background: #f1f5f9; }
+    .mock-context-item.highlight { color: var(--primary); }
+    .mock-context-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* Section picker tabs */
+    .picker-tabs {
+      display: flex; border-bottom: 1px solid var(--border); padding: 0 20px;
+    }
+    .picker-tab {
+      padding: 10px 16px; font-size: 0.8rem; font-weight: 500;
+      color: var(--text-muted); border-bottom: 2px solid transparent;
+      cursor: default;
+    }
+    .picker-tab.active {
+      color: var(--primary-dark); border-bottom-color: var(--primary);
+    }
+
+    /* Section type grid */
+    .section-type-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      padding: 16px 20px; max-height: 300px; overflow-y: auto;
+    }
+    .section-type-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 8px; border-radius: 8px; border: 1px solid var(--border);
+      font-size: 0.7rem; font-weight: 500; color: var(--text); cursor: default;
+    }
+    .section-type-btn:hover { background: #f8fafc; border-color: var(--primary); }
+    .section-type-icon { font-size: 1.2rem; }
+
+    /* Arrow connector */
+    .arrow-down {
+      text-align: center; padding: 16px 0; font-size: 1.5rem; color: #475569;
+    }
+
+    /* Highlight pulse */
+    .highlight-new {
+      animation: pulse-border 2s ease-in-out infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+      50% { box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      .mock-sidebar, .mock-settings-sidebar { display: none; }
+      .mock-builder-left, .mock-builder-right { display: none; }
+      .block-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="page-header">
+  <span class="step-badge">Visual Walkthrough</span>
+  <h1>Universal Blocks</h1>
+  <p>See exactly how it works in your app — step by step through the real UI.</p>
+</div>
+
+<!-- ===== STEP NAV ===== -->
+<div class="step-nav">
+  <button class="step-btn active" onclick="showStep('save')">1. Save a Block</button>
+  <button class="step-btn" onclick="showStep('settings')">2. Manage in Settings</button>
+  <button class="step-btn" onclick="showStep('insert')">3. Insert into Page</button>
+  <button class="step-btn" onclick="showStep('edit')">4. Edit Connected</button>
+  <button class="step-btn" onclick="showStep('disconnect')">5. Disconnect</button>
+  <button class="step-btn" onclick="showStep('sync')">6. Auto-Sync</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 1: SAVE A BLOCK -->
+<!-- ============================================================ -->
+<div id="step-save" class="step active">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">1</div>
+      <div class="step-title">Save Any Section as a Universal Block</div>
+      <div class="step-subtitle">Right-click any section in the PageBuilder to save it as a reusable block.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> Inside the PageBuilder (estimate pages, scheduling pages, or consultation widgets). The left panel shows your sections list. Right-click or hover any section to see the new "Save as Universal Block" option.
+    </div>
+
+    <!-- Builder mockup -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/estimate-pages/abc123/builder</div>
+      </div>
+      <div class="mock-builder">
+        <!-- Top bar -->
+        <div class="mock-builder-top">
+          <div class="mock-builder-top-left">
+            <span style="color: var(--text-muted);">&#8592;</span>
+            <span class="mock-builder-title">Page Builder</span>
+          </div>
+          <div class="mock-builder-top-right">
+            <span class="btn btn-ghost btn-sm">&#128065; Preview</span>
+            <span class="btn btn-outline btn-sm">Save</span>
+            <span class="btn btn-primary btn-sm">Publish</span>
+          </div>
+        </div>
+        <!-- Body -->
+        <div class="mock-builder-body">
+          <!-- Left: Section list -->
+          <div class="mock-builder-left">
+            <div class="mock-section-label">Sections</div>
+            <div class="mock-section-list">
+              <div class="mock-section-item">
+                <span class="grip">&#9783;</span>
+                <span class="name">Hero</span>
+                <span class="actions">&#128065; &#128465;</span>
+              </div>
+              <div class="mock-section-item">
+                <span class="grip">&#9783;</span>
+                <span class="name">About</span>
+                <span class="actions">&#128065; &#128465;</span>
+              </div>
+              <!-- THE KEY SECTION - with context menu -->
+              <div class="mock-section-item selected" style="position: relative;">
+                <span class="grip">&#9783;</span>
+                <span class="name">Testimonials</span>
+                <span class="actions">&#128065; &#128465;</span>
+                <!-- Context menu -->
+                <div class="mock-context-menu" style="top: 100%; left: 40px;">
+                  <div class="mock-context-item">&#128065;&nbsp; Toggle Visibility</div>
+                  <div class="mock-context-item">&#128196;&nbsp; Duplicate</div>
+                  <div class="mock-context-item highlight" style="font-weight: 600;">
+                    &#128279;&nbsp; Save as Universal Block
+                  </div>
+                  <div class="mock-context-sep"></div>
+                  <div class="mock-context-item" style="color: var(--destructive);">&#128465;&nbsp; Remove</div>
+                </div>
+              </div>
+              <div class="mock-section-item" style="margin-top: 100px;">
+                <span class="grip">&#9783;</span>
+                <span class="name">Pricing</span>
+                <span class="actions">&#128065; &#128465;</span>
+              </div>
+              <div class="mock-section-item">
+                <span class="grip">&#9783;</span>
+                <span class="name">Approval</span>
+                <span class="actions">&#128065; &#128465;</span>
+              </div>
+            </div>
+            <div class="mock-section-bottom">
+              <span class="btn btn-outline" style="width: 100%; justify-content: center;">+ Add Section</span>
+            </div>
+          </div>
+
+          <!-- Center: Preview -->
+          <div class="mock-builder-center">
+            <div style="width: 100%; max-width: 640px;">
+              <div class="preview-card selected" style="text-align: center; padding: 30px;">
+                <div class="preview-label">Testimonials</div>
+                <div style="font-size: 1.1rem; color: var(--text); margin-bottom: 8px;">What Our Customers Say</div>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                  <div style="background: #f8fafc; border-radius: 8px; padding: 12px; flex: 1; text-align: left;">
+                    <div style="color: #f59e0b; font-size: 0.8rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <div style="font-size: 0.75rem; color: var(--text); margin-top: 4px;">"Amazing service! They transformed our home."</div>
+                    <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">— Sarah M.</div>
+                  </div>
+                  <div style="background: #f8fafc; border-radius: 8px; padding: 12px; flex: 1; text-align: left;">
+                    <div style="color: #f59e0b; font-size: 0.8rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <div style="font-size: 0.75rem; color: var(--text); margin-top: 4px;">"Professional team, great results every time."</div>
+                    <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">— Mike R.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Editor -->
+          <div class="mock-builder-right" style="padding: 12px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text); margin-bottom: 12px;">Testimonials</div>
+            <div class="mock-field">
+              <div class="mock-label">Layout</div>
+              <div class="mock-input" style="color: var(--text-muted);">Cards</div>
+            </div>
+            <div class="mock-field">
+              <div class="mock-label">Background</div>
+              <div style="display: flex; gap: 6px;">
+                <div style="width: 28px; height: 28px; border-radius: 4px; background: #fff; border: 1px solid var(--border);"></div>
+                <div class="mock-input" style="flex: 1;">#ffffff</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <!-- Save dialog -->
+    <div class="annotation">
+      <strong>Dialog opens:</strong> Name your block, pick a category, and save. The section becomes a connected Universal Block immediately.
+    </div>
+
+    <div class="mock-dialog-overlay">
+      <div class="mock-dialog">
+        <div class="mock-dialog-header">
+          <div class="mock-dialog-title">Save as Universal Block</div>
+          <div class="mock-dialog-desc">This section will be saved as a reusable block available across all your pages.</div>
+        </div>
+        <div class="mock-dialog-body">
+          <div class="mock-field">
+            <div class="mock-label">Block Name</div>
+            <div class="mock-input" style="color: var(--text);">Customer Testimonials</div>
+          </div>
+          <div class="mock-field">
+            <div class="mock-label">Category</div>
+            <div class="mock-input" style="color: var(--text-muted);">Social Proof</div>
+          </div>
+          <div class="mock-field">
+            <div class="mock-label">Description (optional)</div>
+            <div class="mock-input" style="color: var(--text-muted); height: 48px;">5-star customer reviews with photos</div>
+          </div>
+        </div>
+        <div class="mock-dialog-footer">
+          <span class="btn btn-outline btn-sm">Cancel</span>
+          <span class="btn btn-primary btn-sm">&#128279; Save as Universal Block</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-green annotation">
+      <strong>Result:</strong> The Testimonials section now shows a link icon and "SYNCED" badge in the section list. It's saved to your company's Universal Blocks library.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 2: MANAGE IN SETTINGS -->
+<!-- ============================================================ -->
+<div id="step-settings" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">2</div>
+      <div class="step-title">Manage Blocks in Settings</div>
+      <div class="step-subtitle">All your Universal Blocks live in Settings > Customization > Universal Blocks.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> Settings sidebar, under the "Customization" section — right alongside Custom Fields, Tags, Brand Kit, and Contracts.
+    </div>
+
+    <!-- Full app with sidebar + settings -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/settings/universal-blocks</div>
+      </div>
+      <div class="mock-app">
+        <!-- App sidebar -->
+        <div class="mock-sidebar">
+          <div class="mock-sidebar-logo">
+            <div class="mock-logo-icon">S</div>
+            <div class="mock-logo-text">ServicePro</div>
+          </div>
+          <div class="mock-nav">
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#127968;</span> Dashboard</div>
+            <div class="mock-nav-section">Sales</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128200;</span> Sales / Leads</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128196;</span> Estimates</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128195;</span> Estimate Pages</div>
+            <div class="mock-nav-section">Operations</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128295;</span> Jobs</div>
+            <div class="mock-nav-item"><span class="mock-nav-icon">&#128197;</span> Calendar</div>
+            <div class="mock-nav-section" style="margin-top: auto;"></div>
+            <div class="mock-nav-item active"><span class="mock-nav-icon">&#9881;</span> Settings</div>
+          </div>
+        </div>
+
+        <!-- Settings layout -->
+        <div class="mock-main">
+          <div class="mock-settings-layout">
+            <!-- Settings sidebar -->
+            <div class="mock-settings-sidebar">
+              <div class="mock-settings-header">Settings</div>
+              <div class="mock-settings-nav">
+                <div class="mock-settings-section-label">General</div>
+                <div class="mock-settings-item"><span class="s-icon">&#127970;</span> Company Profile</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128101;</span> Team Members</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128101;</span> Crews</div>
+
+                <div class="mock-settings-section-label">Business</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128176;</span> Service Catalog</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128230;</span> Materials</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128196;</span> Estimate Builder</div>
+
+                <div class="mock-settings-section-label">Customization</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128221;</span> Custom Fields</div>
+                <div class="mock-settings-item"><span class="s-icon">&#127991;</span> Tags</div>
+                <div class="mock-settings-item"><span class="s-icon">&#127912;</span> Brand Kit</div>
+                <div class="mock-settings-item active highlight-new" style="font-weight: 600;">
+                  <span class="s-icon">&#128279;</span> Universal Blocks
+                </div>
+                <div class="mock-settings-item"><span class="s-icon">&#128196;</span> Contracts</div>
+
+                <div class="mock-settings-section-label">Integrations</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128241;</span> Tech Portal</div>
+                <div class="mock-settings-item"><span class="s-icon">&#128273;</span> API Keys</div>
+              </div>
+            </div>
+
+            <!-- Settings content: Universal Blocks manager -->
+            <div class="mock-settings-content">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                  <div class="mock-page-title">Universal Blocks</div>
+                  <div class="mock-page-desc">Reusable sections that sync across all your pages. Edit once, update everywhere.</div>
+                </div>
+              </div>
+
+              <!-- Category filter pills -->
+              <div style="display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;">
+                <span class="btn btn-primary btn-sm">All</span>
+                <span class="btn btn-outline btn-sm">Social Proof</span>
+                <span class="btn btn-outline btn-sm">Headers</span>
+                <span class="btn btn-outline btn-sm">Content</span>
+                <span class="btn btn-outline btn-sm">CTA</span>
+              </div>
+
+              <!-- Block cards grid -->
+              <div class="block-grid">
+                <div class="block-card">
+                  <div class="block-card-type">&#9733; Testimonials</div>
+                  <div class="block-card-name">Customer Testimonials</div>
+                  <div class="block-card-meta">Social Proof &middot; Used on 12 pages</div>
+                  <div class="block-card-actions">
+                    <span class="btn btn-outline btn-sm">&#9998; Edit</span>
+                    <span class="btn btn-destructive btn-sm">&#128465; Delete</span>
+                  </div>
+                </div>
+                <div class="block-card">
+                  <div class="block-card-type">&#128737; Trust Badges</div>
+                  <div class="block-card-name">Certifications & Awards</div>
+                  <div class="block-card-meta">Social Proof &middot; Used on 8 pages</div>
+                  <div class="block-card-actions">
+                    <span class="btn btn-outline btn-sm">&#9998; Edit</span>
+                    <span class="btn btn-destructive btn-sm">&#128465; Delete</span>
+                  </div>
+                </div>
+                <div class="block-card">
+                  <div class="block-card-type">&#128247; Gallery</div>
+                  <div class="block-card-name">Project Gallery</div>
+                  <div class="block-card-meta">Media &middot; Used on 5 pages</div>
+                  <div class="block-card-actions">
+                    <span class="btn btn-outline btn-sm">&#9998; Edit</span>
+                    <span class="btn btn-destructive btn-sm">&#128465; Delete</span>
+                  </div>
+                </div>
+                <div class="block-card">
+                  <div class="block-card-type">&#127758; About</div>
+                  <div class="block-card-name">Company Story</div>
+                  <div class="block-card-meta">Content &middot; Used on 3 pages</div>
+                  <div class="block-card-actions">
+                    <span class="btn btn-outline btn-sm">&#9998; Edit</span>
+                    <span class="btn btn-destructive btn-sm">&#128465; Delete</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 3: INSERT INTO A PAGE -->
+<!-- ============================================================ -->
+<div id="step-insert" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">3</div>
+      <div class="step-title">Insert a Block into Any Page</div>
+      <div class="step-subtitle">Click "Add Section" in the PageBuilder — now with a "Universal Blocks" tab.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> The existing "Add Section" dialog in the PageBuilder. We add a second tab — "Universal Blocks" — alongside the standard section types.
+    </div>
+
+    <!-- Section Picker dialog with tabs -->
+    <div class="mock-dialog-overlay">
+      <div class="mock-dialog" style="max-width: 520px;">
+        <div class="mock-dialog-header" style="padding-bottom: 0; border: none;">
+          <div class="mock-dialog-title">Add Section</div>
+        </div>
+        <div class="picker-tabs">
+          <div class="picker-tab">Section Types</div>
+          <div class="picker-tab active">Universal Blocks</div>
+        </div>
+        <div class="mock-dialog-body" style="max-height: 400px; overflow-y: auto;">
+          <!-- Category filter -->
+          <div style="display: flex; gap: 5px; margin-bottom: 12px; flex-wrap: wrap;">
+            <span class="btn btn-primary btn-sm" style="font-size: 0.65rem; padding: 3px 8px;">All</span>
+            <span class="btn btn-outline btn-sm" style="font-size: 0.65rem; padding: 3px 8px;">Social Proof</span>
+            <span class="btn btn-outline btn-sm" style="font-size: 0.65rem; padding: 3px 8px;">Content</span>
+            <span class="btn btn-outline btn-sm" style="font-size: 0.65rem; padding: 3px 8px;">Media</span>
+          </div>
+
+          <!-- Block list -->
+          <div class="block-grid">
+            <div class="block-card" style="border-color: var(--primary);">
+              <div class="block-card-type">&#9733; Testimonials</div>
+              <div class="block-card-name">Customer Testimonials</div>
+              <div class="block-card-meta">Used on 12 pages</div>
+              <div class="block-card-actions">
+                <span class="btn btn-primary btn-sm">&#128279; Insert Connected</span>
+                <span class="btn btn-outline btn-sm">&#128196; Insert Copy</span>
+              </div>
+            </div>
+            <div class="block-card">
+              <div class="block-card-type">&#128737; Trust Badges</div>
+              <div class="block-card-name">Certifications & Awards</div>
+              <div class="block-card-meta">Used on 8 pages</div>
+              <div class="block-card-actions">
+                <span class="btn btn-primary btn-sm">&#128279; Insert Connected</span>
+                <span class="btn btn-outline btn-sm">&#128196; Insert Copy</span>
+              </div>
+            </div>
+            <div class="block-card">
+              <div class="block-card-type">&#128247; Gallery</div>
+              <div class="block-card-name">Project Gallery</div>
+              <div class="block-card-meta">Used on 5 pages</div>
+              <div class="block-card-actions">
+                <span class="btn btn-primary btn-sm">&#128279; Insert Connected</span>
+                <span class="btn btn-outline btn-sm">&#128196; Insert Copy</span>
+              </div>
+            </div>
+            <div class="block-card">
+              <div class="block-card-type">&#127758; About</div>
+              <div class="block-card-name">Company Story</div>
+              <div class="block-card-meta">Used on 3 pages</div>
+              <div class="block-card-actions">
+                <span class="btn btn-primary btn-sm">&#128279; Insert Connected</span>
+                <span class="btn btn-outline btn-sm">&#128196; Insert Copy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-green annotation">
+      <strong>"Insert Connected"</strong> = the section stays linked. Any edits sync across all pages using it.<br>
+      <strong>"Insert Copy"</strong> = drops in a local copy. No sync — you can edit freely on just this page.
+    </div>
+
+    <div class="annotation">
+      <strong>This works in all 3 builder modes:</strong> Estimate Pages, Scheduling Pages, and Consultation Widget Builder. Same dialog, same blocks.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 4: EDIT A CONNECTED BLOCK -->
+<!-- ============================================================ -->
+<div id="step-edit" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">4</div>
+      <div class="step-title">Editing a Connected Block</div>
+      <div class="step-subtitle">When you select a connected section, a banner warns you that changes apply everywhere.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Where:</strong> The right panel of the PageBuilder. When a connected section is selected, a blue banner appears above the normal editor fields.
+    </div>
+
+    <!-- Builder with connected section selected -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/estimate-pages/def456/builder</div>
+      </div>
+      <div class="mock-builder">
+        <div class="mock-builder-top">
+          <div class="mock-builder-top-left">
+            <span style="color: var(--text-muted);">&#8592;</span>
+            <span class="mock-builder-title">Page Builder</span>
+            <span style="font-size: 0.65rem; background: var(--amber-light); color: var(--amber); padding: 2px 8px; border-radius: 4px; font-weight: 600;">UNSAVED</span>
+          </div>
+          <div class="mock-builder-top-right">
+            <span class="btn btn-outline btn-sm">Save</span>
+            <span class="btn btn-primary btn-sm">Publish</span>
+          </div>
+        </div>
+        <div class="mock-builder-body">
+          <!-- Left -->
+          <div class="mock-builder-left">
+            <div class="mock-section-label">Sections</div>
+            <div class="mock-section-list">
+              <div class="mock-section-item">
+                <span class="grip">&#9783;</span>
+                <span class="name">Hero</span>
+              </div>
+              <div class="mock-section-item selected">
+                <span class="grip">&#9783;</span>
+                <span class="name">&#128279; Testimonials</span>
+                <span class="mock-connected-badge">SYNCED</span>
+              </div>
+              <div class="mock-section-item">
+                <span class="grip">&#9783;</span>
+                <span class="name">Scope of Work</span>
+              </div>
+              <div class="mock-section-item">
+                <span class="grip">&#9783;</span>
+                <span class="name">&#128279; Trust Badges</span>
+                <span class="mock-connected-badge">SYNCED</span>
+              </div>
+              <div class="mock-section-item">
+                <span class="grip">&#9783;</span>
+                <span class="name">Pricing</span>
+              </div>
+              <div class="mock-section-item">
+                <span class="grip">&#9783;</span>
+                <span class="name">Approval</span>
+              </div>
+            </div>
+            <div class="mock-section-bottom">
+              <span class="btn btn-outline" style="width: 100%; justify-content: center;">+ Add Section</span>
+            </div>
+          </div>
+
+          <!-- Center -->
+          <div class="mock-builder-center">
+            <div style="width: 100%; max-width: 640px;">
+              <div class="preview-card">
+                <div class="preview-label">Hero</div>
+                <div style="font-size: 0.85rem; color: var(--text);">Your Company Name</div>
+              </div>
+              <div class="preview-card connected selected">
+                <span class="universal-tag">&#128279; UNIVERSAL BLOCK</span>
+                <div class="preview-label">Testimonials</div>
+                <div style="font-size: 0.95rem; color: var(--text); margin-bottom: 8px;">What Our Customers Say</div>
+                <div style="display: flex; gap: 10px;">
+                  <div style="background: #f8fafc; border-radius: 6px; padding: 10px; flex: 1;">
+                    <div style="color: #f59e0b; font-size: 0.7rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <div style="font-size: 0.7rem; color: var(--text); margin-top: 3px;">"Amazing service!"</div>
+                    <div style="font-size: 0.6rem; color: var(--text-muted); margin-top: 2px;">— Sarah M.</div>
+                  </div>
+                  <div style="background: #f8fafc; border-radius: 6px; padding: 10px; flex: 1;">
+                    <div style="color: #f59e0b; font-size: 0.7rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <div style="font-size: 0.7rem; color: var(--text); margin-top: 3px;">"Professional team!"</div>
+                    <div style="font-size: 0.6rem; color: var(--text-muted); margin-top: 2px;">— Mike R.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: The key part — connected banner -->
+          <div class="mock-builder-right">
+            <div class="connected-banner">
+              <div class="connected-banner-title">&#128279; Universal Block</div>
+              <div class="connected-banner-desc">
+                <strong style="color: var(--text);">"Customer Testimonials"</strong><br>
+                Edits will apply to <strong style="color: var(--primary-dark);">all 12 pages</strong> using this block.
+              </div>
+              <div class="connected-banner-actions">
+                <span class="btn btn-primary btn-sm">Edit Block</span>
+                <span class="btn btn-outline btn-sm">&#128268; Disconnect</span>
+              </div>
+            </div>
+            <div style="padding: 12px;">
+              <div class="mock-field">
+                <div class="mock-label">Layout</div>
+                <div class="mock-input">Cards</div>
+              </div>
+              <div class="mock-field">
+                <div class="mock-label">Title</div>
+                <div class="mock-input">What Our Customers Say</div>
+              </div>
+              <div class="mock-field">
+                <div class="mock-label">Background</div>
+                <div style="display: flex; gap: 6px;">
+                  <div style="width: 28px; height: 28px; border-radius: 4px; background: #fff; border: 1px solid var(--border);"></div>
+                  <div class="mock-input" style="flex: 1;">#ffffff</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>On Save:</strong> When you click Save, the PageBuilder detects that a connected section was edited. It first updates the Universal Block (PATCH /api/universal-blocks/[id]), then saves the page. Next time any other page loads, it pulls the latest content.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 5: DISCONNECT -->
+<!-- ============================================================ -->
+<div id="step-disconnect" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">5</div>
+      <div class="step-title">Disconnect for Local Edits</div>
+      <div class="step-subtitle">Need a one-off variation? Disconnect to make a local copy that won't affect other pages.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>When:</strong> You want to customize a section on one specific page without changing all the others. Click "Disconnect" in the banner, confirm, and it becomes a normal local section.
+    </div>
+
+    <!-- Confirmation dialog -->
+    <div class="mock-dialog-overlay">
+      <div class="mock-dialog" style="max-width: 420px;">
+        <div class="mock-dialog-header">
+          <div class="mock-dialog-title">Disconnect Universal Block?</div>
+          <div class="mock-dialog-desc">This will make a local copy of "Customer Testimonials" on this page. Future changes to the universal block won't appear here, and edits here won't affect other pages.</div>
+        </div>
+        <div class="mock-dialog-footer">
+          <span class="btn btn-outline btn-sm">Cancel</span>
+          <span class="btn btn-primary btn-sm">&#128268; Disconnect</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="annotation-green annotation">
+      <strong>After disconnecting:</strong> The link icon and "SYNCED" badge disappear. The section is now a regular local section — you can edit it freely without affecting any other pages.
+    </div>
+
+    <!-- Before/After comparison -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px;">
+      <!-- Before -->
+      <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;">
+        <div style="background: var(--primary-light); padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: var(--primary-dark); border-bottom: 1px solid rgba(59,130,246,0.15);">BEFORE — Connected</div>
+        <div style="padding: 12px;">
+          <div class="mock-section-item" style="border: 1px solid rgba(59,130,246,0.2); background: var(--primary-light);">
+            <span class="grip">&#9783;</span>
+            <span class="name">&#128279; Testimonials</span>
+            <span class="mock-connected-badge">SYNCED</span>
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-muted); padding: 8px 8px 0; text-align: center;">Edits sync to all 12 pages</div>
+        </div>
+      </div>
+      <!-- After -->
+      <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;">
+        <div style="background: var(--green-light); padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: #16a34a; border-bottom: 1px solid rgba(34,197,94,0.15);">AFTER — Disconnected</div>
+        <div style="padding: 12px;">
+          <div class="mock-section-item" style="border: 1px solid var(--border);">
+            <span class="grip">&#9783;</span>
+            <span class="name">Testimonials</span>
+            <span class="actions">&#128065; &#128465;</span>
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-muted); padding: 8px 8px 0; text-align: center;">Edits only affect this page</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 6: AUTO-SYNC -->
+<!-- ============================================================ -->
+<div id="step-sync" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">6</div>
+      <div class="step-title">Auto-Sync Across All Pages</div>
+      <div class="step-subtitle">When a universal block is updated, all connected pages get the latest content on next load.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>How it works:</strong> Lazy sync on page load. When any page opens (in the builder OR the public customer view), connected sections automatically pull the latest settings + content from the universal_blocks table.
+    </div>
+
+    <!-- Visual sync diagram -->
+    <div style="background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 32px; margin: 20px 0;">
+      <!-- Source block -->
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-block; background: var(--primary-light); border: 2px solid var(--primary); border-radius: 10px; padding: 16px 24px;">
+          <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--primary-dark); letter-spacing: 0.06em;">Universal Block</div>
+          <div style="font-size: 1.1rem; font-weight: 600; color: var(--text); margin-top: 4px;">&#128279; Customer Testimonials</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Last updated: just now</div>
+        </div>
+      </div>
+
+      <!-- Arrows -->
+      <div style="text-align: center; font-size: 1.2rem; color: var(--primary); margin-bottom: 16px;">
+        &#8595;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8595;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8595;
+      </div>
+
+      <!-- Connected pages -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.2rem; margin-bottom: 4px;">&#128196;</div>
+          <div style="font-size: 0.8rem; font-weight: 600; color: var(--text);">Estimate Page</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Johnson Kitchen Remodel</div>
+          <div style="font-size: 0.6rem; color: var(--green); font-weight: 600; margin-top: 6px;">&#10003; SYNCED</div>
+        </div>
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.2rem; margin-bottom: 4px;">&#128196;</div>
+          <div style="font-size: 0.8rem; font-weight: 600; color: var(--text);">Estimate Page</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Smith Bathroom Reno</div>
+          <div style="font-size: 0.6rem; color: var(--green); font-weight: 600; margin-top: 6px;">&#10003; SYNCED</div>
+        </div>
+        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; text-align: center;">
+          <div style="font-size: 1.2rem; margin-bottom: 4px;">&#128197;</div>
+          <div style="font-size: 0.8rem; font-weight: 600; color: var(--text);">Scheduling Page</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Online Booking</div>
+          <div style="font-size: 0.6rem; color: var(--green); font-weight: 600; margin-top: 6px;">&#10003; SYNCED</div>
+        </div>
+      </div>
+
+      <!-- Disconnected page -->
+      <div style="margin-top: 16px; display: flex; justify-content: center;">
+        <div style="border: 1px dashed var(--border); border-radius: 8px; padding: 14px; text-align: center; width: 33%; opacity: 0.6;">
+          <div style="font-size: 1.2rem; margin-bottom: 4px;">&#128196;</div>
+          <div style="font-size: 0.8rem; font-weight: 600; color: var(--text);">Estimate Page</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">Davis Custom Job</div>
+          <div style="font-size: 0.6rem; color: var(--amber); font-weight: 600; margin-top: 6px;">&#128268; DISCONNECTED</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-amber annotation">
+      <strong>Deleted block safety:</strong> If a Universal Block is deleted, all connected sections automatically become local copies. They keep their last content — nothing is lost.
+    </div>
+
+    <div class="annotation">
+      <strong>Public pages sync too:</strong> When a customer views their estimate page link, connected sections pull the latest content. So if you update a testimonial, your customer sees it immediately without republishing.
+    </div>
+
+    <!-- Summary flow -->
+    <div style="background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-top: 20px;">
+      <div style="font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 16px;">Complete Flow Summary</div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 0.78rem;">
+        <span style="background: #f1f5f9; padding: 6px 12px; border-radius: 6px; color: var(--text); font-weight: 500;">Design a section</span>
+        <span style="color: var(--text-muted);">&#8594;</span>
+        <span style="background: var(--primary-light); padding: 6px 12px; border-radius: 6px; color: var(--primary-dark); font-weight: 500;">Save as Universal Block</span>
+        <span style="color: var(--text-muted);">&#8594;</span>
+        <span style="background: #f1f5f9; padding: 6px 12px; border-radius: 6px; color: var(--text); font-weight: 500;">Insert into other pages</span>
+        <span style="color: var(--text-muted);">&#8594;</span>
+        <span style="background: var(--green-light); padding: 6px 12px; border-radius: 6px; color: #16a34a; font-weight: 500;">Edit once, syncs everywhere</span>
+        <span style="color: var(--text-muted);">&#8594;</span>
+        <span style="background: var(--amber-light); padding: 6px 12px; border-radius: 6px; color: #d97706; font-weight: 500;">Disconnect for local edits</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showStep(id) {
+    document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.step-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('step-' + id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>

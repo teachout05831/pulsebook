@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Technician View - Mobile Dispatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: #0f172a;
+      min-height: 100vh;
+    }
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      background: #1e293b;
+      border-radius: 40px;
+      border: 8px solid #334155;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .notch {
+      width: 150px;
+      height: 30px;
+      background: #334155;
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+    }
+    .scroll-container {
+      height: calc(100% - 60px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-container::-webkit-scrollbar { display: none; }
+    .tech-card {
+      transition: all 0.2s;
+    }
+    .tech-card:active {
+      transform: scale(0.98);
+    }
+    .expandable-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .expanded .expandable-content {
+      max-height: 500px;
+    }
+    .expand-icon {
+      transition: transform 0.3s;
+    }
+    .expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-8">
+
+  <div class="phone-frame">
+    <!-- Notch -->
+    <div class="notch"></div>
+
+    <!-- Header -->
+    <div class="bg-slate-800 px-4 py-3 flex items-center justify-between border-b border-slate-700">
+      <div class="flex items-center gap-2">
+        <button class="p-2 hover:bg-slate-700 rounded-lg">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div>
+          <h1 class="text-white font-semibold">Team Schedule</h1>
+          <p class="text-slate-400 text-xs">Today, Feb 2</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button class="p-2 hover:bg-slate-700 rounded-lg">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+        </button>
+        <button class="p-2 hover:bg-slate-700 rounded-lg">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="scroll-container bg-slate-900 px-4 py-4">
+
+      <!-- Unassigned Jobs Alert -->
+      <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-red-400 font-medium">Unassigned Jobs</p>
+              <p class="text-slate-400 text-sm">3 jobs need assignment</p>
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Technician 1 - Available with jobs -->
+      <div class="tech-card bg-slate-800 rounded-2xl mb-4 overflow-hidden expanded" onclick="this.classList.toggle('expanded')">
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">MT</div>
+                <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 border-2 border-slate-800 rounded-full"></span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">Mike Thompson</h3>
+                <div class="flex items-center gap-2 text-sm">
+                  <span class="text-emerald-400">Available</span>
+                  <span class="text-slate-500">•</span>
+                  <span class="text-slate-400">2 jobs today</span>
+                </div>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 expand-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="expandable-content">
+          <div class="px-4 pb-4 space-y-2">
+            <!-- Job 1 -->
+            <div class="bg-slate-700/50 rounded-xl p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <span class="text-blue-400 text-sm font-semibold">9A</span>
+                </div>
+                <div>
+                  <p class="text-white text-sm font-medium">AC Repair</p>
+                  <p class="text-slate-400 text-xs">Smith Residence</p>
+                </div>
+              </div>
+              <span class="px-2 py-1 bg-slate-600 text-slate-300 text-xs rounded-full">Scheduled</span>
+            </div>
+
+            <!-- Job 2 -->
+            <div class="bg-slate-700/50 rounded-xl p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
+                  <span class="text-amber-400 text-sm font-semibold">1P</span>
+                </div>
+                <div>
+                  <p class="text-white text-sm font-medium">Furnace Install</p>
+                  <p class="text-slate-400 text-xs">Johnson Home</p>
+                </div>
+              </div>
+              <span class="px-2 py-1 bg-amber-500/20 text-amber-400 text-xs rounded-full">High</span>
+            </div>
+
+            <!-- Assign Button -->
+            <button class="w-full flex items-center justify-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 py-3 rounded-xl text-sm font-medium transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Assign Job to Mike
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technician 2 - Currently on job -->
+      <div class="tech-card bg-slate-800 rounded-2xl mb-4 overflow-hidden" onclick="this.classList.toggle('expanded')">
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-semibold">SC</div>
+                <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-amber-500 border-2 border-slate-800 rounded-full"></span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">Sarah Chen</h3>
+                <div class="flex items-center gap-2 text-sm">
+                  <span class="text-amber-400">On Job</span>
+                  <span class="text-slate-500">•</span>
+                  <span class="text-slate-400">3 jobs today</span>
+                </div>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 expand-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="expandable-content">
+          <div class="px-4 pb-4 space-y-2">
+            <!-- Completed -->
+            <div class="bg-slate-700/30 rounded-xl p-3 flex items-center justify-between opacity-60">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-slate-400 text-sm font-medium line-through">HVAC Inspection</p>
+                  <p class="text-slate-500 text-xs">8:00 AM - 9:15 AM</p>
+                </div>
+              </div>
+              <span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded-full">Done</span>
+            </div>
+
+            <!-- In Progress -->
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <div class="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                </div>
+                <div>
+                  <p class="text-white text-sm font-medium">Duct Cleaning</p>
+                  <p class="text-blue-400 text-xs">In progress • 1h 23m</p>
+                </div>
+              </div>
+              <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full">Active</span>
+            </div>
+
+            <!-- Scheduled -->
+            <div class="bg-slate-700/50 rounded-xl p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center">
+                  <span class="text-slate-300 text-sm font-semibold">3P</span>
+                </div>
+                <div>
+                  <p class="text-white text-sm font-medium">Filter Replacement</p>
+                  <p class="text-slate-400 text-xs">Anderson Office</p>
+                </div>
+              </div>
+              <span class="px-2 py-1 bg-slate-600 text-slate-300 text-xs rounded-full">Next</span>
+            </div>
+
+            <button class="w-full flex items-center justify-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 py-3 rounded-xl text-sm font-medium transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Assign Job to Sarah
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technician 3 - Offline -->
+      <div class="tech-card bg-slate-800/50 rounded-2xl mb-4 overflow-hidden" onclick="this.classList.toggle('expanded')">
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <div class="w-12 h-12 bg-slate-600 rounded-full flex items-center justify-center text-slate-400 font-semibold">JW</div>
+                <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-slate-500 border-2 border-slate-800 rounded-full"></span>
+              </div>
+              <div>
+                <h3 class="text-slate-400 font-semibold">James Wilson</h3>
+                <div class="flex items-center gap-2 text-sm">
+                  <span class="text-slate-500">Offline</span>
+                  <span class="text-slate-600">•</span>
+                  <span class="text-slate-500">1 job today</span>
+                </div>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-slate-500 expand-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="expandable-content">
+          <div class="px-4 pb-4 space-y-2">
+            <div class="bg-slate-700/30 rounded-xl p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center">
+                  <span class="text-slate-400 text-sm font-semibold">2P</span>
+                </div>
+                <div>
+                  <p class="text-slate-400 text-sm font-medium">Annual Maintenance</p>
+                  <p class="text-slate-500 text-xs">Wilson Residence</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technician 4 - On break -->
+      <div class="tech-card bg-slate-800 rounded-2xl mb-4 overflow-hidden" onclick="this.classList.toggle('expanded')">
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">KL</div>
+                <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-yellow-500 border-2 border-slate-800 rounded-full"></span>
+              </div>
+              <div>
+                <h3 class="text-white font-semibold">Kevin Lee</h3>
+                <div class="flex items-center gap-2 text-sm">
+                  <span class="text-yellow-400">On Break</span>
+                  <span class="text-slate-500">•</span>
+                  <span class="text-slate-400">2 jobs today</span>
+                </div>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 expand-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="expandable-content">
+          <div class="px-4 pb-4 space-y-2">
+            <div class="bg-emerald-500/10 rounded-xl p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-slate-400 text-sm font-medium line-through">Plumbing Check</p>
+                  <p class="text-slate-500 text-xs">Completed 10:30 AM</p>
+                </div>
+              </div>
+              <span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded-full">Done</span>
+            </div>
+
+            <div class="bg-slate-700/50 rounded-xl p-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-slate-600 rounded-lg flex items-center justify-center">
+                  <span class="text-slate-300 text-sm font-semibold">2P</span>
+                </div>
+                <div>
+                  <p class="text-white text-sm font-medium">Water Heater Repair</p>
+                  <p class="text-slate-400 text-xs">Garcia Home</p>
+                </div>
+              </div>
+              <span class="px-2 py-1 bg-slate-600 text-slate-300 text-xs rounded-full">Next</span>
+            </div>
+
+            <button class="w-full flex items-center justify-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 py-3 rounded-xl text-sm font-medium transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Assign Job to Kevin
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="bg-slate-800/50 rounded-2xl p-4 mb-4">
+        <h4 class="text-slate-400 text-sm font-medium mb-3">Today's Summary</h4>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="text-center">
+            <p class="text-2xl font-bold text-white">4</p>
+            <p class="text-slate-500 text-xs">Techs</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-blue-400">8</p>
+            <p class="text-slate-500 text-xs">Jobs</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-emerald-400">2</p>
+            <p class="text-slate-500 text-xs">Done</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-red-400">3</p>
+            <p class="text-slate-500 text-xs">Unassigned</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-8"></div>
+    </div>
+  </div>
+
+  <!-- Back link -->
+  <a href="index.html" class="fixed bottom-8 left-8 text-slate-400 hover:text-white flex items-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Back to mockups
+  </a>
+
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sales Asset Library - Dedicated Full Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    .video-card:hover .play-overlay { opacity: 1; }
+    .video-card:hover .delete-btn { opacity: 1; }
+    .video-card:hover .thumbnail-img { transform: scale(1.03); }
+  </style>
+</head>
+<body class="bg-[#f9fafb] font-sans text-gray-900 antialiased">
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-gray-300 flex flex-col flex-shrink-0">
+      <!-- Logo -->
+      <div class="px-5 py-5 border-b border-gray-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <span class="text-white font-semibold text-base">ServicePro</span>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <!-- Main nav -->
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span class="text-sm font-medium">Dashboard</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span class="text-sm font-medium">Customers</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span class="text-sm font-medium">Jobs</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          <span class="text-sm font-medium">Estimates</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span class="text-sm font-medium">Invoices</span>
+        </a>
+
+        <!-- Divider -->
+        <div class="pt-4 pb-2">
+          <div class="border-t border-gray-800"></div>
+        </div>
+
+        <!-- Settings group -->
+        <div class="space-y-1">
+          <div class="px-3 py-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Settings</span>
+          </div>
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+            <span class="text-sm font-medium">Brand Kit</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <span class="text-sm font-medium">Consultations</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 text-white">
+            <svg class="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span class="text-sm font-medium">Sales Assets</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+            <span class="text-sm font-medium">API Keys</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-sm font-medium">General</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- User section -->
+      <div class="px-3 py-4 border-t border-gray-800">
+        <div class="flex items-center gap-3 px-3">
+          <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">MJ</div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-200 truncate">Mike Johnson</p>
+            <p class="text-xs text-gray-500 truncate">mike@servicecompany.com</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="max-w-6xl mx-auto px-8 py-8">
+
+        <!-- Page Header -->
+        <div class="flex items-start justify-between mb-8">
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-violet-100">
+                <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              </div>
+              <h1 class="text-2xl font-semibold text-gray-900">Sales Asset Library</h1>
+            </div>
+            <p class="text-sm text-gray-500 ml-[52px]">Manage videos your sales team can share during consultations to close more deals.</p>
+          </div>
+          <button class="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-violet-700 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            Upload Video
+          </button>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-3 gap-4 mb-8">
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              </div>
+              <div>
+                <p class="text-2xl font-semibold text-gray-900">6</p>
+                <p class="text-xs text-gray-500 font-medium">Total Videos</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </div>
+              <div>
+                <p class="text-2xl font-semibold text-gray-900">234</p>
+                <p class="text-xs text-gray-500 font-medium">Total Views</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+              </div>
+              <div>
+                <p class="text-2xl font-semibold text-gray-900">Intro</p>
+                <p class="text-xs text-gray-500 font-medium">Most Watched Category</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-panel layout -->
+        <div class="flex gap-6">
+
+          <!-- Category Filter Sidebar -->
+          <div class="w-56 flex-shrink-0">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div class="px-4 py-3 border-b border-gray-100">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500">Categories</h3>
+              </div>
+              <div class="p-2">
+                <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-violet-50 text-violet-700 text-sm font-medium">
+                  <span>All Videos</span>
+                  <span class="bg-violet-100 text-violet-700 text-xs font-semibold px-2 py-0.5 rounded-full">6</span>
+                </button>
+                <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors mt-0.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-amber-400"></div>
+                    <span>Testimonial</span>
+                  </div>
+                  <span class="text-gray-400 text-xs font-medium">2</span>
+                </button>
+                <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors mt-0.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-blue-400"></div>
+                    <span>Intro</span>
+                  </div>
+                  <span class="text-gray-400 text-xs font-medium">1</span>
+                </button>
+                <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors mt-0.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-purple-400"></div>
+                    <span>Case Study</span>
+                  </div>
+                  <span class="text-gray-400 text-xs font-medium">1</span>
+                </button>
+                <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors mt-0.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                    <span>Process</span>
+                  </div>
+                  <span class="text-gray-400 text-xs font-medium">2</span>
+                </button>
+                <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium transition-colors mt-0.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                    <span>Other</span>
+                  </div>
+                  <span class="text-gray-400 text-xs font-medium">0</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Grid -->
+          <div class="flex-1">
+            <div class="grid grid-cols-3 gap-5">
+
+              <!-- Video 1 -->
+              <div class="video-card group cursor-pointer bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div class="relative aspect-video overflow-hidden bg-gray-100">
+                  <img src="https://picsum.photos/seed/video1/400/225" alt="Why Customers Choose Us" class="thumbnail-img w-full h-full object-cover transition-transform duration-200" />
+                  <div class="play-overlay absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 transition-opacity duration-200">
+                    <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                      <svg class="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-2 right-2 bg-black/75 text-white text-xs font-medium px-1.5 py-0.5 rounded">2:34</div>
+                  <button class="delete-btn absolute top-2 right-2 opacity-0 transition-opacity duration-200 w-7 h-7 bg-red-500/90 hover:bg-red-600 rounded-md flex items-center justify-center shadow-sm">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+                <div class="px-3.5 py-3">
+                  <h3 class="text-sm font-medium text-gray-900 truncate">Why Customers Choose Us</h3>
+                  <div class="mt-1.5 flex items-center gap-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Testimonial</span>
+                    <span class="text-xs text-gray-500">42 plays</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Video 2 -->
+              <div class="video-card group cursor-pointer bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div class="relative aspect-video overflow-hidden bg-gray-100">
+                  <img src="https://picsum.photos/seed/video2/400/225" alt="Meet the Owner: Mike Johnson" class="thumbnail-img w-full h-full object-cover transition-transform duration-200" />
+                  <div class="play-overlay absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 transition-opacity duration-200">
+                    <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                      <svg class="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-2 right-2 bg-black/75 text-white text-xs font-medium px-1.5 py-0.5 rounded">1:45</div>
+                  <button class="delete-btn absolute top-2 right-2 opacity-0 transition-opacity duration-200 w-7 h-7 bg-red-500/90 hover:bg-red-600 rounded-md flex items-center justify-center shadow-sm">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+                <div class="px-3.5 py-3">
+                  <h3 class="text-sm font-medium text-gray-900 truncate">Meet the Owner: Mike Johnson</h3>
+                  <div class="mt-1.5 flex items-center gap-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Intro</span>
+                    <span class="text-xs text-gray-500">67 plays</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Video 3 -->
+              <div class="video-card group cursor-pointer bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div class="relative aspect-video overflow-hidden bg-gray-100">
+                  <img src="https://picsum.photos/seed/video3/400/225" alt="Kitchen Renovation Case Study" class="thumbnail-img w-full h-full object-cover transition-transform duration-200" />
+                  <div class="play-overlay absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 transition-opacity duration-200">
+                    <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                      <svg class="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-2 right-2 bg-black/75 text-white text-xs font-medium px-1.5 py-0.5 rounded">4:12</div>
+                  <button class="delete-btn absolute top-2 right-2 opacity-0 transition-opacity duration-200 w-7 h-7 bg-red-500/90 hover:bg-red-600 rounded-md flex items-center justify-center shadow-sm">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+                <div class="px-3.5 py-3">
+                  <h3 class="text-sm font-medium text-gray-900 truncate">Kitchen Renovation Case Study</h3>
+                  <div class="mt-1.5 flex items-center gap-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Case Study</span>
+                    <span class="text-xs text-gray-500">31 plays</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Video 4 -->
+              <div class="video-card group cursor-pointer bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div class="relative aspect-video overflow-hidden bg-gray-100">
+                  <img src="https://picsum.photos/seed/video4/400/225" alt="Our 5-Step Process" class="thumbnail-img w-full h-full object-cover transition-transform duration-200" />
+                  <div class="play-overlay absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 transition-opacity duration-200">
+                    <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                      <svg class="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-2 right-2 bg-black/75 text-white text-xs font-medium px-1.5 py-0.5 rounded">3:08</div>
+                  <button class="delete-btn absolute top-2 right-2 opacity-0 transition-opacity duration-200 w-7 h-7 bg-red-500/90 hover:bg-red-600 rounded-md flex items-center justify-center shadow-sm">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+                <div class="px-3.5 py-3">
+                  <h3 class="text-sm font-medium text-gray-900 truncate">Our 5-Step Process</h3>
+                  <div class="mt-1.5 flex items-center gap-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Process</span>
+                    <span class="text-xs text-gray-500">58 plays</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Video 5 -->
+              <div class="video-card group cursor-pointer bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div class="relative aspect-video overflow-hidden bg-gray-100">
+                  <img src="https://picsum.photos/seed/video5/400/225" alt="Customer Success: The Williams Family" class="thumbnail-img w-full h-full object-cover transition-transform duration-200" />
+                  <div class="play-overlay absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 transition-opacity duration-200">
+                    <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                      <svg class="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-2 right-2 bg-black/75 text-white text-xs font-medium px-1.5 py-0.5 rounded">2:15</div>
+                  <button class="delete-btn absolute top-2 right-2 opacity-0 transition-opacity duration-200 w-7 h-7 bg-red-500/90 hover:bg-red-600 rounded-md flex items-center justify-center shadow-sm">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+                <div class="px-3.5 py-3">
+                  <h3 class="text-sm font-medium text-gray-900 truncate">Customer Success: The Williams Family</h3>
+                  <div class="mt-1.5 flex items-center gap-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Testimonial</span>
+                    <span class="text-xs text-gray-500">36 plays</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Video 6 -->
+              <div class="video-card group cursor-pointer bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div class="relative aspect-video overflow-hidden bg-gray-100">
+                  <img src="https://picsum.photos/seed/video6/400/225" alt="Bathroom Remodel Walkthrough" class="thumbnail-img w-full h-full object-cover transition-transform duration-200" />
+                  <div class="play-overlay absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 transition-opacity duration-200">
+                    <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                      <svg class="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
+                  </div>
+                  <div class="absolute bottom-2 right-2 bg-black/75 text-white text-xs font-medium px-1.5 py-0.5 rounded">5:22</div>
+                  <button class="delete-btn absolute top-2 right-2 opacity-0 transition-opacity duration-200 w-7 h-7 bg-red-500/90 hover:bg-red-600 rounded-md flex items-center justify-center shadow-sm">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+                <div class="px-3.5 py-3">
+                  <h3 class="text-sm font-medium text-gray-900 truncate">Bathroom Remodel Walkthrough</h3>
+                  <div class="mt-1.5 flex items-center gap-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Process</span>
+                    <span class="text-xs text-gray-500">18 plays</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-6 flex items-center justify-between">
+              <p class="text-sm text-gray-500">Showing 6 of 6 videos</p>
+              <div class="flex items-center gap-2">
+                <button disabled class="px-3 py-1.5 text-sm font-medium text-gray-400 bg-white border border-gray-200 rounded-lg cursor-not-allowed">Previous</button>
+                <button disabled class="px-3 py-1.5 text-sm font-medium text-gray-400 bg-white border border-gray-200 rounded-lg cursor-not-allowed">Next</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Floating indicator -->
+  <div class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs font-medium px-4 py-2 rounded-full shadow-lg z-50">
+    Mockup 2 of 3 &mdash; Dedicated full-page at /settings/sales-assets
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+/* ========================================
+   CONTRACT PRINT STYLES
+   ======================================== */
+@media print {
+  /* Hide all UI chrome */
+  nav, header, aside,
+  .no-print,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  /* Reset page layout */
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Contract print area fills the page */
+  .contract-print-area {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+
+  /* Preserve stage background colors */
+  .contract-print-area [style*="background"] {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Avoid breaking inside blocks */
+  .contract-print-area > div > div {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Signature blocks get more space */
+  .contract-print-area canvas {
+    border: 1px solid #ccc !important;
+  }
+
+  /* Clean table borders for print */
+  .contract-print-area table {
+    border-collapse: collapse;
+  }
+  .contract-print-area th,
+  .contract-print-area td {
+    border: 1px solid #d1d5db !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+}

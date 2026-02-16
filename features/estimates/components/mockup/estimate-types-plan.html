@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Estimate Types - Planning Doc</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;color:#1e293b;line-height:1.6}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    h1{font-size:24px;font-weight:800;margin-bottom:4px}
+    h2{font-size:18px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e2e8f0}
+    h3{font-size:14px;font-weight:700;margin-bottom:8px;color:#475569}
+    .subtitle{font-size:13px;color:#64748b;margin-bottom:32px}
+    .section{margin-bottom:40px}
+    .card{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:16px}
+    .card-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:9999px;text-transform:uppercase;letter-spacing:0.04em}
+    .badge-blue{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
+    .badge-green{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+    .badge-amber{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+    .badge-purple{background:#faf5ff;color:#7c3aed;border:1px solid #ddd6fe}
+    .badge-slate{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1}
+    .note{font-size:12px;color:#64748b;font-style:italic;margin-top:8px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+    @media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+    /* Wireframe styles */
+    .wire{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:12px;font-size:12px}
+    .wire-title{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px}
+    .wire-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #e2e8f0;font-size:12px}
+    .wire-row:last-child{border:none}
+    .wire-input{background:white;border:1px solid #e2e8f0;border-radius:4px;padding:4px 8px;font-size:12px;color:#64748b;display:inline-block}
+    .wire-btn{background:#2563eb;color:white;border:none;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:600;cursor:default;display:inline-flex;align-items:center;gap:4px}
+    .wire-btn-out{background:white;color:#475569;border:1px solid #e2e8f0;border-radius:4px;padding:4px 10px;font-size:11px;font-weight:500;cursor:default}
+    .wire-total{background:#1e293b;color:white;border-radius:0 0 6px 6px;padding:8px 12px;font-size:13px;font-weight:600;display:flex;justify-content:space-between;margin:-12px;margin-top:12px}
+    .wire-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+    .wire-item:last-child{border:none}
+    .wire-qty{background:white;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:11px;width:36px;text-align:center;color:#64748b}
+    .wire-price{font-weight:600;margin-left:auto;white-space:nowrap}
+
+    /* Flow diagrams */
+    .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+    .flow-step{background:white;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:500}
+    .flow-step.active{background:#eff6ff;border-color:#93c5fd;color:#2563eb}
+    .flow-arrow{color:#cbd5e1;font-size:16px}
+
+    /* Comparison table */
+    table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+    th{text-align:left;padding:8px 12px;background:#f8fafc;border-bottom:2px solid #e2e8f0;font-size:11px;text-transform:uppercase;color:#64748b;letter-spacing:0.04em}
+    td{padding:8px 12px;border-bottom:1px solid #f1f5f9}
+    .check{color:#16a34a;font-weight:700}
+    .x{color:#cbd5e1}
+    .maybe{color:#d97706}
+
+    /* Connector lines */
+    .connector{text-align:center;color:#cbd5e1;font-size:20px;margin:8px 0}
+
+    /* Planning callout */
+    .callout{border-left:3px solid #2563eb;background:#eff6ff;padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:13px}
+    .callout-amber{border-left-color:#f59e0b;background:#fffbeb}
+    .callout-green{border-left-color:#16a34a;background:#f0fdf4}
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Estimate Pricing System - Planning Doc</h1>
+  <p class="subtitle">How companies build estimates: pricing models, line items, materials, and the builder concept.</p>
+
+  <!-- ============================================ -->
+  <!-- SECTION 1: THE THREE PRICING MODELS -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>1. Three Pricing Models</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Every service company prices differently. We support three core models. Companies pick their default, but can mix per-estimate.</p>
+
+    <div class="grid-3">
+      <!-- HOURLY -->
+      <div class="card">
+        <div class="card-title"><span class="badge badge-blue">Hourly</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Charge by time. Rate x Hours x Team = base. Best for jobs where scope is hard to predict upfront.</p>
+
+        <div class="wire">
+          <div class="wire-title">How it calculates</div>
+          <div class="wire-row"><span>Rate</span><span class="wire-input">$150/hr</span></div>
+          <div class="wire-row"><span>Team size</span><span class="wire-input">2</span></div>
+          <div class="wire-row"><span>Est. hours</span><span class="wire-input">3h</span></div>
+          <div style="border-top:1px solid #e2e8f0;margin:8px 0;"></div>
+          <div class="wire-row"><span style="font-weight:600;">Labor subtotal</span><span style="font-weight:600;">$900.00</span></div>
+          <div class="wire-row"><span>+ Trip fee</span><span>$125.00</span></div>
+          <div class="wire-row"><span>+ Materials</span><span>$0.00</span></div>
+          <div class="wire-total"><span>Estimate Total</span><span>$1,025.00</span></div>
+        </div>
+
+        <p class="note">Used by: movers, handymen, general labor, some cleaners</p>
+      </div>
+
+      <!-- FLAT RATE -->
+      <div class="card">
+        <div class="card-title"><span class="badge badge-green">Flat Rate</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Fixed price per service. Customer knows the exact cost upfront. Best for standardized work.</p>
+
+        <div class="wire">
+          <div class="wire-title">How it calculates</div>
+          <div class="wire-row"><span>Service price</span><span class="wire-input">$350.00</span></div>
+          <div class="wire-row"><span>Scope</span><span class="wire-input">2BR Apt</span></div>
+          <div style="border-top:1px solid #e2e8f0;margin:8px 0;"></div>
+          <div class="wire-row"><span style="font-weight:600;">Service subtotal</span><span style="font-weight:600;">$350.00</span></div>
+          <div class="wire-row"><span>+ Add-ons</span><span>$75.00</span></div>
+          <div class="wire-row"><span>+ Materials</span><span>$0.00</span></div>
+          <div class="wire-total"><span>Estimate Total</span><span>$425.00</span></div>
+        </div>
+
+        <p class="note">Used by: cleaners, pest control, painters, landscapers</p>
+      </div>
+
+      <!-- PER-SERVICE -->
+      <div class="card">
+        <div class="card-title"><span class="badge badge-purple">Per-Service</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">E-commerce style. Pick items from a catalog, set quantities. Customer builds their own package.</p>
+
+        <div class="wire">
+          <div class="wire-title">How it calculates</div>
+          <div class="wire-item"><span class="wire-qty">1x</span><span>Deep Clean - Kitchen</span><span class="wire-price">$150.00</span></div>
+          <div class="wire-item"><span class="wire-qty">3x</span><span>Standard Room Clean</span><span class="wire-price">$225.00</span></div>
+          <div class="wire-item"><span class="wire-qty">1x</span><span>Oven Detail</span><span class="wire-price">$45.00</span></div>
+          <div class="wire-item"><span class="wire-qty">1x</span><span>Fridge Interior</span><span class="wire-price">$35.00</span></div>
+          <div style="border-top:1px solid #e2e8f0;margin:8px 0;"></div>
+          <div class="wire-row"><span style="font-weight:600;">Cart subtotal</span><span style="font-weight:600;">$455.00</span></div>
+          <div class="wire-total"><span>Estimate Total</span><span>$455.00</span></div>
+        </div>
+
+        <p class="note">Used by: detailing, salons, multi-service, junk removal</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Key decision:</strong> Companies set their default pricing model in Settings. But individual estimates can override it. A moving company might be hourly by default, but offer a flat-rate quote for a small job.
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 2: LINE ITEMS BREAKDOWN -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>2. Line Item Categories</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Every estimate has these categories. Each is expandable - click to add items. Categories with no items show a dash.</p>
+
+    <div class="card">
+      <div class="wire" style="max-width:500px;">
+        <div class="wire-title">Pricing Breakdown (Right Sidebar)</div>
+
+        <!-- Primary Service -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;">
+            <span style="font-weight:600;color:#2563eb;cursor:pointer;">Primary Service</span>
+            <span style="font-weight:600;">$300.00</span>
+          </div>
+          <div style="background:#f8fafc;padding:8px;border-radius:0 0 4px 4px;font-size:11px;color:#64748b;">
+            <div style="display:flex;justify-content:space-between;padding:2px 0;">
+              <span>Moving - Local (2 men, 2h @ $150/hr)</span><span>$300.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Services -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;">
+            <span style="font-weight:600;color:#2563eb;cursor:pointer;">Additional Services</span>
+            <span style="font-weight:600;">$75.00</span>
+          </div>
+          <div style="background:#f8fafc;padding:8px;border-radius:0 0 4px 4px;font-size:11px;color:#64748b;">
+            <div style="display:flex;justify-content:space-between;padding:2px 0;">
+              <span>Packing - 10 boxes</span><span>$50.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:2px 0;">
+              <span>Furniture disassembly (2 items)</span><span>$25.00</span>
+            </div>
+            <div style="padding:4px 0;">
+              <span class="wire-btn">+ Add Service</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Materials -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;">
+            <span style="font-weight:600;color:#2563eb;cursor:pointer;">Materials</span>
+            <span style="font-weight:600;">$45.00</span>
+          </div>
+          <div style="background:#f8fafc;padding:8px;border-radius:0 0 4px 4px;font-size:11px;color:#64748b;">
+            <div style="display:flex;justify-content:space-between;padding:2px 0;">
+              <span>Medium boxes x10</span><span>$30.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:2px 0;">
+              <span>Tape rolls x3</span><span>$15.00</span>
+            </div>
+            <div style="padding:4px 0;">
+              <span class="wire-btn">+ Add Material</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip / Travel -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;">
+            <span style="font-weight:600;color:#2563eb;cursor:pointer;">Trip Fee</span>
+            <span style="font-weight:600;">$125.00</span>
+          </div>
+        </div>
+
+        <!-- Valuation / Insurance -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;">
+            <span style="font-weight:600;color:#2563eb;cursor:pointer;">Valuation</span>
+            <span style="color:#cbd5e1;">&mdash;</span>
+          </div>
+        </div>
+
+        <!-- Discounts -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;">
+            <span style="font-weight:600;color:#2563eb;cursor:pointer;">Discounts</span>
+            <span style="color:#ef4444;font-weight:500;">-$50.00</span>
+          </div>
+          <div style="background:#f8fafc;padding:8px;border-radius:0 0 4px 4px;font-size:11px;color:#64748b;">
+            <div style="display:flex;justify-content:space-between;padding:2px 0;">
+              <span>Repeat customer - 10%</span><span style="color:#ef4444;">-$50.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:2px solid #e2e8f0;margin:8px 0;"></div>
+        <div class="wire-row"><span style="font-weight:700;">Subtotal</span><span style="font-weight:700;">$495.00</span></div>
+        <div class="wire-row"><span>Tax (8.6%)</span><span>$42.57</span></div>
+        <div style="border-top:2px solid #e2e8f0;margin:8px 0;"></div>
+        <div class="wire-row"><span style="font-weight:700;font-size:14px;">Total</span><span style="font-weight:700;font-size:14px;">$537.57</span></div>
+      </div>
+
+      <div class="callout" style="margin-top:16px;">
+        <strong>Expandable rows:</strong> Each category is a clickable link. Click it to expand and see/edit individual items. Add buttons let you add more items from the company's catalog. Categories with nothing show a dash.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 3: THE BUILDER CONCEPT -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>3. Estimate Builder (Settings)</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Companies configure how their estimates work. Like custom fields, but for pricing structure. Lives in Settings.</p>
+
+    <div class="grid-2">
+      <!-- Service Catalog -->
+      <div class="card">
+        <div class="card-title">Service Catalog <span class="badge badge-slate">Settings</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Company defines their services + pricing. These become the options when building an estimate.</p>
+
+        <div class="wire">
+          <div class="wire-title">Services</div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;">Local Moving</div>
+              <div style="font-size:10px;color:#94a3b8;">Hourly | $150/hr base</div>
+            </div>
+            <span class="wire-btn-out">Edit</span>
+          </div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;">Packing Service</div>
+              <div style="font-size:10px;color:#94a3b8;">Flat | $50/room</div>
+            </div>
+            <span class="wire-btn-out">Edit</span>
+          </div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;">Furniture Assembly</div>
+              <div style="font-size:10px;color:#94a3b8;">Per item | $25 each</div>
+            </div>
+            <span class="wire-btn-out">Edit</span>
+          </div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;">Deep Clean</div>
+              <div style="font-size:10px;color:#94a3b8;">Flat | $200-$500</div>
+            </div>
+            <span class="wire-btn-out">Edit</span>
+          </div>
+          <div style="padding:8px 0;"><span class="wire-btn">+ Add Service</span></div>
+        </div>
+      </div>
+
+      <!-- Materials Catalog -->
+      <div class="card">
+        <div class="card-title">Materials Catalog <span class="badge badge-slate">Settings</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Supplies and materials that can be added to any estimate. Tracked for inventory and billing.</p>
+
+        <div class="wire">
+          <div class="wire-title">Materials</div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;">Small Box</div>
+              <div style="font-size:10px;color:#94a3b8;">$2.50 each</div>
+            </div>
+            <span class="wire-btn-out">Edit</span>
+          </div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;">Medium Box</div>
+              <div style="font-size:10px;color:#94a3b8;">$3.00 each</div>
+            </div>
+            <span class="wire-btn-out">Edit</span>
+          </div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;">Wardrobe Box</div>
+              <div style="font-size:10px;color:#94a3b8;">$12.00 each</div>
+            </div>
+            <span class="wire-btn-out">Edit</span>
+          </div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-weight:600;">Packing Tape</div>
+              <div style="font-size:10px;color:#94a3b8;">$5.00 / roll</div>
+            </div>
+            <span class="wire-btn-out">Edit</span>
+          </div>
+          <div style="padding:8px 0;"><span class="wire-btn">+ Add Material</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px;">
+      <!-- Resource Fields Config -->
+      <div class="card">
+        <div class="card-title">Resource Fields <span class="badge badge-slate">Settings</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Toggle which resource boxes show on estimates. Companies add custom fields like Rooms or Sq. Footage for their industry.</p>
+
+        <div class="wire">
+          <div class="wire-title">Built-in fields (toggle ON/OFF)</div>
+          <div class="wire-row">
+            <span>Trucks / Vehicles</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div class="wire-row">
+            <span>Team Size</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div class="wire-row">
+            <span>Estimated Hours</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div class="wire-row">
+            <span>Hourly Rate</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div class="wire-row">
+            <span>Service Details</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div style="border-top:1px dashed #e2e8f0;margin:8px 0;"></div>
+          <div class="wire-title">Custom resource fields (company adds their own)</div>
+          <div class="wire-row">
+            <span>Sq. Footage</span>
+            <span style="color:#d97706;font-weight:600;">OFF</span>
+          </div>
+          <div class="wire-row">
+            <span>Rooms</span>
+            <span style="color:#d97706;font-weight:600;">OFF</span>
+          </div>
+          <div class="wire-row">
+            <span>Floors / Stories</span>
+            <span style="color:#d97706;font-weight:600;">OFF</span>
+          </div>
+          <div style="padding:4px 0;"><span class="wire-btn">+ Add Custom Field</span></div>
+        </div>
+        <p class="note">A cleaning company turns OFF Trucks, turns ON Rooms and Sq. Footage. A painter turns ON Rooms + Sq. Footage + Floors.</p>
+      </div>
+
+      <!-- How different companies configure -->
+      <div class="card" style="grid-column:1/-1;">
+        <div class="card-title">Example: How Different Companies Set Up Resources</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+          <div class="wire">
+            <div class="wire-title">Moving Company</div>
+            <div class="wire-row"><span>Trucks</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+            <div class="wire-row"><span>Team</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+            <div class="wire-row"><span>Hours</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+            <div class="wire-row"><span>Rate</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+          </div>
+          <div class="wire">
+            <div class="wire-title">Cleaning Company</div>
+            <div class="wire-row"><span>Team</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+            <div class="wire-row"><span>Rooms</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+            <div class="wire-row"><span>Sq. Footage</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+          </div>
+          <div class="wire">
+            <div class="wire-title">Carpet Cleaner</div>
+            <div class="wire-row"><span>Rooms</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+            <div class="wire-row"><span>Sq. Footage</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+          </div>
+          <div class="wire">
+            <div class="wire-title">Landscaper</div>
+            <div class="wire-row"><span>Team</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+            <div class="wire-row"><span>Sq. Footage</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+            <div class="wire-row"><span>Hours</span><span style="color:#16a34a;font-size:11px;">ON</span></div>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:12px;">
+          <strong>Extensible by design:</strong> Companies can add any custom resource field they need. The field is a name + type (number, dropdown, text). It shows up as a box in the Resources card on the estimate. Start with the common ones built-in, let companies add more as needed.
+        </div>
+      </div>
+
+      <!-- Pricing Categories Config -->
+      <div class="card">
+        <div class="card-title">Pricing Categories <span class="badge badge-slate">Settings</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Configure which line item sections appear in the pricing breakdown.</p>
+
+        <div class="wire">
+          <div class="wire-title">Categories on estimates</div>
+          <div class="wire-row">
+            <span>Primary Service</span>
+            <span style="color:#16a34a;font-weight:600;">ALWAYS</span>
+          </div>
+          <div class="wire-row">
+            <span>Additional Services</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div class="wire-row">
+            <span>Materials</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div class="wire-row">
+            <span>Trip / Travel Fee</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div class="wire-row">
+            <span>Valuation / Insurance</span>
+            <span style="color:#d97706;font-weight:600;">OFF</span>
+          </div>
+          <div class="wire-row">
+            <span>Discounts</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div class="wire-row">
+            <span>Sales Tax</span>
+            <span style="color:#16a34a;font-weight:600;">ON</span>
+          </div>
+          <div style="padding:4px 0;"><span class="wire-btn">+ Add Category</span></div>
+        </div>
+        <p class="note">A plumber might only need: Primary Service + Materials + Tax. No trip fee, no valuation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 4: ADDING ITEMS FLOW -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>4. Adding Items to an Estimate</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">When a user clicks "+ Add Service" or "+ Add Material", they get a picker from the company's catalog.</p>
+
+    <div class="card">
+      <div class="card-title">Add Service Flow</div>
+
+      <div class="flow">
+        <div class="flow-step">Click "+ Add Service"</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step active">Picker modal opens</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step">Select from catalog</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step">Set qty / price</div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-step">Added to estimate</div>
+      </div>
+
+      <div class="grid-2" style="margin-top:16px;">
+        <!-- Picker modal wireframe -->
+        <div class="wire">
+          <div class="wire-title">Service Picker (Modal)</div>
+          <div style="margin-bottom:8px;">
+            <span class="wire-input" style="width:100%;display:block;">Search services...</span>
+          </div>
+          <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin:8px 0 4px;">Moving</div>
+          <div class="wire-item" style="cursor:pointer;background:#eff6ff;border-radius:4px;padding:6px 8px;margin:2px 0;">
+            <span>Local Moving</span><span class="wire-price">$150/hr</span>
+          </div>
+          <div class="wire-item" style="cursor:pointer;padding:6px 8px;margin:2px 0;">
+            <span>Long Distance Moving</span><span class="wire-price">$2,500+</span>
+          </div>
+          <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin:8px 0 4px;">Add-ons</div>
+          <div class="wire-item" style="cursor:pointer;padding:6px 8px;margin:2px 0;">
+            <span>Packing Service</span><span class="wire-price">$50/room</span>
+          </div>
+          <div class="wire-item" style="cursor:pointer;padding:6px 8px;margin:2px 0;">
+            <span>Furniture Assembly</span><span class="wire-price">$25/item</span>
+          </div>
+          <div class="wire-item" style="cursor:pointer;padding:6px 8px;margin:2px 0;">
+            <span>Piano Moving</span><span class="wire-price">$200</span>
+          </div>
+          <div style="padding:8px 0;border-top:1px solid #e2e8f0;margin-top:8px;">
+            <span class="wire-btn-out">+ Create New Service</span>
+          </div>
+        </div>
+
+        <!-- After adding -->
+        <div class="wire">
+          <div class="wire-title">After selecting "Packing Service"</div>
+          <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:12px;margin-top:8px;">
+            <div style="font-weight:600;margin-bottom:8px;">Packing Service</div>
+            <div class="wire-row"><span>Price per room</span><span class="wire-input">$50.00</span></div>
+            <div class="wire-row"><span>Number of rooms</span><span class="wire-input">3</span></div>
+            <div class="wire-row"><span>Description</span><span class="wire-input" style="width:auto;">Full pack, all rooms</span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:8px 0;"></div>
+            <div class="wire-row"><span style="font-weight:600;">Line total</span><span style="font-weight:600;">$150.00</span></div>
+            <div style="margin-top:8px;display:flex;gap:8px;">
+              <span class="wire-btn">Add to Estimate</span>
+              <span class="wire-btn-out">Cancel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 5: HOW EACH MODEL LOOKS ON ESTIMATE -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>5. Estimate View by Pricing Model</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">How the right sidebar pricing card adapts based on the company's pricing model.</p>
+
+    <div class="grid-3">
+      <!-- Hourly view -->
+      <div class="card">
+        <div class="card-title"><span class="badge badge-blue">Hourly View</span></div>
+        <div class="wire">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;text-align:center;margin-bottom:8px;">
+            <div style="background:white;border:1px solid #e2e8f0;border-radius:4px;padding:4px;">
+              <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Trucks</div>
+              <div style="font-weight:700;">1</div>
+            </div>
+            <div style="background:white;border:1px solid #e2e8f0;border-radius:4px;padding:4px;">
+              <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Team</div>
+              <div style="font-weight:700;">2</div>
+            </div>
+            <div style="background:white;border:1px solid #e2e8f0;border-radius:4px;padding:4px;">
+              <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Hours</div>
+              <div style="font-weight:700;">3h</div>
+            </div>
+            <div style="background:white;border:1px solid #e2e8f0;border-radius:4px;padding:4px;">
+              <div style="font-size:9px;color:#16a34a;text-transform:uppercase;">Rate</div>
+              <div style="font-weight:700;color:#16a34a;">$150/hr</div>
+            </div>
+          </div>
+          <div class="wire-row"><span style="color:#2563eb;">Labor (2x3h@$150)</span><span style="font-weight:500;">$900</span></div>
+          <div class="wire-row"><span style="color:#2563eb;">+ Add-ons</span><span>$75</span></div>
+          <div class="wire-row"><span style="color:#2563eb;">+ Materials</span><span>$45</span></div>
+          <div class="wire-row"><span style="color:#2563eb;">Trip Fee</span><span>$125</span></div>
+          <div class="wire-total"><span>Total</span><span>$1,145</span></div>
+        </div>
+      </div>
+
+      <!-- Flat rate view -->
+      <div class="card">
+        <div class="card-title"><span class="badge badge-green">Flat Rate View</span></div>
+        <div class="wire">
+          <div style="background:white;border:1px solid #e2e8f0;border-radius:4px;padding:8px;margin-bottom:8px;text-align:center;">
+            <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;">Service Details</div>
+            <div style="font-weight:600;font-size:11px;">2BR Apartment &middot; Deep Clean</div>
+          </div>
+          <div class="wire-row"><span style="color:#2563eb;">Deep Clean - 2BR</span><span style="font-weight:500;">$350</span></div>
+          <div class="wire-row"><span style="color:#2563eb;">+ Add-ons</span><span>$75</span></div>
+          <div class="wire-row"><span style="color:#2563eb;">+ Materials</span><span>&mdash;</span></div>
+          <div class="wire-row"><span style="color:#2563eb;">Discount</span><span style="color:#ef4444;">-$25</span></div>
+          <div class="wire-total"><span>Total</span><span>$400</span></div>
+        </div>
+        <p class="note">No trucks/hours/rate boxes. Just service + price.</p>
+      </div>
+
+      <!-- Per-service view -->
+      <div class="card">
+        <div class="card-title"><span class="badge badge-purple">Per-Service View</span></div>
+        <div class="wire">
+          <div style="font-size:10px;font-weight:600;color:#94a3b8;text-transform:uppercase;margin-bottom:4px;">Cart</div>
+          <div class="wire-item"><span class="wire-qty">1x</span><span>Kitchen Deep Clean</span><span class="wire-price">$150</span></div>
+          <div class="wire-item"><span class="wire-qty">3x</span><span>Room Clean @$75</span><span class="wire-price">$225</span></div>
+          <div class="wire-item"><span class="wire-qty">1x</span><span>Oven Detail</span><span class="wire-price">$45</span></div>
+          <div class="wire-item"><span class="wire-qty">1x</span><span>Fridge Interior</span><span class="wire-price">$35</span></div>
+          <div style="padding:4px 0;"><span class="wire-btn" style="font-size:10px;">+ Add Item</span></div>
+          <div class="wire-total"><span>Total</span><span>$455</span></div>
+        </div>
+        <p class="note">E-commerce feel. Add items, change qty, remove.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 6: COMPARISON TABLE -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>6. Feature Comparison</h2>
+
+    <div class="card" style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Hourly</th>
+            <th>Flat Rate</th>
+            <th>Per-Service</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Trucks / Vehicles</td><td class="check">Yes</td><td class="x">Optional</td><td class="x">No</td></tr>
+          <tr><td>Team Size</td><td class="check">Yes</td><td class="maybe">Optional</td><td class="x">No</td></tr>
+          <tr><td>Estimated Hours</td><td class="check">Yes</td><td class="x">No</td><td class="x">No</td></tr>
+          <tr><td>Hourly Rate</td><td class="check">Yes</td><td class="x">No</td><td class="x">No</td></tr>
+          <tr><td>Service Details</td><td class="check">Yes</td><td class="check">Yes</td><td class="x">N/A (items are the detail)</td></tr>
+          <tr><td>Service Catalog Picker</td><td class="maybe">For add-ons</td><td class="maybe">For add-ons</td><td class="check">Primary input</td></tr>
+          <tr><td>Materials</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+          <tr><td>Additional Services</td><td class="check">Yes</td><td class="check">Yes</td><td class="x">Everything is a service</td></tr>
+          <tr><td>Trip Fee</td><td class="check">Yes</td><td class="maybe">Optional</td><td class="maybe">Optional</td></tr>
+          <tr><td>Discounts</td><td class="check">Yes</td><td class="check">Yes</td><td class="check">Yes</td></tr>
+          <tr><td>Valuation / Insurance</td><td class="maybe">Moving only</td><td class="x">Rare</td><td class="x">No</td></tr>
+          <tr><td>Binding / Non-Binding</td><td class="maybe">Moving only</td><td class="x">N/A</td><td class="x">N/A</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout-green callout" style="margin-top:16px;">
+      <strong>Universal defaults:</strong> Every estimate always has: Primary Service + Subtotal + Tax + Total. Everything else is configurable per company. The estimate page adapts its UI based on what's turned on.
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 7: CUSTOM LINE ITEMS -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>7. Custom Line Items</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Not everything is in the catalog. Users can add one-off items with a custom name and price.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Adding a custom item</div>
+        <div class="wire">
+          <div class="wire-title">Custom Line Item Form</div>
+          <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:12px;margin-top:4px;">
+            <div class="wire-row"><span>Name</span><span class="wire-input" style="width:auto;">Haul away old couch</span></div>
+            <div class="wire-row"><span>Category</span><span class="wire-input">Additional Service</span></div>
+            <div class="wire-row"><span>Quantity</span><span class="wire-input">1</span></div>
+            <div class="wire-row"><span>Price</span><span class="wire-input">$50.00</span></div>
+            <div class="wire-row"><span>Taxable</span><span class="wire-input">No</span></div>
+            <div class="wire-row"><span>Description</span><span class="wire-input" style="width:auto;">Remove to curb for pickup</span></div>
+            <div style="margin-top:8px;display:flex;gap:8px;">
+              <span class="wire-btn">Add to Estimate</span>
+              <span class="wire-btn-out">Cancel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">How it appears in pricing</div>
+        <div class="wire">
+          <div class="wire-title">Additional Services (expanded)</div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10px;background:#eff6ff;color:#2563eb;padding:1px 5px;border-radius:3px;">catalog</span>
+              <span>Packing Service (3 rooms)</span>
+            </div>
+            <span class="wire-price">$150.00</span>
+          </div>
+          <div class="wire-item" style="justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10px;background:#faf5ff;color:#7c3aed;padding:1px 5px;border-radius:3px;">custom</span>
+              <span>Haul away old couch</span>
+            </div>
+            <span class="wire-price">$50.00</span>
+          </div>
+          <div style="padding:4px 0;"><span class="wire-btn" style="font-size:10px;">+ Add Service</span> <span class="wire-btn-out" style="font-size:10px;margin-left:4px;">+ Custom Item</span></div>
+        </div>
+        <p class="note">Custom items show a "custom" tag to distinguish from catalog items. Both work the same in totals.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 8: DEPOSITS & PAYMENT TERMS -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>8. Deposits & Payment Terms</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Most service companies require a deposit to book. This needs to show clearly on the estimate.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Deposit Settings <span class="badge badge-slate">Settings</span></div>
+        <div class="wire">
+          <div class="wire-title">Company defaults</div>
+          <div class="wire-row"><span>Require deposit</span><span style="color:#16a34a;font-weight:600;">ON</span></div>
+          <div class="wire-row"><span>Deposit type</span><span class="wire-input">Percentage</span></div>
+          <div class="wire-row"><span>Amount</span><span class="wire-input">50%</span></div>
+          <div style="border-top:1px dashed #e2e8f0;margin:8px 0;"></div>
+          <div class="wire-row"><span>Or fixed amount</span><span class="wire-input">$200.00</span></div>
+          <div style="border-top:1px dashed #e2e8f0;margin:8px 0;"></div>
+          <div class="wire-row"><span>Deposit due</span><span class="wire-input">At booking</span></div>
+          <div class="wire-row"><span>Balance due</span><span class="wire-input">Upon completion</span></div>
+        </div>
+        <p class="note">Can be overridden per-estimate. Some big jobs might need a different split.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">How it shows on estimate</div>
+        <div class="wire">
+          <div class="wire-title">Pricing card (bottom section)</div>
+          <div class="wire-row"><span style="font-weight:600;">Subtotal</span><span style="font-weight:600;">$425.00</span></div>
+          <div class="wire-row"><span>Tax (8.6%)</span><span>$36.55</span></div>
+          <div style="border-top:1px solid #e2e8f0;margin:4px 0;"></div>
+          <div class="wire-row"><span style="font-weight:700;">Estimated Total</span><span style="font-weight:700;">$461.55</span></div>
+          <div style="border-top:1px solid #e2e8f0;margin:4px 0;"></div>
+          <div class="wire-row" style="background:#fffbeb;padding:6px 4px;border-radius:4px;margin:4px 0;">
+            <span style="font-weight:600;color:#b45309;">Deposit Due (50%)</span>
+            <span style="font-weight:700;color:#b45309;">$230.78</span>
+          </div>
+          <div class="wire-row">
+            <span style="color:#64748b;">Balance due at completion</span>
+            <span style="color:#64748b;">$230.77</span>
+          </div>
+        </div>
+        <div class="wire" style="margin-top:12px;">
+          <div class="wire-title">Customer sees on estimate page</div>
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:10px;text-align:center;margin-top:4px;">
+            <div style="font-size:11px;color:#64748b;">Estimated Total</div>
+            <div style="font-size:20px;font-weight:800;color:#1e293b;">$461.55</div>
+            <div style="margin:8px 0;">
+              <span class="wire-btn" style="font-size:12px;padding:8px 20px;border-radius:6px;">Pay Deposit - $230.78</span>
+            </div>
+            <div style="font-size:10px;color:#64748b;">Balance of $230.77 due upon completion</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 9: MINIMUM CHARGE -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>9. Minimum Charge</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Almost every service company has a minimum. The system enforces it automatically.</p>
+
+    <div class="card">
+      <div class="grid-2">
+        <div>
+          <div class="card-title">Configuration <span class="badge badge-slate">Settings</span></div>
+          <div class="wire">
+            <div class="wire-title">Minimum charge rules</div>
+            <div class="wire-row"><span>Enable minimum charge</span><span style="color:#16a34a;font-weight:600;">ON</span></div>
+            <div class="wire-row"><span>Minimum type</span><span class="wire-input">Hours</span></div>
+            <div class="wire-row"><span>Minimum hours</span><span class="wire-input">2</span></div>
+            <div style="border-top:1px dashed #e2e8f0;margin:8px 0;"></div>
+            <div class="wire-row"><span>Or fixed minimum</span><span class="wire-input">$200.00</span></div>
+          </div>
+          <p class="note">Options: minimum hours (e.g. "2 hour minimum") or fixed dollar amount (e.g. "$200 minimum charge").</p>
+        </div>
+        <div>
+          <div class="card-title">How it enforces</div>
+          <div class="wire">
+            <div class="wire-title">Scenario: 1 hour job @ $150/hr</div>
+            <div class="wire-row"><span>Calculated total</span><span>$150.00</span></div>
+            <div class="wire-row"><span style="color:#ef4444;">Below 2hr minimum ($300)</span><span></span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:4px 0;"></div>
+            <div class="wire-row" style="background:#fef2f2;padding:4px;border-radius:4px;">
+              <span style="font-weight:600;">Adjusted to minimum</span>
+              <span style="font-weight:600;">$300.00</span>
+            </div>
+          </div>
+          <div class="wire" style="margin-top:8px;">
+            <div class="wire-title">User sees a notice</div>
+            <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:8px;font-size:11px;color:#92400e;margin-top:4px;">
+              2 hour minimum applies. Estimate adjusted from $150 to $300.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 10: ESTIMATE EXPIRATION -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>10. Estimate Expiration</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Estimates aren't valid forever. Configurable expiration keeps pricing commitments under control.</p>
+
+    <div class="card">
+      <div class="grid-2">
+        <div>
+          <div class="card-title">Configuration <span class="badge badge-slate">Settings</span></div>
+          <div class="wire">
+            <div class="wire-title">Expiration defaults</div>
+            <div class="wire-row"><span>Default validity period</span><span class="wire-input">30 days</span></div>
+            <div class="wire-row"><span>Show expiry on estimate</span><span style="color:#16a34a;font-weight:600;">ON</span></div>
+            <div class="wire-row"><span>Auto-mark as expired</span><span style="color:#16a34a;font-weight:600;">ON</span></div>
+            <div class="wire-row"><span>Send reminder before</span><span class="wire-input">3 days</span></div>
+          </div>
+          <p class="note">Can override per-estimate. A big commercial job might get 60 days.</p>
+        </div>
+        <div>
+          <div class="card-title">How it appears</div>
+          <div class="wire">
+            <div class="wire-title">On the estimate header</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+              <span style="font-size:11px;color:#64748b;">Created: Feb 2, 2026</span>
+              <span style="font-size:11px;color:#64748b;">&middot;</span>
+              <span style="font-size:11px;color:#d97706;font-weight:600;">Expires: Mar 4, 2026</span>
+            </div>
+          </div>
+          <div class="wire" style="margin-top:8px;">
+            <div class="wire-title">When expired</div>
+            <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:4px;padding:8px;font-size:11px;color:#991b1b;margin-top:4px;">
+              This estimate expired on Mar 4, 2026. <a href="#" style="color:#2563eb;font-weight:600;">Extend</a> or <a href="#" style="color:#2563eb;font-weight:600;">Duplicate as new</a>
+            </div>
+          </div>
+          <div class="wire" style="margin-top:8px;">
+            <div class="wire-title">Customer-facing estimate page</div>
+            <div style="font-size:11px;color:#64748b;margin-top:4px;">Footer text: "This estimate is valid until March 4, 2026."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 11: OPTIONAL / RECOMMENDED ITEMS -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>11. Optional / Recommended Items</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Show items on the estimate that aren't included in the total unless the customer opts in. Great for upselling.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">How the estimator adds them</div>
+        <div class="wire">
+          <div class="wire-title">When adding a line item</div>
+          <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:12px;margin-top:4px;">
+            <div style="font-weight:600;margin-bottom:8px;">Mattress Cover (Queen)</div>
+            <div class="wire-row"><span>Price</span><span class="wire-input">$15.00</span></div>
+            <div class="wire-row"><span>Quantity</span><span class="wire-input">2</span></div>
+            <div class="wire-row">
+              <span>Mark as optional</span>
+              <span style="display:inline-flex;align-items:center;gap:4px;">
+                <span style="width:32px;height:18px;background:#2563eb;border-radius:9px;display:inline-block;position:relative;">
+                  <span style="width:14px;height:14px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></span>
+                </span>
+                <span style="font-size:11px;color:#2563eb;font-weight:600;">Yes</span>
+              </span>
+            </div>
+            <div style="margin-top:8px;">
+              <span class="wire-btn">Add as Optional</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">What the customer sees</div>
+        <div class="wire">
+          <div class="wire-title">On the estimate page</div>
+          <div style="margin-top:4px;">
+            <div class="wire-row"><span style="font-weight:600;">Estimated Total</span><span style="font-weight:700;">$425.00</span></div>
+          </div>
+          <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:6px;padding:10px;margin-top:8px;">
+            <div style="font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;margin-bottom:6px;">Recommended Add-ons</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #e2e8f0;">
+              <span style="width:16px;height:16px;border:2px solid #d1d5db;border-radius:3px;display:inline-block;flex-shrink:0;"></span>
+              <span style="font-size:12px;flex:1;">Mattress Covers (x2)</span>
+              <span style="font-size:12px;font-weight:600;">+$30.00</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+              <span style="width:16px;height:16px;border:2px solid #2563eb;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:#2563eb;color:white;font-size:10px;">&#10003;</span>
+              <span style="font-size:12px;flex:1;">TV Crating</span>
+              <span style="font-size:12px;font-weight:600;">+$45.00</span>
+            </div>
+            <div style="border-top:1px solid #e2e8f0;margin-top:6px;padding-top:6px;">
+              <div class="wire-row"><span style="font-size:11px;color:#64748b;">New total with selected add-ons</span><span style="font-weight:700;">$470.00</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="note">Customers check the ones they want. Total updates live. Selections saved when they approve/book.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 12: PACKAGES / BUNDLES -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>12. Packages & Bundles</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Pre-built combos that group multiple services at a discounted price. Simplifies quoting and upsells.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Package Builder <span class="badge badge-slate">Settings</span></div>
+        <div class="wire">
+          <div class="wire-title">Example package</div>
+          <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:12px;margin-top:4px;">
+            <div style="font-weight:700;margin-bottom:2px;">Move + Pack Bundle</div>
+            <div style="font-size:11px;color:#64748b;margin-bottom:8px;">Full-service move with packing included</div>
+            <div class="wire-item" style="font-size:11px;"><span>Local Moving (hourly)</span><span class="wire-price">$150/hr</span></div>
+            <div class="wire-item" style="font-size:11px;"><span>Full Packing Service</span><span class="wire-price">$250</span></div>
+            <div class="wire-item" style="font-size:11px;"><span>Materials (included)</span><span class="wire-price">$50</span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:6px 0;"></div>
+            <div class="wire-row"><span style="color:#94a3b8;text-decoration:line-through;">Individual total</span><span style="color:#94a3b8;text-decoration:line-through;">$450+</span></div>
+            <div class="wire-row"><span style="font-weight:700;color:#16a34a;">Bundle price</span><span style="font-weight:700;color:#16a34a;">$399</span></div>
+            <div style="font-size:10px;color:#16a34a;text-align:right;">Save ~$51</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Selecting a package on estimate</div>
+        <div class="wire">
+          <div class="wire-title">In the service picker</div>
+          <div style="margin-top:4px;">
+            <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Packages</div>
+            <div class="wire-item" style="cursor:pointer;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:8px;margin:2px 0;">
+              <div>
+                <div style="font-weight:600;">Move + Pack Bundle</div>
+                <div style="font-size:10px;color:#16a34a;">Save ~$51 vs individual pricing</div>
+              </div>
+              <span class="wire-price" style="color:#16a34a;">$399</span>
+            </div>
+            <div class="wire-item" style="cursor:pointer;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:8px;margin:2px 0;">
+              <div>
+                <div style="font-weight:600;">Premium Move Package</div>
+                <div style="font-size:10px;color:#16a34a;">Pack + Move + Clean + Unpack</div>
+              </div>
+              <span class="wire-price" style="color:#16a34a;">$799</span>
+            </div>
+          </div>
+          <div style="border-top:1px solid #e2e8f0;margin:8px 0;"></div>
+          <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Individual services</div>
+          <div class="wire-item" style="cursor:pointer;padding:4px 0;">
+            <span>Local Moving</span><span class="wire-price">$150/hr</span>
+          </div>
+          <div class="wire-item" style="cursor:pointer;padding:4px 0;">
+            <span>Packing Service</span><span class="wire-price">$50/room</span>
+          </div>
+        </div>
+        <p class="note">Packages show first in the picker with the savings highlighted. Bundle expands into individual line items on the estimate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 13: RECURRING PRICING -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>13. Recurring Pricing</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Cleaning and maintenance companies often offer recurring service at a lower rate. Show both one-time and recurring options.</p>
+
+    <div class="card">
+      <div class="grid-2">
+        <div>
+          <div class="card-title">Recurring setup</div>
+          <div class="wire">
+            <div class="wire-title">On the estimate</div>
+            <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:12px;margin-top:4px;">
+              <div class="wire-row"><span>Service type</span><span class="wire-input">Recurring</span></div>
+              <div class="wire-row"><span>Frequency</span><span class="wire-input">Bi-weekly</span></div>
+              <div class="wire-row"><span>One-time price</span><span style="color:#94a3b8;text-decoration:line-through;">$350.00</span></div>
+              <div class="wire-row"><span style="font-weight:600;">Recurring price</span><span style="font-weight:700;color:#16a34a;">$275.00/visit</span></div>
+              <div class="wire-row"><span>Start date</span><span class="wire-input">Mar 1, 2026</span></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card-title">Customer sees</div>
+          <div class="wire">
+            <div class="wire-title">Pricing comparison</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+              <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:10px;text-align:center;">
+                <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;">One-Time</div>
+                <div style="font-size:18px;font-weight:700;margin:4px 0;">$350</div>
+                <div style="font-size:10px;color:#64748b;">Single visit</div>
+              </div>
+              <div style="background:#f0fdf4;border:2px solid #16a34a;border-radius:6px;padding:10px;text-align:center;position:relative;">
+                <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:#16a34a;color:white;font-size:9px;font-weight:700;padding:1px 8px;border-radius:9999px;">SAVE 21%</div>
+                <div style="font-size:10px;color:#16a34a;text-transform:uppercase;font-weight:600;">Bi-Weekly</div>
+                <div style="font-size:18px;font-weight:700;margin:4px 0;">$275<span style="font-size:11px;font-weight:500;color:#64748b;">/visit</span></div>
+                <div style="font-size:10px;color:#64748b;">Every 2 weeks</div>
+              </div>
+            </div>
+          </div>
+          <p class="note">Customer picks one-time or recurring. Recurring auto-creates follow-up jobs on schedule.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:12px;">
+      <strong>Frequency options:</strong> Weekly, Bi-weekly, Monthly, Quarterly. Each can have its own discounted rate. Company sets these up in service catalog per service.
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 14: WHAT NEEDS TO BE BUILT (UPDATED) -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>14. What Needs to Be Built</h2>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Settings (Admin configures once)</div>
+        <div style="font-size:12px;">
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Default pricing model selector</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Service catalog CRUD</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Materials catalog CRUD</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Package / bundle builder</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Resource field toggles</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Pricing category toggles</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Deposit / payment terms config</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Minimum charge rules</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Estimate expiration defaults</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;display:flex;justify-content:space-between;">
+            <span>Recurring frequency + pricing</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Estimate Page (Per-estimate)</div>
+        <div style="font-size:12px;">
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Pricing model override per estimate</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Service picker modal (catalog + packages)</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Materials picker modal</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Custom line item form</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Optional/recommended items toggle</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Expandable line item rows</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Deposit amount display + override</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Minimum charge enforcement + notice</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Expiration date display + extend</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Recurring vs one-time toggle</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+            <span>Auto-calculate totals</span>
+            <span class="badge badge-amber">Update</span>
+          </div>
+          <div style="padding:6px 0;display:flex;justify-content:space-between;">
+            <span>Adaptive resource fields</span>
+            <span class="badge badge-blue">New</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Customer-Facing Estimate Page</div>
+      <div style="font-size:12px;">
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+          <span>Optional items checkboxes (live total update)</span>
+          <span class="badge badge-blue">New</span>
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+          <span>Deposit payment button + balance display</span>
+          <span class="badge badge-blue">New</span>
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+          <span>Recurring vs one-time pricing comparison</span>
+          <span class="badge badge-blue">New</span>
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;">
+          <span>Expiration notice + expired state</span>
+          <span class="badge badge-blue">New</span>
+        </div>
+        <div style="padding:6px 0;display:flex;justify-content:space-between;">
+          <span>Package details breakdown</span>
+          <span class="badge badge-blue">New</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Database Tables & Updates</div>
+      <div style="font-size:12px;">
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="font-weight:600;font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:3px;">service_catalog</span>
+          — id, company_id, name, category, pricing_type (hourly/flat/per_unit), base_price, unit_label, description, sort_order, active, recurring_prices (JSONB: {weekly, biweekly, monthly, quarterly})
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="font-weight:600;font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:3px;">materials_catalog</span>
+          — id, company_id, name, unit_price, unit_label, category, description, active
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="font-weight:600;font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:3px;">service_packages</span>
+          — id, company_id, name, description, items (JSONB: [{catalog_id, qty}]), bundle_price, savings_label, active, sort_order
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="font-weight:600;font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:3px;">estimate_line_items</span>
+          — id, estimate_id, category (service/material/fee/discount), catalog_item_id (nullable), package_id (nullable), name, quantity, unit_price, total, is_optional, sort_order
+        </div>
+        <div style="padding:6px 0;">
+          <span style="font-weight:600;font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:3px;">estimates</span> (updates)
+          — + pricing_model, + resource_fields (JSONB), + service_details, + deposit_type, + deposit_amount, + expires_at, + minimum_charge, + recurring_frequency, + recurring_price
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 15: MVP SCOPE -->
+  <!-- ============================================ -->
+  <div class="section">
+    <h2>15. MVP Scope - What to Build First</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px;">Start with enough to cover the majority of service companies. Add more later. The system is extensible - that's the key.</p>
+
+    <div class="grid-2">
+      <!-- Phase 1: MVP -->
+      <div class="card" style="border:2px solid #16a34a;">
+        <div class="card-title" style="color:#16a34a;">Phase 1: MVP <span class="badge badge-green">Build First</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Covers movers, cleaners, painters, handymen, pest control, landscapers, carpet cleaners, and most general service companies.</p>
+
+        <div style="font-size:12px;">
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">1.</span>
+            <div>
+              <span style="font-weight:600;">3 Pricing Models</span>
+              <div style="font-size:11px;color:#94a3b8;">Hourly, Flat Rate, Per-Service selector</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">2.</span>
+            <div>
+              <span style="font-weight:600;">Service Catalog</span>
+              <div style="font-size:11px;color:#94a3b8;">Company creates their services + pricing in Settings</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">3.</span>
+            <div>
+              <span style="font-weight:600;">Materials Catalog</span>
+              <div style="font-size:11px;color:#94a3b8;">Supplies and materials with unit pricing</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">4.</span>
+            <div>
+              <span style="font-weight:600;">Resource Fields (built-in + custom)</span>
+              <div style="font-size:11px;color:#94a3b8;">Trucks, Team, Hours, Rate, Rooms, Sq. Footage - toggle ON/OFF, add custom</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">5.</span>
+            <div>
+              <span style="font-weight:600;">Line Items (expandable categories)</span>
+              <div style="font-size:11px;color:#94a3b8;">Primary service + additional services + materials + trip fee + discounts</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">6.</span>
+            <div>
+              <span style="font-weight:600;">Service + Material Picker Modals</span>
+              <div style="font-size:11px;color:#94a3b8;">Browse catalog, set qty/price, add to estimate</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">7.</span>
+            <div>
+              <span style="font-weight:600;">Custom Line Items</span>
+              <div style="font-size:11px;color:#94a3b8;">One-off items not in catalog</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">8.</span>
+            <div>
+              <span style="font-weight:600;">Deposits</span>
+              <div style="font-size:11px;color:#94a3b8;">Percentage or fixed, show on estimate</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;display:flex;align-items:start;gap:8px;">
+            <span style="color:#16a34a;font-weight:700;flex-shrink:0;">9.</span>
+            <div>
+              <span style="font-weight:600;">Auto-calculate totals</span>
+              <div style="font-size:11px;color:#94a3b8;">Subtotal + tax + deposit + balance, updates live</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-green callout" style="margin-top:12px;">
+          <strong>This alone covers 80%+ of service companies.</strong> Any company can set up services, price them, add to estimates, and collect deposits. The extensible resource fields (rooms, sq ft, custom) make it work for any industry.
+        </div>
+      </div>
+
+      <!-- Phase 2: Enhancements -->
+      <div class="card" style="border:1px solid #e2e8f0;">
+        <div class="card-title" style="color:#64748b;">Phase 2: Enhancements <span class="badge badge-slate">Build Later</span></div>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;">Nice-to-haves that make the system more powerful. Each is independently addable without breaking Phase 1.</p>
+
+        <div style="font-size:12px;">
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#94a3b8;font-weight:700;flex-shrink:0;">A.</span>
+            <div>
+              <span style="font-weight:600;">Packages & Bundles</span>
+              <div style="font-size:11px;color:#94a3b8;">Group services at a discount price</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#94a3b8;font-weight:700;flex-shrink:0;">B.</span>
+            <div>
+              <span style="font-weight:600;">Optional / Recommended Items</span>
+              <div style="font-size:11px;color:#94a3b8;">Customer toggles add-ons on their estimate page</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#94a3b8;font-weight:700;flex-shrink:0;">C.</span>
+            <div>
+              <span style="font-weight:600;">Recurring Pricing</span>
+              <div style="font-size:11px;color:#94a3b8;">Weekly/biweekly/monthly with discounted rates</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#94a3b8;font-weight:700;flex-shrink:0;">D.</span>
+            <div>
+              <span style="font-weight:600;">Minimum Charge</span>
+              <div style="font-size:11px;color:#94a3b8;">Auto-enforce minimum hours or dollar amount</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:start;gap:8px;">
+            <span style="color:#94a3b8;font-weight:700;flex-shrink:0;">E.</span>
+            <div>
+              <span style="font-weight:600;">Estimate Expiration</span>
+              <div style="font-size:11px;color:#94a3b8;">Auto-expire + reminders</div>
+            </div>
+          </div>
+          <div style="padding:6px 0;display:flex;align-items:start;gap:8px;">
+            <span style="color:#94a3b8;font-weight:700;flex-shrink:0;">F.</span>
+            <div>
+              <span style="font-weight:600;">Valuation / Insurance</span>
+              <div style="font-size:11px;color:#94a3b8;">Moving-industry specific protection tiers</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-amber" style="margin-top:12px;">
+          <strong>Each is modular.</strong> Phase 2 items are independent add-ons. Can ship any of them at any time without touching Phase 1 code. The extensible architecture makes this possible.
+        </div>
+      </div>
+    </div>
+
+    <!-- MVP Database -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Phase 1 Database (MVP Tables)</div>
+      <div style="font-size:12px;">
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="font-weight:600;font-family:monospace;background:#f0fdf4;padding:2px 6px;border-radius:3px;color:#16a34a;">service_catalog</span>
+          — id, company_id, name, category, pricing_type, base_price, unit_label, description, sort_order, active
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="font-weight:600;font-family:monospace;background:#f0fdf4;padding:2px 6px;border-radius:3px;color:#16a34a;">materials_catalog</span>
+          — id, company_id, name, unit_price, unit_label, category, description, active
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="font-weight:600;font-family:monospace;background:#f0fdf4;padding:2px 6px;border-radius:3px;color:#16a34a;">estimate_line_items</span>
+          — id, estimate_id, category, catalog_item_id (nullable), name, quantity, unit_price, total, sort_order
+        </div>
+        <div style="padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="font-weight:600;font-family:monospace;background:#f0fdf4;padding:2px 6px;border-radius:3px;color:#16a34a;">estimates</span> (add columns)
+          — + pricing_model, + resource_fields (JSONB), + service_details, + deposit_type, + deposit_amount
+        </div>
+        <div style="padding:6px 0;">
+          <span style="font-weight:600;font-family:monospace;background:#f0fdf4;padding:2px 6px;border-radius:3px;color:#16a34a;">company settings</span> (add to JSONB)
+          — + estimateBuilder: { defaultPricingModel, resourceFields[], pricingCategories[], depositDefaults }
+        </div>
+      </div>
+      <p class="note" style="margin-top:8px;">Phase 2 adds: service_packages table, is_optional + package_id to line_items, expires_at + minimum_charge + recurring fields to estimates.</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:20px;font-size:12px;color:#94a3b8;border-top:1px solid #e2e8f0;margin-top:40px;">
+    Estimate Pricing System - Planning Document &middot; <a href="estimate-mockup.html" style="color:#2563eb;">Back to Mockup</a>
+  </div>
+
+</div>
+</body>
+</html>

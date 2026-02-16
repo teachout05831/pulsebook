@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Component - Concept A: Communication-First Layout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .activity-item:hover { background-color: #f8fafc; }
+    .tab-btn.active { border-color: #3b82f6; color: #3b82f6; background-color: #eff6ff; }
+    .comm-tab.active { background-color: #3b82f6; color: white; }
+    .filter-tab.active { background-color: #1e40af; color: white; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-7xl mx-auto p-6">
+
+    <!-- Header -->
+    <div class="bg-white rounded-t-lg border-b px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <h1 class="text-xl font-bold text-gray-900">Sales - #67550</h1>
+          <button class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100">
+            <i class="fa-regular fa-bell"></i>
+            Create Follow-up
+          </button>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
+            <i class="fa-regular fa-paper-plane"></i>
+            Send Estimate
+            <i class="fa-solid fa-chevron-down text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex bg-white rounded-b-lg shadow-sm">
+
+      <!-- Left Column - Communication & Activity -->
+      <div class="flex-1 border-r">
+
+        <!-- Communication Composer -->
+        <div class="p-6 border-b">
+          <div class="flex gap-1 mb-4">
+            <button class="comm-tab active flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border transition-colors">
+              <i class="fa-regular fa-sticky-note mr-2"></i>Note
+            </button>
+            <button class="comm-tab flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors">
+              <i class="fa-regular fa-envelope mr-2"></i>Email
+            </button>
+            <button class="comm-tab flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors">
+              <i class="fa-solid fa-phone mr-2"></i>Call
+            </button>
+            <button class="comm-tab flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors">
+              <i class="fa-regular fa-comment mr-2"></i>Text
+            </button>
+          </div>
+
+          <!-- Note Composer (active state) -->
+          <div class="space-y-3">
+            <textarea
+              class="w-full px-4 py-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              rows="3"
+              placeholder="Add a note about this customer..."
+            ></textarea>
+            <div class="flex justify-between items-center">
+              <label class="flex items-center gap-2 text-sm text-gray-600">
+                <input type="checkbox" class="rounded border-gray-300">
+                Pin this note
+              </label>
+              <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                <i class="fa-solid fa-plus mr-1"></i> Add Note
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="px-6 py-4 border-b bg-gray-50">
+          <div class="grid grid-cols-4 gap-4">
+            <div class="text-center p-3 bg-white rounded-lg border">
+              <div class="text-2xl font-bold text-blue-600">3</div>
+              <div class="text-xs text-gray-500">Calls</div>
+            </div>
+            <div class="text-center p-3 bg-white rounded-lg border">
+              <div class="text-2xl font-bold text-purple-600">0</div>
+              <div class="text-xs text-gray-500">Texts</div>
+            </div>
+            <div class="text-center p-3 bg-white rounded-lg border">
+              <div class="text-2xl font-bold text-green-600">5</div>
+              <div class="text-xs text-gray-500">Emails</div>
+            </div>
+            <div class="text-center p-3 bg-white rounded-lg border">
+              <div class="text-2xl font-bold text-amber-600">0</div>
+              <div class="text-xs text-gray-500">Days Until Job</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900">Activity</h2>
+            <div class="flex gap-1">
+              <button class="filter-tab active px-3 py-1.5 text-xs font-medium rounded-full bg-blue-600 text-white">All</button>
+              <button class="filter-tab px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">Notes</button>
+              <button class="filter-tab px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">Emails</button>
+              <button class="filter-tab px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">Calls</button>
+              <button class="filter-tab px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">Texts</button>
+              <button class="filter-tab px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">Follow-ups</button>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="space-y-6">
+            <!-- Date Group -->
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 mb-3">February, 2026</h3>
+
+              <!-- Email Activity -->
+              <div class="activity-item border rounded-lg p-4 mb-3 cursor-pointer transition-colors">
+                <div class="flex gap-3">
+                  <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fa-regular fa-envelope text-green-600"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                      <div class="flex items-center gap-2">
+                        <span class="font-medium text-gray-900">Email</span>
+                        <span class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">Delivered</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <i class="fa-solid fa-reply text-xs"></i>
+                        <span>02/02/2026 @ 2:51 PM</span>
+                        <button class="p-1 hover:bg-gray-100 rounded">
+                          <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">
+                      You sent a tracked email to <span class="text-blue-600">lacymobilenotary@gmail.com</span>
+                    </p>
+                    <p class="text-xs text-green-600 mb-2">Delivered 02/02/2026 @ 2:51 PM</p>
+                    <div class="bg-gray-50 rounded-lg p-3 border-l-4 border-green-500">
+                      <p class="font-medium text-gray-900 mb-1">Lock In Your Date & Save This Week</p>
+                      <p class="text-sm text-gray-600">Hi Keajuana! Daniela with <strong>Arizona Reliable Movers</strong> checking in 🚚 Just wanted to follow up on the moving estimate we sent over. We've been helping families across Arizona for <strong>over 8 years</strong>, and we'd love to take great care of you as well.</p>
+                    </div>
+                    <button class="text-sm text-blue-600 hover:text-blue-700 mt-2">Expand</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Call Activity -->
+              <div class="activity-item border rounded-lg p-4 mb-3 cursor-pointer transition-colors">
+                <div class="flex gap-3">
+                  <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-phone text-blue-600"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                      <div class="flex items-center gap-2">
+                        <span class="font-medium text-gray-900">Call</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <span>02/02/2026 @ 2:50 PM</span>
+                        <button class="p-1 hover:bg-gray-100 rounded">
+                          <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">
+                      You made a phone call to Keajuana Lacy <span class="text-blue-600">(414) 899-9920</span> via RingCentral
+                    </p>
+                    <div class="flex items-center gap-2 mt-2">
+                      <span class="text-sm font-medium text-gray-700">Call Outcome:</span>
+                      <span class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded">Left Voicemail</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- January Date Group -->
+            <div>
+              <h3 class="text-sm font-medium text-gray-500 mb-3">January, 2026</h3>
+
+              <!-- System Email -->
+              <div class="activity-item border rounded-lg p-4 mb-3 cursor-pointer transition-colors">
+                <div class="flex gap-3">
+                  <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fa-regular fa-envelope text-green-600"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                      <div class="flex items-center gap-2">
+                        <span class="font-medium text-gray-900">Email</span>
+                        <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">Opened</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <i class="fa-solid fa-reply text-xs"></i>
+                        <span>01/30/2026 @ 9:30 AM</span>
+                        <button class="p-1 hover:bg-gray-100 rounded">
+                          <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">
+                      Tracked System Email sent to Keajuana Lacy <span class="text-blue-600">lacymobilenotary@gmail.com</span>
+                    </p>
+                    <p class="text-xs text-blue-600 mb-2">Opened at 01/30/2026 @ 9:41 AM</p>
+                    <div class="bg-gray-50 rounded-lg p-3 border-l-4 border-blue-500">
+                      <p class="font-medium text-gray-900">Your Moving Estimate</p>
+                    </div>
+                    <button class="text-sm text-blue-600 hover:text-blue-700 mt-2">Expand</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Information Sidebar -->
+      <div class="w-80 flex-shrink-0">
+
+        <!-- Customer Info -->
+        <div class="p-4 border-b">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+              <i class="fa-regular fa-user mr-2"></i>Customer Info
+            </h3>
+            <button class="text-blue-600 hover:text-blue-700 text-sm">Edit</button>
+          </div>
+          <div class="space-y-2">
+            <div class="font-medium text-gray-900">Keajuana Lacy</div>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <i class="fa-solid fa-phone w-4"></i>
+              <a href="tel:4148999920" class="text-blue-600 hover:underline">(414) 899-9920</a>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <i class="fa-regular fa-envelope w-4"></i>
+              <a href="mailto:lacymobilenotary@gmail.com" class="text-blue-600 hover:underline">lacymobilenotary@gmail.com</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lead Details -->
+        <div class="p-4 border-b">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            <i class="fa-solid fa-chart-line mr-2"></i>Lead Details
+          </h3>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Quote Number</span>
+              <span class="text-sm font-medium text-gray-900">67550</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">Service Type</span>
+              <select class="text-sm font-medium text-gray-900 border rounded px-2 py-1 bg-white">
+                <option>Moving</option>
+                <option>Cleaning</option>
+                <option>Handyman</option>
+                <option>Landscaping</option>
+              </select>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Service Date</span>
+              <span class="text-sm font-medium text-gray-900">2/1/2026</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">Lead Status</span>
+              <select class="text-sm font-medium border rounded px-2 py-1 bg-amber-50 text-amber-700">
+                <option>New</option>
+                <option>Contacted</option>
+                <option selected>Qualified</option>
+                <option>Proposal Sent</option>
+                <option>Won</option>
+                <option>Lost</option>
+              </select>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500">Assigned To</span>
+              <select class="text-sm font-medium text-blue-600 border rounded px-2 py-1 bg-white">
+                <option selected>Daniela</option>
+                <option>John</option>
+                <option>Maria</option>
+              </select>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Estimator</span>
+              <span class="text-sm text-gray-400">Unassigned</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Source</span>
+              <span class="text-sm font-medium text-gray-900">Equate Media</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Est. Value</span>
+              <span class="text-sm font-bold text-green-600">$1,200</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Balance Due</span>
+              <span class="text-sm font-medium text-gray-900">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service Location -->
+        <div class="p-4 border-b">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            <i class="fa-solid fa-location-dot mr-2"></i>Service Location
+          </h3>
+          <div class="space-y-3">
+            <div>
+              <div class="text-xs text-gray-400 uppercase mb-1">Address</div>
+              <div class="text-sm text-gray-900">123 Main Street</div>
+              <div class="text-sm text-blue-600">Chandler, Arizona 85225</div>
+              <div class="text-xs text-gray-500">House • 0 flights of stairs</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Fields (Service-Specific) -->
+        <div class="p-4 border-b">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+              <i class="fa-solid fa-sliders mr-2"></i>Custom Fields
+            </h3>
+            <button class="text-blue-600 hover:text-blue-700 text-xs">+ Add Field</button>
+          </div>
+          <div class="space-y-3 text-sm">
+            <!-- These would change based on service type -->
+            <div class="flex justify-between">
+              <span class="text-gray-500">Move Size</span>
+              <span class="font-medium">1 Bedroom Apt (600-800 SQFT)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Branch</span>
+              <span class="font-medium">ARM Moving</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">Opportunity Type</span>
+              <span class="font-medium">Local</span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mt-3 italic">Fields are customizable per service type in Settings</p>
+        </div>
+
+        <!-- Raw Lead Data -->
+        <div class="p-4">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            <i class="fa-solid fa-code mr-2"></i>Inbound Lead Raw Body
+          </h3>
+          <button class="w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 border border-blue-200">
+            View Inbound Lead Raw Body
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Concept Label -->
+    <div class="mt-6 text-center text-gray-500 text-sm">
+      <strong>Concept A:</strong> Communication-First Layout — Prioritizes composing messages and viewing activity timeline
+    </div>
+
+  </div>
+
+  <script>
+    // Simple tab switching for demo
+    document.querySelectorAll('.comm-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.comm-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Template 5: Customer Preview (Shareable Link)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Header Banner -->
+  <div class="bg-blue-600 text-white text-center py-3 text-sm">
+    <i class="fas fa-lock mr-2"></i>
+    This is a secure estimate preview. Your information is protected.
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto my-8 px-4">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <!-- Company Header -->
+      <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-8 py-8 text-center">
+        <div class="w-20 h-20 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center">
+          <i class="fas fa-truck-moving text-3xl text-slate-800"></i>
+        </div>
+        <h1 class="text-2xl font-bold">ABC Moving Company</h1>
+        <p class="text-slate-300 mt-1">Professional Moving Services</p>
+      </div>
+
+      <!-- Estimate Header -->
+      <div class="px-8 py-6 border-b border-gray-100 text-center">
+        <p class="text-gray-500 uppercase tracking-wide text-sm mb-1">Estimate</p>
+        <h2 class="text-4xl font-bold text-gray-900">#67550</h2>
+      </div>
+
+      <!-- Customer & Dates -->
+      <div class="px-8 py-6 bg-gray-50 grid md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Prepared For</p>
+          <p class="font-semibold text-lg">John Smith</p>
+          <p class="text-gray-600">123 Main Street</p>
+          <p class="text-gray-600">Chandler, AZ 85225</p>
+          <p class="text-gray-600 mt-2">(555) 123-4567</p>
+          <p class="text-gray-600">john.smith@email.com</p>
+        </div>
+        <div class="md:text-right">
+          <div class="mb-4">
+            <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Estimate Date</p>
+            <p class="font-semibold">January 15, 2026</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Valid Until</p>
+            <p class="font-semibold text-orange-600">February 14, 2026</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service Details -->
+      <div class="px-8 py-6 border-b border-gray-100">
+        <h3 class="font-bold text-lg mb-4">Service Details</h3>
+
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-blue-50 rounded-xl p-4 text-center">
+            <i class="fas fa-truck text-blue-600 text-2xl mb-2"></i>
+            <p class="text-sm text-gray-500">Move Type</p>
+            <p class="font-semibold">Local Residential</p>
+          </div>
+          <div class="bg-blue-50 rounded-xl p-4 text-center">
+            <i class="far fa-calendar text-blue-600 text-2xl mb-2"></i>
+            <p class="text-sm text-gray-500">Scheduled Date</p>
+            <p class="font-semibold">February 1, 2026</p>
+          </div>
+          <div class="bg-blue-50 rounded-xl p-4 text-center">
+            <i class="far fa-clock text-blue-600 text-2xl mb-2"></i>
+            <p class="text-sm text-gray-500">Estimated Time</p>
+            <p class="font-semibold">8:00 AM - 12:00 PM</p>
+          </div>
+        </div>
+
+        <!-- Locations -->
+        <div class="space-y-4">
+          <div class="flex items-start gap-4 p-4 border border-gray-200 rounded-xl">
+            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-arrow-up text-green-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wide">From (Origin)</p>
+              <p class="font-semibold">123 Main Street, Chandler, AZ 85225</p>
+              <p class="text-sm text-gray-500 mt-1">1 Bedroom Apartment</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4 p-4 border border-gray-200 rounded-xl">
+            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-arrow-down text-red-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wide">To (Destination)</p>
+              <p class="font-semibold">456 Oak Avenue, Phoenix, AZ 85044</p>
+              <p class="text-sm text-gray-500 mt-1">Townhouse</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Breakdown -->
+      <div class="px-8 py-6 border-b border-gray-100">
+        <h3 class="font-bold text-lg mb-4">Pricing Breakdown</h3>
+
+        <!-- Crew Info -->
+        <div class="flex items-center justify-center gap-8 mb-6 py-4 bg-gray-50 rounded-xl">
+          <div class="text-center">
+            <i class="fas fa-truck text-gray-400 text-xl"></i>
+            <p class="font-bold text-xl mt-1">1</p>
+            <p class="text-xs text-gray-500">Truck</p>
+          </div>
+          <div class="text-center">
+            <i class="fas fa-users text-gray-400 text-xl"></i>
+            <p class="font-bold text-xl mt-1">2</p>
+            <p class="text-xs text-gray-500">Movers</p>
+          </div>
+          <div class="text-center">
+            <i class="far fa-clock text-gray-400 text-xl"></i>
+            <p class="font-bold text-xl mt-1">~2</p>
+            <p class="text-xs text-gray-500">Hours Est.</p>
+          </div>
+        </div>
+
+        <!-- Line Items -->
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="text-left px-4 py-3 text-sm font-medium text-gray-600">Description</th>
+                <th class="text-right px-4 py-3 text-sm font-medium text-gray-600">Amount</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr>
+                <td class="px-4 py-4">
+                  <p class="font-medium">Moving Services</p>
+                  <p class="text-sm text-gray-500">2 hours @ $150.00/hr</p>
+                </td>
+                <td class="px-4 py-4 text-right font-medium">$300.00</td>
+              </tr>
+              <tr>
+                <td class="px-4 py-4">
+                  <p class="font-medium">Trip Fee</p>
+                  <p class="text-sm text-gray-500">Travel to/from location</p>
+                </td>
+                <td class="px-4 py-4 text-right font-medium">$125.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Totals -->
+        <div class="mt-4 space-y-2">
+          <div class="flex justify-between py-2">
+            <span class="text-gray-600">Subtotal</span>
+            <span>$425.00</span>
+          </div>
+          <div class="flex justify-between py-2">
+            <span class="text-gray-600">Sales Tax (0%)</span>
+            <span>$0.00</span>
+          </div>
+          <div class="flex justify-between py-3 border-t-2 border-gray-200 text-xl font-bold">
+            <span>Estimated Total</span>
+            <span class="text-blue-600">$425.00</span>
+          </div>
+        </div>
+
+        <p class="mt-4 text-sm text-gray-500 text-center italic">
+          * Hourly rate service - final price will be based on actual time
+        </p>
+      </div>
+
+      <!-- Terms & Conditions -->
+      <div class="px-8 py-6 border-b border-gray-100">
+        <h3 class="font-bold text-lg mb-4">Terms & Conditions</h3>
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li class="flex items-start gap-2">
+            <i class="fas fa-check text-green-500 mt-0.5"></i>
+            <span>Payment due upon completion of services</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i class="fas fa-check text-green-500 mt-0.5"></i>
+            <span>48-hour cancellation notice required for full refund</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i class="fas fa-check text-green-500 mt-0.5"></i>
+            <span>Estimate valid for 30 days from issue date</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i class="fas fa-check text-green-500 mt-0.5"></i>
+            <span>Additional charges may apply for stairs, long carry, or special items</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Signature Section -->
+      <div class="px-8 py-6 bg-blue-50">
+        <div class="text-center mb-6">
+          <h3 class="font-bold text-lg mb-2">Ready to Book?</h3>
+          <p class="text-gray-600">By approving below, you agree to the terms and conditions outlined in this estimate.</p>
+        </div>
+
+        <!-- Signature Pad -->
+        <div class="bg-white border-2 border-dashed border-gray-300 rounded-xl p-8 mb-6 text-center">
+          <i class="fas fa-signature text-4xl text-gray-300 mb-3"></i>
+          <p class="text-gray-500">Click or tap to sign</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4">
+          <button class="flex-1 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-100 transition">
+            <i class="fas fa-times mr-2"></i>
+            Decline
+          </button>
+          <button class="flex-1 py-4 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition shadow-lg">
+            <i class="fas fa-check mr-2"></i>
+            Approve Estimate
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-8 py-6 bg-gray-50 text-center">
+        <p class="text-gray-600 mb-4">Questions about this estimate?</p>
+        <div class="flex items-center justify-center gap-6">
+          <a href="tel:5551234567" class="flex items-center gap-2 text-blue-600 hover:underline">
+            <i class="fas fa-phone"></i>
+            (555) 123-4567
+          </a>
+          <a href="mailto:info@abcmoving.com" class="flex items-center gap-2 text-blue-600 hover:underline">
+            <i class="fas fa-envelope"></i>
+            info@abcmoving.com
+          </a>
+        </div>
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <p class="text-xs text-gray-400">
+            Powered by <span class="font-semibold">ServicePro</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mobile Dispatch - Home View</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: #0f172a;
+      min-height: 100vh;
+    }
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      background: #ffffff;
+      border-radius: 40px;
+      border: 8px solid #334155;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .notch {
+      width: 150px;
+      height: 30px;
+      background: #334155;
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+    }
+    .scroll-container {
+      height: calc(100% - 60px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-container::-webkit-scrollbar { display: none; }
+    .pills-scroll::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="flex items-center justify-center p-8">
+
+  <div class="phone-frame">
+    <!-- Notch -->
+    <div class="notch"></div>
+
+    <!-- Header - Compact Mobile -->
+    <div class="bg-white px-3 py-2.5 border-b border-gray-200">
+      <!-- Row 1: Title + Action Icons -->
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-base font-semibold text-gray-900">Dispatch Center</h1>
+        <div class="flex items-center gap-1.5">
+          <button class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </button>
+          <button class="p-1.5 rounded-lg bg-blue-600 text-white">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Row 2: Date Nav (compact) -->
+      <div class="flex items-center gap-2 mb-2">
+        <button class="p-1 rounded border border-gray-200">
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <button class="p-1 rounded border border-gray-200">
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+        <button class="px-2 py-0.5 text-xs border border-gray-200 rounded text-gray-600">Today</button>
+        <span class="text-sm font-semibold text-gray-900 flex-1">Thu, Feb 6, 2026</span>
+      </div>
+
+      <!-- Row 3: View Switcher (horizontal scroll pills) -->
+      <div class="flex gap-1.5 overflow-x-auto pills-scroll -mx-1 px-1">
+        <button class="flex items-center gap-1 px-2.5 py-1 bg-blue-600 text-white rounded-full text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+          </svg>
+          Cards
+        </button>
+        <button class="flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+          </svg>
+          List
+        </button>
+        <button class="flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/>
+          </svg>
+          Kanban
+        </button>
+        <button class="flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          Timeline
+        </button>
+        <button class="flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium whitespace-nowrap">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+          Map
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Bar - Compact scrollable pills -->
+    <div class="flex items-center gap-3 px-3 py-2 bg-gray-50 border-b border-gray-200 overflow-x-auto pills-scroll">
+      <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+        <span class="text-gray-500">Total</span>
+        <span class="font-semibold text-gray-900">14</span>
+      </span>
+      <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+        <span class="text-gray-500">Unassigned</span>
+        <span class="font-semibold text-gray-900">3</span>
+      </span>
+      <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+        <span class="text-gray-500">Scheduled</span>
+        <span class="font-semibold text-gray-900">5</span>
+      </span>
+      <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+        <span class="text-gray-500">In Progress</span>
+        <span class="font-semibold text-gray-900">4</span>
+      </span>
+      <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+        <span class="text-gray-500">Done</span>
+        <span class="font-semibold text-gray-900">2</span>
+      </span>
+    </div>
+
+    <!-- Technician Filter Row -->
+    <div class="flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200">
+      <button class="flex items-center gap-1.5 px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-600">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        All Techs
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+      <button class="flex items-center gap-1.5 px-2.5 py-1.5 border border-gray-200 rounded-lg text-xs text-gray-600">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+        </svg>
+        Filters
+      </button>
+      <span class="text-xs text-gray-400 ml-auto">14 jobs</span>
+    </div>
+
+    <!-- Scrollable Cards -->
+    <div class="scroll-container bg-gray-50 px-3 py-3">
+
+      <!-- Urgent Card -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3">
+        <div class="h-1 bg-red-500"></div>
+        <div class="p-3">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <div class="flex items-center gap-1.5 mb-1">
+                <span class="text-xs px-1.5 py-0.5 bg-red-100 text-red-700 rounded font-medium">URGENT</span>
+                <span class="text-xs text-gray-400">9:00 AM</span>
+              </div>
+              <h3 class="font-semibold text-gray-900 text-sm">AC Repair - Not Cooling</h3>
+              <p class="text-xs text-gray-500">Smith Residence</p>
+            </div>
+            <button class="p-1 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            </svg>
+            123 Main St, Suite 4B
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-400 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                ~2 hrs
+              </span>
+              <span class="text-xs text-red-600 font-medium">Unassigned</span>
+            </div>
+            <div class="flex gap-1.5">
+              <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium">Assign</button>
+              <button class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium">Start</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- In Progress Card -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3">
+        <div class="h-1 bg-yellow-500"></div>
+        <div class="p-3">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <div class="flex items-center gap-1.5 mb-1">
+                <span class="text-xs px-1.5 py-0.5 bg-yellow-100 text-yellow-700 rounded font-medium">IN PROGRESS</span>
+                <span class="text-xs text-blue-600 font-mono font-medium">1:23:45</span>
+              </div>
+              <h3 class="font-semibold text-gray-900 text-sm">Johnson Family Move</h3>
+              <p class="text-xs text-gray-500">Local Residential Move</p>
+            </div>
+            <button class="p-1 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            </svg>
+            123 Oak St → 456 Pine Ave
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex -space-x-1.5">
+                <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium border-2 border-white">MT</div>
+                <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium border-2 border-white">SC</div>
+                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium border-2 border-white">DW</div>
+              </div>
+            </div>
+            <div class="flex gap-1.5">
+              <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium">View</button>
+              <button class="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-medium">Complete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scheduled Card -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3">
+        <div class="h-1 bg-blue-500"></div>
+        <div class="p-3">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <div class="flex items-center gap-1.5 mb-1">
+                <span class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded font-medium">SCHEDULED</span>
+                <span class="text-xs text-gray-400">11:30 AM</span>
+              </div>
+              <h3 class="font-semibold text-gray-900 text-sm">Furnace Installation</h3>
+              <p class="text-xs text-gray-500">Johnson Home</p>
+            </div>
+            <button class="p-1 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            </svg>
+            456 Oak Avenue
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium">MT</div>
+              <span class="text-xs text-gray-500">Mike T.</span>
+              <span class="text-xs text-gray-400">~3 hrs</span>
+            </div>
+            <div class="flex gap-1.5">
+              <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium">Navigate</button>
+              <button class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium">Start</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Another Scheduled -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3">
+        <div class="h-1 bg-blue-500"></div>
+        <div class="p-3">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <div class="flex items-center gap-1.5 mb-1">
+                <span class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded font-medium">SCHEDULED</span>
+                <span class="text-xs text-gray-400">2:00 PM</span>
+              </div>
+              <h3 class="font-semibold text-gray-900 text-sm">Annual Maintenance</h3>
+              <p class="text-xs text-gray-500">Wilson Residence</p>
+            </div>
+            <button class="p-1 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            </svg>
+            321 Elm Street
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium">JW</div>
+              <span class="text-xs text-gray-500">James W.</span>
+              <span class="text-xs text-gray-400">~1 hr</span>
+            </div>
+            <div class="flex gap-1.5">
+              <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium">View</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed (faded) -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3 opacity-50">
+        <div class="h-1 bg-green-500"></div>
+        <div class="p-3">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <div class="flex items-center gap-1.5 mb-1">
+                <span class="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded font-medium">COMPLETED</span>
+                <span class="text-xs text-gray-400">8:00 AM</span>
+              </div>
+              <h3 class="font-semibold text-gray-900 text-sm">HVAC Inspection</h3>
+              <p class="text-xs text-gray-500">Brown Family</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium">MT</div>
+              <span class="text-xs text-gray-500">Completed 9:15 AM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-8"></div>
+    </div>
+  </div>
+
+  <!-- Back link -->
+  <a href="index.html" class="fixed bottom-8 left-8 text-slate-400 hover:text-white flex items-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Back to mockups
+  </a>
+
+  <!-- Description -->
+  <div class="fixed top-8 right-8 max-w-xs text-right">
+    <h2 class="text-white font-semibold mb-1">Mobile Dispatch Home</h2>
+    <p class="text-slate-400 text-sm">Light theme cards view with compact header, horizontal view switcher pills, scrollable stats, and technician filter.</p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+export { JobDetailsPanel } from "./JobDetailsPanel";

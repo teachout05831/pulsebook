@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Map View - RIGHT Side Panel Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; }
+
+  /* Top bar */
+  .topbar {
+    height: 48px; background: #1e293b; color: #fff;
+    display: flex; align-items: center; padding: 0 16px; gap: 12px;
+    font-size: 14px; font-weight: 500; z-index: 10; position: relative;
+  }
+  .topbar .logo { font-weight: 700; color: #60a5fa; font-size: 16px; }
+  .topbar .divider { width: 1px; height: 24px; background: #475569; }
+  .topbar .view-toggle {
+    display: flex; gap: 2px; background: #334155; border-radius: 6px; padding: 2px;
+  }
+  .topbar .view-btn {
+    padding: 4px 12px; border-radius: 4px; border: none; cursor: pointer;
+    font-size: 12px; font-weight: 500; color: #94a3b8; background: transparent;
+  }
+  .topbar .view-btn.active { background: #1e293b; color: #fff; }
+
+  /* Main layout */
+  .main { display: flex; height: calc(100vh - 48px); position: relative; }
+
+  /* Side panel - RIGHT */
+  .side-panel {
+    width: 380px;
+    background: #fff;
+    border-left: 1px solid #e2e8f0;
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute; right: 0; top: 0; bottom: 0;
+    z-index: 20;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+  }
+  .side-panel.open { transform: translateX(0); }
+
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .panel-header h2 { font-size: 18px; font-weight: 600; color: #111827; }
+  .panel-header p { font-size: 13px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+  .panel-close {
+    background: none; border: none; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 16px; flex-shrink: 0;
+  }
+  .panel-close:hover { background: #f3f4f6; color: #374151; }
+
+  .panel-body {
+    flex: 1; overflow-y: auto; padding: 16px 20px;
+  }
+
+  /* Customer section */
+  .customer-section {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .customer-name { font-size: 15px; font-weight: 600; color: #111827; }
+  .customer-phone { font-size: 13px; color: #6b7280; margin-top: 2px; }
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 2px 10px;
+    border-radius: 9999px; background: #dbeafe; color: #1d4ed8;
+  }
+
+  /* Info rows */
+  .info-list { margin-bottom: 16px; }
+  .info-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 13px; color: #4b5563; margin-bottom: 8px;
+  }
+  .info-icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: #9ca3af; }
+
+  .divider { border-top: 1px solid #e5e7eb; margin: 12px 0; }
+
+  /* Controls */
+  .form-group { margin-bottom: 12px; }
+  .form-label { font-size: 12px; font-weight: 500; color: #374151; margin-bottom: 4px; display: block; }
+  .form-select {
+    width: 100%; padding: 7px 10px; font-size: 13px;
+    border: 1px solid #d1d5db; border-radius: 6px; background: #fff;
+  }
+  .tab-group {
+    display: flex; margin-bottom: 6px;
+    border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden;
+  }
+  .tab-btn {
+    flex: 1; padding: 5px 10px; font-size: 11px; font-weight: 500;
+    border: none; cursor: pointer; text-align: center;
+    background: #fff; color: #6b7280;
+  }
+  .tab-btn.active { background: #f3f4f6; color: #111827; }
+
+  /* Photos section */
+  .photos-section { margin-top: 4px; }
+  .photos-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .photos-title { font-size: 13px; font-weight: 600; color: #111827; }
+  .photos-count { font-size: 11px; color: #6b7280; }
+
+  .photo-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  }
+  .photo-thumb {
+    aspect-ratio: 1; border-radius: 6px; overflow: hidden; cursor: pointer;
+    position: relative; border: 1px solid #e5e7eb;
+    transition: transform 0.15s ease;
+  }
+  .photo-thumb:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-thumb .zoom-icon {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.15s ease;
+  }
+  .photo-thumb:hover .zoom-icon { opacity: 1; }
+  .zoom-icon svg { width: 20px; height: 20px; color: #fff; }
+
+  /* Footer */
+  .panel-footer {
+    padding: 12px 20px; border-top: 1px solid #e5e7eb;
+    display: flex; gap: 8px;
+  }
+  .btn {
+    padding: 7px 14px; font-size: 13px; font-weight: 500;
+    border-radius: 6px; cursor: pointer; border: none; flex: 1;
+  }
+  .btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+  .btn-outline:hover { background: #f9fafb; }
+  .btn-primary { background: #2563eb; color: #fff; }
+  .btn-primary:hover { background: #1d4ed8; }
+
+  /* Map area */
+  .map-area {
+    flex: 1; background: #e8eaed; position: relative;
+    transition: margin-right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .map-area.shifted { margin-right: 380px; }
+
+  /* Map pins */
+  .map-pin {
+    position: absolute; cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .map-pin:hover { transform: scale(1.2); z-index: 5; }
+  .map-pin.selected { transform: scale(1.3); z-index: 10; }
+  .pin-body {
+    width: 32px; height: 40px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pin-body svg { width: 32px; height: 40px; }
+  .pin-label {
+    position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .pin-tooltip {
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: #1e293b; color: #fff; padding: 6px 10px;
+    border-radius: 6px; font-size: 11px; white-space: nowrap;
+    opacity: 0; transition: opacity 0.15s ease; pointer-events: none;
+  }
+  .map-pin:hover .pin-tooltip { opacity: 1; }
+  .map-pin.selected .pin-tooltip { opacity: 1; background: #2563eb; }
+
+  /* Selected pin pulse ring */
+  .map-pin.selected .pin-body::after {
+    content: '';
+    position: absolute; top: -6px; left: -6px;
+    width: 44px; height: 44px;
+    border: 3px solid #2563eb;
+    border-radius: 50%;
+    animation: pulse-ring 1.5s ease-out infinite;
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+
+  /* Map controls */
+  .zoom-indicator {
+    position: absolute; bottom: 80px; right: 16px;
+    background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    overflow: hidden; transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .zoom-indicator.shifted { right: 396px; }
+  .zoom-btn {
+    display: block; width: 36px; height: 36px; border: none; background: #fff;
+    cursor: pointer; font-size: 18px; color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .zoom-btn:last-child { border-bottom: none; }
+  .zoom-btn:hover { background: #f3f4f6; }
+
+  .map-type-toggle {
+    position: absolute; top: 12px; right: 12px;
+    background: #fff; padding: 6px 12px; border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    font-size: 12px; font-weight: 500; color: #374151;
+    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .map-type-toggle.shifted { right: 396px; }
+
+  .map-legend {
+    position: absolute; bottom: 16px; left: 16px;
+    background: #fff; padding: 10px 14px; border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 11px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .legend-item:last-child { margin-bottom: 0; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Fake map background */
+  .map-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #dce8d0 0%, #e2dcc8 30%, #ddd8c6 50%, #d5ddd0 70%, #e0e4d6 100%);
+  }
+  .map-bg svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.15; }
+  .area-label {
+    position: absolute; font-weight: 500; letter-spacing: 2px; color: #666;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 85%; max-height: 80vh; border-radius: 8px; }
+  .lightbox-close {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255,255,255,0.15); border: none; color: #fff;
+    width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+    font-size: 20px; display: flex; align-items: center; justify-content: center;
+  }
+  .lightbox-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.15); border: none; color: #fff;
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 22px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lightbox-nav.prev { left: 16px; }
+  .lightbox-nav.next { right: 16px; }
+
+  /* Label */
+  .mockup-label {
+    position: fixed; top: 56px; left: 50%; transform: translateX(-50%);
+    background: #fef3c7; color: #92400e; padding: 6px 16px;
+    border-radius: 0 0 8px 8px; font-size: 12px; font-weight: 600;
+    z-index: 30; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+</style>
+</head>
+<body>
+
+<div class="mockup-label">RIGHT PANEL MOCKUP — Click a pin to open panel</div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <span class="logo">ServicePro</span>
+  <span class="divider"></span>
+  <span>Dispatch</span>
+  <span style="margin-left:auto;"></span>
+  <div class="view-toggle">
+    <button class="view-btn">Technician</button>
+    <button class="view-btn active">Map</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Map area -->
+  <div class="map-area" id="mapArea">
+    <div class="map-bg">
+      <svg>
+        <line x1="0" y1="30%" x2="100%" y2="28%" stroke="#888" stroke-width="3"/>
+        <line x1="0" y1="55%" x2="100%" y2="58%" stroke="#888" stroke-width="3"/>
+        <line x1="0" y1="75%" x2="100%" y2="72%" stroke="#888" stroke-width="2"/>
+        <line x1="20%" y1="0" x2="22%" y2="100%" stroke="#888" stroke-width="2"/>
+        <line x1="45%" y1="0" x2="42%" y2="100%" stroke="#888" stroke-width="3"/>
+        <line x1="70%" y1="0" x2="73%" y2="100%" stroke="#888" stroke-width="2"/>
+        <line x1="88%" y1="0" x2="85%" y2="100%" stroke="#888" stroke-width="2"/>
+      </svg>
+      <div class="area-label" style="top:18%;left:30%;font-size:13px;">SCOTTSDALE</div>
+      <div class="area-label" style="top:60%;left:55%;font-size:13px;">TEMPE</div>
+      <div class="area-label" style="top:45%;left:15%;font-size:13px;">PHOENIX</div>
+      <div class="area-label" style="top:35%;left:65%;font-size:11px;letter-spacing:1px;color:#888;">Paradise Valley</div>
+    </div>
+
+    <!-- Map pins -->
+    <div class="map-pin" id="pin1" style="top:22%;left:45%;" onclick="selectPin(1)">
+      <div class="pin-body">
+        <svg viewBox="0 0 32 40"><path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 24 16 24s16-12 16-24C32 7.16 24.84 0 16 0z" fill="#2563eb"/></svg>
+        <span class="pin-label">1</span>
+      </div>
+      <div class="pin-tooltip">AC Unit Repair — Adam Richardson</div>
+    </div>
+
+    <div class="map-pin" id="pin2" style="top:38%;left:35%;" onclick="selectPin(2)">
+      <div class="pin-body">
+        <svg viewBox="0 0 32 40"><path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 24 16 24s16-12 16-24C32 7.16 24.84 0 16 0z" fill="#2563eb"/></svg>
+        <span class="pin-label">2</span>
+      </div>
+      <div class="pin-tooltip">Plumbing Fix — Sarah Mitchell</div>
+    </div>
+
+    <div class="map-pin" id="pin3" style="top:50%;left:60%;" onclick="selectPin(3)">
+      <div class="pin-body">
+        <svg viewBox="0 0 32 40"><path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 24 16 24s16-12 16-24C32 7.16 24.84 0 16 0z" fill="#16a34a"/></svg>
+        <span class="pin-label">1</span>
+      </div>
+      <div class="pin-tooltip">Electrical Inspection — David Chen</div>
+    </div>
+
+    <div class="map-pin" id="pin4" style="top:30%;left:72%;" onclick="selectPin(4)">
+      <div class="pin-body">
+        <svg viewBox="0 0 32 40"><path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 24 16 24s16-12 16-24C32 7.16 24.84 0 16 0z" fill="#16a34a"/></svg>
+        <span class="pin-label">2</span>
+      </div>
+      <div class="pin-tooltip">Window Repair — Lisa Park</div>
+    </div>
+
+    <div class="map-pin" id="pin5" style="top:65%;left:40%;" onclick="selectPin(5)">
+      <div class="pin-body">
+        <svg viewBox="0 0 32 40"><path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 24 16 24s16-12 16-24C32 7.16 24.84 0 16 0z" fill="#dc2626"/></svg>
+        <span class="pin-label">1</span>
+      </div>
+      <div class="pin-tooltip">Roof Inspection — James Thompson</div>
+    </div>
+
+    <div class="map-pin" id="pin6" style="top:55%;left:25%;" onclick="selectPin(6)">
+      <div class="pin-body">
+        <svg viewBox="0 0 32 40"><path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 24 16 24s16-12 16-24C32 7.16 24.84 0 16 0z" fill="#6b7280"/></svg>
+        <span class="pin-label">?</span>
+      </div>
+      <div class="pin-tooltip">HVAC Maintenance — Unassigned</div>
+    </div>
+
+    <!-- Map controls -->
+    <div class="zoom-indicator" id="zoomCtrl">
+      <button class="zoom-btn">+</button>
+      <button class="zoom-btn">−</button>
+    </div>
+
+    <div class="map-type-toggle" id="mapTypeCtrl">Map ▾</div>
+
+    <div class="map-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#2563eb;"></div><span>Truck 1 — Adam R.</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#16a34a;"></div><span>Truck 2 — John S.</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#dc2626;"></div><span>Truck 3 — Jimmy G.</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#6b7280;"></div><span>Unassigned</span></div>
+    </div>
+  </div>
+
+  <!-- Right side panel -->
+  <div class="side-panel" id="panel">
+    <div class="panel-header">
+      <div>
+        <h2 id="panel-title">AC Unit Repair</h2>
+        <p id="panel-desc">Central AC not cooling properly. Customer reports warm air.</p>
+      </div>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+
+    <div class="panel-body">
+      <div class="customer-section">
+        <div>
+          <div class="customer-name">Adam Richardson</div>
+          <div class="customer-phone">📞 (480) 555-1234</div>
+        </div>
+        <span class="badge">Normal</span>
+      </div>
+
+      <div class="info-list">
+        <div class="info-row">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>4521 E Cactus Rd, Scottsdale, AZ 85254</span>
+        </div>
+        <div class="info-row">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>2026-02-09 at 07:00</span>
+        </div>
+        <div class="info-row">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>90 minutes</span>
+        </div>
+        <div class="info-row">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Test job for Adam Richardson</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select">
+          <option selected>Scheduled</option>
+          <option>In Progress</option>
+          <option>Completed</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Assigned Technician</label>
+        <div class="tab-group">
+          <button class="tab-btn active">Individual</button>
+          <button class="tab-btn">Crew</button>
+        </div>
+        <select class="form-select">
+          <option>Adam Richardson</option>
+          <option>John Smith</option>
+          <option>Jimmy G</option>
+        </select>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="photos-section">
+        <div class="photos-header">
+          <span class="photos-title">Job Photos</span>
+          <span class="photos-count">5 photos</span>
+        </div>
+        <div class="photo-grid">
+          <div class="photo-thumb" onclick="openLightbox(0)">
+            <img src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=200&h=200&fit=crop" />
+            <div class="zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+          </div>
+          <div class="photo-thumb" onclick="openLightbox(1)">
+            <img src="https://images.unsplash.com/photo-1631545806609-3c480a498e26?w=200&h=200&fit=crop" />
+            <div class="zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+          </div>
+          <div class="photo-thumb" onclick="openLightbox(2)">
+            <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=200&h=200&fit=crop" />
+            <div class="zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+          </div>
+          <div class="photo-thumb" onclick="openLightbox(3)">
+            <img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=200&h=200&fit=crop" />
+            <div class="zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+          </div>
+          <div class="photo-thumb" onclick="openLightbox(4)">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200&h=200&fit=crop" />
+            <div class="zoom-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-footer">
+      <button class="btn btn-outline" onclick="closePanel()">Close</button>
+      <button class="btn btn-primary">View Full Job →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav prev" onclick="event.stopPropagation(); navLightbox(-1)">‹</button>
+  <img id="lightbox-img" src="" onclick="event.stopPropagation()" />
+  <button class="lightbox-nav next" onclick="event.stopPropagation(); navLightbox(1)">›</button>
+</div>
+
+<script>
+  const photos = [
+    'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=900&h=700&fit=crop',
+    'https://images.unsplash.com/photo-1631545806609-3c480a498e26?w=900&h=700&fit=crop',
+    'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=900&h=700&fit=crop',
+    'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=900&h=700&fit=crop',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=900&h=700&fit=crop',
+  ];
+  let currentPhoto = 0;
+  let selectedPinId = null;
+
+  function selectPin(id) {
+    // Deselect previous
+    document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+
+    // Select new
+    const pin = document.getElementById('pin' + id);
+    pin.classList.add('selected');
+    selectedPinId = id;
+
+    // Open panel
+    document.getElementById('panel').classList.add('open');
+
+    // Shift map controls so they don't go behind panel
+    document.getElementById('zoomCtrl').classList.add('shifted');
+    document.getElementById('mapTypeCtrl').classList.add('shifted');
+  }
+
+  function closePanel() {
+    document.getElementById('panel').classList.remove('open');
+    document.getElementById('zoomCtrl').classList.remove('shifted');
+    document.getElementById('mapTypeCtrl').classList.remove('shifted');
+    document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+    selectedPinId = null;
+  }
+
+  function openLightbox(idx) {
+    currentPhoto = idx;
+    document.getElementById('lightbox-img').src = photos[idx];
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+  function navLightbox(dir) {
+    currentPhoto = (currentPhoto + dir + photos.length) % photos.length;
+    document.getElementById('lightbox-img').src = photos[currentPhoto];
+  }
+</script>
+
+</body>
+</html>

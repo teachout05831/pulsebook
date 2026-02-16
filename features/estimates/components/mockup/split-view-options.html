@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split View Layout Options — 13 Mockups</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .scroll-area::-webkit-scrollbar { width: 4px; }
+    .scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .preview-frame { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+  <!-- HEADER -->
+  <div class="bg-white border-b sticky top-0 z-50">
+    <div class="max-w-[1600px] mx-auto px-5 py-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-lg font-semibold">Estimate #EST-002</h1>
+            <span class="px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">Draft</span>
+          </div>
+          <div class="text-xs text-slate-500 mt-0.5">John Smith &bull; (555) 123-4567 &bull; john@email.com</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg font-medium">Send to Customer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION SELECTOR -->
+  <div class="bg-white border-b shadow-sm">
+    <div class="max-w-[1600px] mx-auto px-5 py-3">
+      <p class="text-xs font-medium text-slate-500 mb-2 uppercase tracking-wider">Choose a Layout Option</p>
+      <div class="flex gap-2 flex-wrap">
+        <button onclick="show(1)" id="btn1" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-blue-600 text-white">
+          A: Compact Sidebar + Wide Preview
+        </button>
+        <button onclick="show(2)" id="btn2" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-slate-100 text-slate-600 hover:bg-slate-200">
+          B: Two-Column Editor + Preview
+        </button>
+        <button onclick="show(3)" id="btn3" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-slate-100 text-slate-600 hover:bg-slate-200">
+          C: Tabbed Editor + Wide Preview
+        </button>
+        <button onclick="show(4)" id="btn4" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-slate-100 text-slate-600 hover:bg-slate-200">
+          D: Stacked Cards + Tall Preview
+        </button>
+        <button onclick="show(5)" id="btn5" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-slate-100 text-slate-600 hover:bg-slate-200">
+          E: Mini Sidebar + Full Preview
+        </button>
+        <button onclick="show(6)" id="btn6" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-green-100 text-green-700 hover:bg-green-200">
+          F: Balanced 50/50 + Sticky Priority
+        </button>
+        <button onclick="show(7)" id="btn7" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-green-100 text-green-700 hover:bg-green-200">
+          G: Floating Resources Dashboard
+        </button>
+        <button onclick="show(8)" id="btn8" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-green-100 text-green-700 hover:bg-green-200">
+          H: Enhanced D (Collapsible)
+        </button>
+        <button onclick="show(9)" id="btn9" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-green-100 text-green-700 hover:bg-green-200">
+          I: Three-Column Smart
+        </button>
+        <button onclick="show(10)" id="btn10" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-purple-100 text-purple-700 hover:bg-purple-200">
+          J: Two-Col + Resources Header
+        </button>
+        <button onclick="show(11)" id="btn11" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-purple-100 text-purple-700 hover:bg-purple-200">
+          K: Two-Col + Resources Left
+        </button>
+        <button onclick="show(12)" id="btn12" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-purple-100 text-purple-700 hover:bg-purple-200">
+          L: Two-Col + Horizontal Bar
+        </button>
+        <button onclick="show(13)" id="btn13" class="opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-purple-100 text-purple-700 hover:bg-purple-200">
+          M: Two-Col + Resources Sidebar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-[1600px] mx-auto px-5 py-4">
+
+    <!-- ══════════ OPTION A: Compact Sidebar (320px) + Wide Preview ══════════ -->
+    <div id="opt1" class="fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">Option A</span>
+        <span class="text-sm text-slate-600">Narrow editor sidebar (~320px) with condensed cards. Preview gets most of the space.</span>
+      </div>
+      <div class="grid grid-cols-[320px_1fr] gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Editor Sidebar -->
+        <div class="space-y-2 overflow-y-auto h-full pr-1 scroll-area">
+          <div class="bg-white rounded-lg border p-3">
+            <h3 class="text-xs font-semibold text-slate-900 mb-2">Quote Info</h3>
+            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5">
+              <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+              <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Sales Rep</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Lead Status</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>None</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Crew</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+            <div class="space-y-1">
+              <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin:</span> 123 Oak St, Austin TX</div>
+              <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest:</span> 456 Pine Ave, Dallas TX</div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <h3 class="text-xs font-semibold mb-2">Resources</h3>
+            <div class="grid grid-cols-4 gap-2 text-center">
+              <div><p class="text-[10px] text-slate-400">TRUCKS</p><p class="text-lg font-bold">1</p></div>
+              <div><p class="text-[10px] text-slate-400">TEAM</p><p class="text-lg font-bold">2</p></div>
+              <div><p class="text-[10px] text-slate-400">MIN HRS</p><p class="text-lg font-bold">4</p></div>
+              <div><p class="text-[10px] text-slate-400">MAX</p><p class="text-lg font-bold">6</p></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] py-1 border-b border-slate-100"><span class="truncate flex-1">Long Distance Base</span><span class="font-medium ml-2">$1,800</span></div>
+              <div class="flex justify-between text-[11px] py-1 border-b border-slate-100"><span class="truncate flex-1">Packing Service</span><span class="font-medium ml-2">$650</span></div>
+              <div class="flex justify-between text-[11px] py-1 border-b border-slate-100"><span class="truncate flex-1">Disassembly/Assembly</span><span class="font-medium ml-2">$250</span></div>
+              <div class="flex justify-between text-[11px] py-1"><span class="truncate flex-1">Blankets (15x$10)</span><span class="font-medium ml-2">$150</span></div>
+            </div>
+            <div class="border-t mt-2 pt-2 flex justify-between text-xs font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <h3 class="text-xs font-semibold mb-2">Notes</h3>
+            <textarea class="w-full text-[11px] border rounded p-2 h-16 resize-none" placeholder="Internal notes..."></textarea>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Page Sections</h3><a class="text-[10px] text-blue-600">Full Builder &rarr;</a></div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] px-2 py-1 rounded hover:bg-slate-50"><span>Hero</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between text-[11px] px-2 py-1 rounded hover:bg-slate-50"><span>Pricing</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between text-[11px] px-2 py-1 rounded hover:bg-slate-50"><span>Testimonials</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between text-[11px] px-2 py-1 rounded hover:bg-slate-50"><span>Approval</span><span class="text-blue-500">&#128065;</span></div>
+            </div>
+            <button class="w-full mt-2 text-[11px] py-1.5 border border-dashed rounded text-slate-500">+ Add Section</button>
+          </div>
+        </div>
+        <!-- PREVIEW - Wide -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <!-- Chrome bar with device toggle -->
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(1,'desktop')" id="desk-1" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(1,'mobile')" id="mob-1" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- Desktop view -->
+          <div id="preview-desktop-1" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4"><span>#EST-002</span><span>|</span><span>Prepared for John</span></div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-4">Hi Sarah! &#128075;</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team. Here's everything you need to know about your upcoming move.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Est. Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing Details</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Long Distance Base</span><span class="font-medium">$1,800.00</span></div>
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Packing Service</span><span class="font-medium">$650.00</span></div>
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Disassembly/Assembly</span><span class="font-medium">$250.00</span></div>
+                <div class="flex justify-between py-2"><span class="text-sm">Blankets & Padding</span><span class="font-medium">$150.00</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 space-y-2">
+                <div class="flex justify-between"><span class="text-slate-500">Subtotal</span><span>$2,850.00</span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Tax (8.25%)</span><span>$235.13</span></div>
+                <div class="flex justify-between text-lg font-bold pt-2 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              </div>
+              <div class="mt-8 text-center py-6 bg-slate-50 rounded-lg">
+                <button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve Estimate</button>
+              </div>
+            </div>
+          </div>
+          <!-- Mobile view -->
+          <div id="preview-mobile-1" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002 | For John</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">February 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! &#128075;</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span class="font-medium">$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 space-y-1">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Subtotal</span><span>$2,850</span></div>
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Tax</span><span>$235.13</span></div>
+                    <div class="flex justify-between text-sm font-bold pt-1 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+                  </div>
+                  <div class="mt-4 text-center py-3 bg-slate-50 rounded-lg">
+                    <button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve Estimate</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION B: Two-Column Editor + Preview ══════════ -->
+    <div id="opt2" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">Option B</span>
+        <span class="text-sm text-slate-600">Editor cards in 2 columns (~55%). Preview takes ~45%.</span>
+      </div>
+      <div class="grid grid-cols-[55%_1fr] gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Editor - 2 columns -->
+        <div class="overflow-y-auto h-full pr-1 scroll-area">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+              <div class="space-y-1.5">
+                <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+                <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+                <div><label class="text-[10px] text-slate-400">Sales Rep</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+                <div><label class="text-[10px] text-slate-400">Lead Status</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>None</option></select></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <div class="space-y-1.5">
+                <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin</span><br>123 Oak St, Austin TX</div>
+                <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest</span><br>456 Pine Ave, Dallas TX</div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Resources</h3>
+              <div class="grid grid-cols-2 gap-2 text-center">
+                <div><p class="text-[10px] text-slate-400">TRUCKS</p><p class="text-xl font-bold">1</p></div>
+                <div><p class="text-[10px] text-slate-400">TEAM</p><p class="text-xl font-bold">2</p></div>
+                <div><p class="text-[10px] text-slate-400">MIN HRS</p><p class="text-xl font-bold">4</p></div>
+                <div><p class="text-[10px] text-slate-400">MAX HRS</p><p class="text-xl font-bold">6</p></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Notes</h3>
+              <textarea class="w-full text-[11px] border rounded p-2 h-20 resize-none" placeholder="Internal notes..."></textarea>
+              <textarea class="w-full text-[11px] border rounded p-2 h-12 resize-none mt-1.5" placeholder="Customer notes..."></textarea>
+            </div>
+            <div class="bg-white rounded-lg border p-3 col-span-2">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add Item</button></div>
+              <table class="w-full text-[11px]">
+                <thead><tr class="text-slate-400"><th class="text-left py-1 font-medium">Description</th><th class="text-center w-14 font-medium">Qty</th><th class="text-right w-20 font-medium">Price</th><th class="text-right w-20 font-medium">Total</th></tr></thead>
+                <tbody>
+                  <tr class="border-b"><td class="py-1.5">Long Distance Base Rate</td><td class="text-center">1</td><td class="text-right">$1,800</td><td class="text-right font-medium">$1,800</td></tr>
+                  <tr class="border-b"><td class="py-1.5">Full Packing Service</td><td class="text-center">1</td><td class="text-right">$650</td><td class="text-right font-medium">$650</td></tr>
+                  <tr class="border-b"><td class="py-1.5">Disassembly/Assembly</td><td class="text-center">1</td><td class="text-right">$250</td><td class="text-right font-medium">$250</td></tr>
+                  <tr><td class="py-1.5">Blankets & Padding</td><td class="text-center">15</td><td class="text-right">$10</td><td class="text-right font-medium">$150</td></tr>
+                </tbody>
+              </table>
+              <div class="border-t mt-2 pt-2 flex justify-between text-xs"><span class="text-slate-500">Subtotal</span><span>$2,850.00</span></div>
+              <div class="flex justify-between text-xs"><span class="text-slate-500">Tax</span><span>$235.13</span></div>
+              <div class="flex justify-between text-sm font-bold mt-1 pt-1 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+            </div>
+            <div class="bg-white rounded-lg border p-3 col-span-2">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Page Sections</h3><a class="text-[10px] text-blue-600">Full Builder &rarr;</a></div>
+              <div class="flex gap-2 flex-wrap">
+                <span class="inline-flex items-center gap-1 px-2 py-1 text-[11px] bg-blue-50 text-blue-700 rounded-md">&#128065; Hero</span>
+                <span class="inline-flex items-center gap-1 px-2 py-1 text-[11px] bg-blue-50 text-blue-700 rounded-md">&#128065; Pricing</span>
+                <span class="inline-flex items-center gap-1 px-2 py-1 text-[11px] bg-blue-50 text-blue-700 rounded-md">&#128065; Testimonials</span>
+                <span class="inline-flex items-center gap-1 px-2 py-1 text-[11px] bg-slate-100 text-slate-400 rounded-md">&#128065; FAQ</span>
+                <span class="inline-flex items-center gap-1 px-2 py-1 text-[11px] bg-blue-50 text-blue-700 rounded-md">&#128065; Approval</span>
+                <button class="px-2 py-1 text-[11px] border border-dashed rounded-md text-slate-500">+ Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Preview -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(2,'desktop')" id="desk-2" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(2,'mobile')" id="mob-2" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- Desktop -->
+          <div id="preview-desktop-2" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-14 px-6">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002 | Prepared for John</div>
+              <h2 class="text-3xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-6 bg-white">
+              <h3 class="text-base font-semibold mb-3">Hi Sarah! &#128075;</h3>
+              <p class="text-slate-600 text-sm mb-5">Thanks for choosing our team.</p>
+              <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="text-center p-3 bg-blue-50 rounded-lg"><p class="text-xl font-bold text-blue-600">1</p><p class="text-[11px] text-slate-500">Trucks</p></div>
+                <div class="text-center p-3 bg-blue-50 rounded-lg"><p class="text-xl font-bold text-blue-600">2</p><p class="text-[11px] text-slate-500">Movers</p></div>
+                <div class="text-center p-3 bg-blue-50 rounded-lg"><p class="text-xl font-bold text-blue-600">6</p><p class="text-[11px] text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-base font-semibold mb-3">Pricing</h3>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between py-1.5 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                <div class="flex justify-between py-1.5 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                <div class="flex justify-between py-1.5 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                <div class="flex justify-between py-1.5"><span>Blankets</span><span class="font-medium">$150</span></div>
+              </div>
+              <div class="border-t mt-3 pt-3 flex justify-between font-bold text-lg"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              <div class="mt-6 text-center"><button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg">Approve Estimate</button></div>
+            </div>
+          </div>
+          <!-- Mobile -->
+          <div id="preview-mobile-2" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002 | For John</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">February 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! &#128075;</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span class="font-medium">$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 space-y-1">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Subtotal</span><span>$2,850</span></div>
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Tax</span><span>$235.13</span></div>
+                    <div class="flex justify-between text-sm font-bold pt-1 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+                  </div>
+                  <div class="mt-4 text-center py-3 bg-slate-50 rounded-lg">
+                    <button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve Estimate</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION C: Tabbed Editor + Wide Preview ══════════ -->
+    <div id="opt3" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">Option C</span>
+        <span class="text-sm text-slate-600">Editor panel uses tabs (Details / Pricing / Page) to save horizontal space. Preview takes ~60%.</span>
+      </div>
+      <div class="grid grid-cols-[360px_1fr] gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Tabbed Editor -->
+        <div class="bg-white rounded-lg border h-full flex flex-col overflow-hidden">
+          <div class="flex border-b">
+            <button onclick="setTab('details')" id="tab-details" class="tab-btn flex-1 px-3 py-2.5 text-xs font-medium text-blue-600 border-b-2 border-blue-600">Details</button>
+            <button onclick="setTab('pricing')" id="tab-pricing" class="tab-btn flex-1 px-3 py-2.5 text-xs font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700">Pricing</button>
+            <button onclick="setTab('page')" id="tab-page" class="tab-btn flex-1 px-3 py-2.5 text-xs font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700">Page</button>
+          </div>
+          <div id="panel-details" class="flex-1 overflow-y-auto p-3 space-y-3 scroll-area">
+            <div>
+              <h3 class="text-xs font-semibold text-slate-900 mb-2">Quote Info</h3>
+              <div class="space-y-1.5">
+                <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-1"><option>Long Distance</option></select></div>
+                <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-1"><option>Website</option></select></div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div><label class="text-[10px] text-slate-400">Sales Rep</label><select class="w-full text-[11px] border rounded px-1.5 py-1"><option>Unassigned</option></select></div>
+                  <div><label class="text-[10px] text-slate-400">Crew</label><select class="w-full text-[11px] border rounded px-1.5 py-1"><option>Unassigned</option></select></div>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <div>
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <div class="space-y-1.5">
+                <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin:</span> 123 Oak St, Austin TX</div>
+                <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest:</span> 456 Pine Ave, Dallas TX</div>
+              </div>
+            </div>
+            <hr>
+            <div>
+              <h3 class="text-xs font-semibold mb-2">Resources</h3>
+              <div class="grid grid-cols-4 gap-2 text-center">
+                <div><p class="text-[10px] text-slate-400">TRUCKS</p><p class="text-lg font-bold">1</p></div>
+                <div><p class="text-[10px] text-slate-400">TEAM</p><p class="text-lg font-bold">2</p></div>
+                <div><p class="text-[10px] text-slate-400">MIN</p><p class="text-lg font-bold">4</p></div>
+                <div><p class="text-[10px] text-slate-400">MAX</p><p class="text-lg font-bold">6</p></div>
+              </div>
+            </div>
+            <hr>
+            <div>
+              <h3 class="text-xs font-semibold mb-2">Notes</h3>
+              <textarea class="w-full text-[11px] border rounded p-2 h-16 resize-none" placeholder="Internal notes..."></textarea>
+              <textarea class="w-full text-[11px] border rounded p-2 h-12 resize-none mt-1.5" placeholder="Customer notes..."></textarea>
+            </div>
+          </div>
+          <div id="panel-pricing" class="hidden flex-1 overflow-y-auto p-3 space-y-3 scroll-area">
+            <div class="flex justify-between items-center"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+            <div class="space-y-2">
+              <div class="p-2 border rounded"><div class="flex justify-between text-[11px] mb-1"><span class="font-medium">Long Distance Base Rate</span><span>$1,800</span></div><div class="flex gap-2"><input class="w-14 text-[10px] border rounded px-1.5 py-0.5 text-center" value="1"><span class="text-[10px] text-slate-400">&times;</span><input class="w-20 text-[10px] border rounded px-1.5 py-0.5 text-right" value="$1,800.00"></div></div>
+              <div class="p-2 border rounded"><div class="flex justify-between text-[11px] mb-1"><span class="font-medium">Full Packing Service</span><span>$650</span></div><div class="flex gap-2"><input class="w-14 text-[10px] border rounded px-1.5 py-0.5 text-center" value="1"><span class="text-[10px] text-slate-400">&times;</span><input class="w-20 text-[10px] border rounded px-1.5 py-0.5 text-right" value="$650.00"></div></div>
+              <div class="p-2 border rounded"><div class="flex justify-between text-[11px] mb-1"><span class="font-medium">Disassembly/Assembly</span><span>$250</span></div><div class="flex gap-2"><input class="w-14 text-[10px] border rounded px-1.5 py-0.5 text-center" value="1"><span class="text-[10px] text-slate-400">&times;</span><input class="w-20 text-[10px] border rounded px-1.5 py-0.5 text-right" value="$250.00"></div></div>
+              <div class="p-2 border rounded"><div class="flex justify-between text-[11px] mb-1"><span class="font-medium">Blankets & Padding</span><span>$150</span></div><div class="flex gap-2"><input class="w-14 text-[10px] border rounded px-1.5 py-0.5 text-center" value="15"><span class="text-[10px] text-slate-400">&times;</span><input class="w-20 text-[10px] border rounded px-1.5 py-0.5 text-right" value="$10.00"></div></div>
+            </div>
+            <div class="border-t pt-2 space-y-1">
+              <div class="flex justify-between text-[11px]"><span class="text-slate-500">Subtotal</span><span>$2,850.00</span></div>
+              <div class="flex justify-between text-[11px]"><span class="text-slate-500">Tax (8.25%)</span><span>$235.13</span></div>
+              <div class="flex justify-between text-sm font-bold border-t pt-1 mt-1"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+            </div>
+            <hr>
+            <div><h3 class="text-xs font-semibold mb-2">Estimate Type</h3><select class="w-full text-[11px] border rounded px-2 py-1"><option>Hourly</option><option>Flat Rate</option></select></div>
+          </div>
+          <div id="panel-page" class="hidden flex-1 overflow-y-auto p-3 space-y-3 scroll-area">
+            <div class="flex justify-between items-center"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Full Builder &rarr;</a></div>
+            <div class="space-y-1">
+              <div class="flex justify-between items-center px-2 py-1.5 rounded hover:bg-slate-50 text-[11px]"><span>Hero</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between items-center px-2 py-1.5 rounded hover:bg-slate-50 text-[11px]"><span>Pricing Details</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between items-center px-2 py-1.5 rounded hover:bg-slate-50 text-[11px]"><span>Testimonials</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between items-center px-2 py-1.5 rounded hover:bg-slate-50 text-[11px]"><span>FAQ</span><span class="text-slate-300">&#128065;</span></div>
+              <div class="flex justify-between items-center px-2 py-1.5 rounded hover:bg-slate-50 text-[11px]"><span>Approval</span><span class="text-blue-500">&#128065;</span></div>
+            </div>
+            <button class="w-full py-2 text-[11px] border border-dashed rounded-lg text-slate-500">+ Add Section</button>
+            <hr>
+            <button class="w-full py-2 text-[11px] border border-dashed rounded-lg text-slate-500">&#127912; Apply Template</button>
+            <hr>
+            <h3 class="text-xs font-semibold">Send</h3>
+            <button class="w-full py-2 text-[11px] bg-blue-50 rounded-lg text-blue-700">&#9993; Send via Email</button>
+            <button class="w-full py-2 text-[11px] bg-green-50 rounded-lg text-green-700">&#128172; Send via Text</button>
+            <button class="w-full py-2 text-[11px] bg-purple-50 rounded-lg text-purple-700">&#128279; Copy Link</button>
+          </div>
+        </div>
+        <!-- Preview - Wide -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(3,'desktop')" id="desk-3" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(3,'mobile')" id="mob-3" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- Desktop -->
+          <div id="preview-desktop-3" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002 | Prepared for John</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-3">Hi Sarah! &#128075;</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team. Here's everything you need to know about your upcoming move.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing Details</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Long Distance Base Rate</span><span class="font-medium">$1,800.00</span></div>
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Packing Service</span><span class="font-medium">$650.00</span></div>
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Disassembly/Assembly</span><span class="font-medium">$250.00</span></div>
+                <div class="flex justify-between py-2"><span class="text-sm">Blankets & Padding</span><span class="font-medium">$150.00</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 space-y-2">
+                <div class="flex justify-between"><span class="text-slate-500">Subtotal</span><span>$2,850.00</span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Tax (8.25%)</span><span>$235.13</span></div>
+                <div class="flex justify-between text-lg font-bold pt-2 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              </div>
+              <div class="mt-8 text-center py-6 bg-slate-50 rounded-lg">
+                <button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve Estimate</button>
+              </div>
+            </div>
+          </div>
+          <!-- Mobile -->
+          <div id="preview-mobile-3" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002 | For John</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">February 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! &#128075;</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span class="font-medium">$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 space-y-1">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Subtotal</span><span>$2,850</span></div>
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Tax</span><span>$235.13</span></div>
+                    <div class="flex justify-between text-sm font-bold pt-1 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+                  </div>
+                  <div class="mt-4 text-center py-3 bg-slate-50 rounded-lg">
+                    <button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve Estimate</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION D: Stacked Cards (left) + Tall Preview ══════════ -->
+    <div id="opt4" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">Option D</span>
+        <span class="text-sm text-slate-600">Similar to current but with 40/60 split. Editor cards stacked in ~40%, preview gets 60%.</span>
+      </div>
+      <div class="grid grid-cols-[40%_1fr] gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Editor - Stacked -->
+        <div class="space-y-2 overflow-y-auto h-full pr-1 scroll-area">
+          <div class="bg-white rounded-lg border p-3">
+            <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5">
+              <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+              <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Sales Rep</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Lead Status</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>None</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Crew</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+            <div class="space-y-1"><div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin:</span> 123 Oak St, Austin TX</div><div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest:</span> 456 Pine Ave, Dallas TX</div></div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <h3 class="text-xs font-semibold mb-2">Resources</h3>
+            <div class="grid grid-cols-4 gap-2 text-center">
+              <div><p class="text-[10px] text-slate-400">TRUCKS</p><p class="text-lg font-bold">1</p></div>
+              <div><p class="text-[10px] text-slate-400">TEAM</p><p class="text-lg font-bold">2</p></div>
+              <div><p class="text-[10px] text-slate-400">MIN</p><p class="text-lg font-bold">4</p></div>
+              <div><p class="text-[10px] text-slate-400">MAX</p><p class="text-lg font-bold">6</p></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] py-1 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+              <div class="flex justify-between text-[11px] py-1 border-b"><span>Packing Service</span><span class="font-medium">$650</span></div>
+              <div class="flex justify-between text-[11px] py-1 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+              <div class="flex justify-between text-[11px] py-1"><span>Blankets (15x$10)</span><span class="font-medium">$150</span></div>
+            </div>
+            <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <h3 class="text-xs font-semibold mb-2">Notes</h3>
+            <textarea class="w-full text-[11px] border rounded p-2 h-14 resize-none" placeholder="Internal notes..."></textarea>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Builder &rarr;</a></div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Testimonials</span><span class="text-blue-500">&#128065;</span></div>
+              <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Approval</span><span class="text-blue-500">&#128065;</span></div>
+            </div>
+            <button class="w-full mt-2 py-1.5 text-[11px] border border-dashed rounded text-slate-500">+ Add Section</button>
+          </div>
+        </div>
+        <!-- Preview - Wider -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(4,'desktop')" id="desk-4" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(4,'mobile')" id="mob-4" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- Desktop -->
+          <div id="preview-desktop-4" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002 | Prepared for John</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-3">Hi Sarah! &#128075;</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing Details</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800.00</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Packing</span><span class="font-medium">$650.00</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Disassembly</span><span class="font-medium">$250.00</span></div>
+                <div class="flex justify-between py-2"><span>Blankets</span><span class="font-medium">$150.00</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 flex justify-between text-lg font-bold"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              <div class="mt-8 text-center"><button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve Estimate</button></div>
+            </div>
+          </div>
+          <!-- Mobile -->
+          <div id="preview-mobile-4" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002 | For John</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">February 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! &#128075;</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span class="font-medium">$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 space-y-1">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Subtotal</span><span>$2,850</span></div>
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Tax</span><span>$235.13</span></div>
+                    <div class="flex justify-between text-sm font-bold pt-1 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+                  </div>
+                  <div class="mt-4 text-center py-3 bg-slate-50 rounded-lg">
+                    <button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve Estimate</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION E: Mini Sidebar (icons + expand) + Full Preview ══════════ -->
+    <div id="opt5" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">Option E</span>
+        <span class="text-sm text-slate-600">Icon-based mini sidebar (~60px collapsed, ~320px expanded). Preview takes almost full width. Click icons to expand sections.</span>
+      </div>
+      <div class="flex gap-3 items-start" style="height:calc(100vh - 240px)">
+        <!-- Mini Sidebar -->
+        <div id="mini-sidebar" class="bg-white rounded-lg border flex h-full overflow-hidden transition-all" style="width:60px; min-width:60px;">
+          <!-- Icon Strip -->
+          <div class="w-[60px] min-w-[60px] border-r flex flex-col items-center py-3 gap-1">
+            <button onclick="togglePanel('quote')" class="sidebar-icon p-2.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors" title="Quote Info">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </button>
+            <button onclick="togglePanel('stops')" class="sidebar-icon p-2.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors" title="Stops">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </button>
+            <button onclick="togglePanel('resources')" class="sidebar-icon p-2.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors" title="Resources">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </button>
+            <button onclick="togglePanel('pricing')" class="sidebar-icon p-2.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors" title="Pricing">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
+            </button>
+            <button onclick="togglePanel('notes')" class="sidebar-icon p-2.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors" title="Notes">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button onclick="togglePanel('sections')" class="sidebar-icon p-2.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600 transition-colors" title="Sections">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            </button>
+            <div class="flex-1"></div>
+            <div class="text-xs font-bold text-blue-600 pb-2">$3,085</div>
+          </div>
+          <!-- Expandable Panel -->
+          <div id="expanded-panel" class="w-[260px] overflow-y-auto scroll-area hidden">
+            <div id="epanel-quote" class="hidden p-3 space-y-1.5">
+              <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+              <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Sales Rep</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Lead Status</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>None</option></select></div>
+            </div>
+            <div id="epanel-stops" class="hidden p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <div class="p-2 bg-green-50 rounded text-[11px] mb-1"><span class="text-green-700 font-medium">Origin:</span> 123 Oak St, Austin TX</div>
+              <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest:</span> 456 Pine Ave, Dallas TX</div>
+            </div>
+            <div id="epanel-resources" class="hidden p-3">
+              <h3 class="text-xs font-semibold mb-2">Resources</h3>
+              <div class="grid grid-cols-2 gap-2 text-center"><div><p class="text-[10px] text-slate-400">TRUCKS</p><p class="text-lg font-bold">1</p></div><div><p class="text-[10px] text-slate-400">TEAM</p><p class="text-lg font-bold">2</p></div><div><p class="text-[10px] text-slate-400">MIN</p><p class="text-lg font-bold">4</p></div><div><p class="text-[10px] text-slate-400">MAX</p><p class="text-lg font-bold">6</p></div></div>
+            </div>
+            <div id="epanel-pricing" class="hidden p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <div class="space-y-1"><div class="flex justify-between text-[11px] py-1 border-b"><span>Base Rate</span><span>$1,800</span></div><div class="flex justify-between text-[11px] py-1 border-b"><span>Packing</span><span>$650</span></div><div class="flex justify-between text-[11px] py-1 border-b"><span>Assembly</span><span>$250</span></div><div class="flex justify-between text-[11px] py-1"><span>Blankets</span><span>$150</span></div></div>
+              <div class="border-t mt-2 pt-2 flex justify-between text-xs font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+            </div>
+            <div id="epanel-notes" class="hidden p-3">
+              <h3 class="text-xs font-semibold mb-2">Notes</h3>
+              <textarea class="w-full text-[11px] border rounded p-2 h-24 resize-none" placeholder="Internal notes..."></textarea>
+            </div>
+            <div id="epanel-sections" class="hidden p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Builder &rarr;</a></div>
+              <div class="space-y-1"><div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span>&#128065;</span></div><div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span>&#128065;</span></div><div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Testimonials</span><span>&#128065;</span></div><div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Approval</span><span>&#128065;</span></div></div>
+              <button class="w-full mt-2 py-1.5 text-[11px] border border-dashed rounded text-slate-500">+ Add Section</button>
+            </div>
+          </div>
+        </div>
+        <!-- Preview - Almost full width -->
+        <div class="flex-1 h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(5,'desktop')" id="desk-5" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(5,'mobile')" id="mob-5" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- Desktop -->
+          <div id="preview-desktop-5" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-20 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002 | Prepared for John</div>
+              <h2 class="text-5xl font-bold mb-3">Estimate EST-002</h2>
+              <p class="text-lg text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="max-w-3xl mx-auto p-10 bg-white">
+              <h3 class="text-xl font-semibold mb-4">Hi Sarah! &#128075;</h3>
+              <p class="text-slate-600 mb-8">Thanks for choosing our team. Here's everything you need to know about your upcoming move.</p>
+              <div class="grid grid-cols-3 gap-6 mb-10">
+                <div class="text-center p-6 bg-blue-50 rounded-xl"><p class="text-3xl font-bold text-blue-600">1</p><p class="text-sm text-slate-500">Trucks</p></div>
+                <div class="text-center p-6 bg-blue-50 rounded-xl"><p class="text-3xl font-bold text-blue-600">2</p><p class="text-sm text-slate-500">Movers</p></div>
+                <div class="text-center p-6 bg-blue-50 rounded-xl"><p class="text-3xl font-bold text-blue-600">6</p><p class="text-sm text-slate-500">Est. Hours</p></div>
+              </div>
+              <h3 class="text-xl font-semibold mb-5">Pricing Details</h3>
+              <div class="space-y-4">
+                <div class="flex justify-between py-3 border-b"><span>Long Distance Moving — Base Rate</span><span class="font-medium">$1,800.00</span></div>
+                <div class="flex justify-between py-3 border-b"><span>Full Packing Service</span><span class="font-medium">$650.00</span></div>
+                <div class="flex justify-between py-3 border-b"><span>Furniture Disassembly/Assembly</span><span class="font-medium">$250.00</span></div>
+                <div class="flex justify-between py-3"><span>Moving Blankets & Padding <span class="text-slate-400 text-sm">15 x $10</span></span><span class="font-medium">$150.00</span></div>
+              </div>
+              <div class="border-t mt-5 pt-5 space-y-2">
+                <div class="flex justify-between text-slate-500"><span>Subtotal</span><span>$2,850.00</span></div>
+                <div class="flex justify-between text-slate-500"><span>Tax (8.25%)</span><span>$235.13</span></div>
+                <div class="flex justify-between text-xl font-bold pt-3 border-t mt-2"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              </div>
+              <div class="mt-10 text-center py-8 bg-slate-50 rounded-xl">
+                <p class="text-slate-600 mb-4">Ready to move forward?</p>
+                <button class="px-10 py-4 bg-green-600 text-white font-semibold rounded-xl text-xl">Approve Estimate</button>
+                <p class="text-xs text-slate-400 mt-3">Valid until March 15, 2026</p>
+              </div>
+            </div>
+          </div>
+          <!-- Mobile -->
+          <div id="preview-mobile-5" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002 | For John</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">February 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! &#128075;</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span class="font-medium">$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 space-y-1">
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Subtotal</span><span>$2,850</span></div>
+                    <div class="flex justify-between text-xs"><span class="text-slate-500">Tax</span><span>$235.13</span></div>
+                    <div class="flex justify-between text-sm font-bold pt-1 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+                  </div>
+                  <div class="mt-4 text-center py-3 bg-slate-50 rounded-lg">
+                    <button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve Estimate</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION F: Balanced 50/50 + Sticky Priority ══════════ -->
+    <div id="opt6" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full">Option F</span>
+        <span class="text-sm text-slate-600">50/50 balanced split. Resources + Total stick to top (always visible), other cards scroll below.</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Editor - 50% -->
+        <div class="h-full overflow-hidden flex flex-col">
+          <!-- Sticky Priority Cards -->
+          <div class="space-y-2 mb-2">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3 shadow-sm">
+              <h3 class="text-xs font-semibold text-blue-900 mb-2 flex items-center gap-1">
+                <span>📊</span> Resources
+              </h3>
+              <div class="grid grid-cols-4 gap-3 text-center">
+                <div><p class="text-[10px] text-blue-600 font-medium">TRUCKS</p><p class="text-xl font-bold text-blue-900">1</p></div>
+                <div><p class="text-[10px] text-blue-600 font-medium">TEAM</p><p class="text-xl font-bold text-blue-900">2</p></div>
+                <div><p class="text-[10px] text-blue-600 font-medium">MIN HRS</p><p class="text-xl font-bold text-blue-900">4</p></div>
+                <div><p class="text-[10px] text-blue-600 font-medium">MAX HRS</p><p class="text-xl font-bold text-blue-900">6</p></div>
+              </div>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-3 shadow-sm">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-semibold text-green-900 flex items-center gap-1">
+                  <span>💰</span> Pricing Summary
+                </h3>
+                <span class="text-2xl font-bold text-green-700">$3,085</span>
+              </div>
+              <div class="mt-2 flex gap-2 text-xs text-green-700">
+                <span>Base: $1,800</span><span>•</span><span>Packing: $650</span><span>•</span><span>Assembly: $250</span><span>•</span><span>Materials: $150</span>
+              </div>
+            </div>
+          </div>
+          <!-- Scrollable Cards Below -->
+          <div class="flex-1 overflow-y-auto pr-1 scroll-area space-y-2">
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+              <div class="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+                <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+                <div><label class="text-[10px] text-slate-400">Sales Rep</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <div class="space-y-1">
+                <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin:</span> 123 Oak St, Austin TX</div>
+                <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest:</span> 456 Pine Ave, Dallas TX</div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-[11px] py-1 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                <div class="flex justify-between text-[11px] py-1 border-b"><span>Packing Service</span><span class="font-medium">$650</span></div>
+                <div class="flex justify-between text-[11px] py-1 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                <div class="flex justify-between text-[11px] py-1"><span>Blankets (15x$10)</span><span class="font-medium">$150</span></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Notes</h3>
+              <textarea class="w-full text-[11px] border rounded p-2 h-16 resize-none" placeholder="Internal notes..."></textarea>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Builder →</a></div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span class="text-blue-500">👁</span></div>
+                <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span class="text-blue-500">👁</span></div>
+                <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Testimonials</span><span class="text-blue-500">👁</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Preview - 50% -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(6,'desktop')" id="desk-6" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(6,'mobile')" id="mob-6" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="preview-desktop-6" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002 | For John</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-4">Hi Sarah! 👋</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                <div class="flex justify-between py-2"><span>Blankets</span><span class="font-medium">$150</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 flex justify-between text-lg font-bold"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              <div class="mt-8 text-center"><button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve Estimate</button></div>
+            </div>
+          </div>
+          <div id="preview-mobile-6" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">Feb 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! 👋</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Base</span><span>$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span>$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Assembly</span><span>$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span>$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+                  <div class="mt-4 text-center"><button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION G: Floating Resources Dashboard ══════════ -->
+    <div id="opt7" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full">Option G</span>
+        <span class="text-sm text-slate-600">50/50 split with two-column editor. Floating resources panel (bottom-left) stays visible while scrolling.</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4 items-start relative" style="height:calc(100vh - 240px)">
+        <!-- Editor - 50% with 2 columns -->
+        <div class="overflow-y-auto h-full pr-1 scroll-area">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+              <div class="space-y-1.5">
+                <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+                <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <div class="space-y-1">
+                <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin</span><br>123 Oak St</div>
+                <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest</span><br>456 Pine Ave</div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3 col-span-2">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <table class="w-full text-[11px]">
+                <thead><tr class="text-slate-400"><th class="text-left py-1">Item</th><th class="text-center w-14">Qty</th><th class="text-right w-20">Price</th><th class="text-right w-20">Total</th></tr></thead>
+                <tbody>
+                  <tr class="border-b"><td class="py-1">Long Distance Base</td><td class="text-center">1</td><td class="text-right">$1,800</td><td class="text-right">$1,800</td></tr>
+                  <tr class="border-b"><td class="py-1">Packing Service</td><td class="text-center">1</td><td class="text-right">$650</td><td class="text-right">$650</td></tr>
+                  <tr class="border-b"><td class="py-1">Disassembly</td><td class="text-center">1</td><td class="text-right">$250</td><td class="text-right">$250</td></tr>
+                  <tr><td class="py-1">Blankets</td><td class="text-center">15</td><td class="text-right">$10</td><td class="text-right">$150</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Notes</h3>
+              <textarea class="w-full text-[11px] border rounded p-2 h-20 resize-none" placeholder="Internal notes..."></textarea>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Builder →</a></div>
+              <div class="flex flex-col gap-1">
+                <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span>👁</span></div>
+                <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span>👁</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Floating Resources Panel -->
+        <div class="absolute bottom-4 left-4 w-72 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-2xl p-4 text-white z-10 border-2 border-blue-400">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold flex items-center gap-1"><span>📊</span> Resources & Total</h3>
+            <button class="text-blue-200 hover:text-white text-xs">📌</button>
+          </div>
+          <div class="grid grid-cols-4 gap-2 mb-3 text-center">
+            <div class="bg-white/10 rounded p-2"><p class="text-[9px] text-blue-200">TRUCKS</p><p class="text-lg font-bold">1</p></div>
+            <div class="bg-white/10 rounded p-2"><p class="text-[9px] text-blue-200">TEAM</p><p class="text-lg font-bold">2</p></div>
+            <div class="bg-white/10 rounded p-2"><p class="text-[9px] text-blue-200">MIN</p><p class="text-lg font-bold">4</p></div>
+            <div class="bg-white/10 rounded p-2"><p class="text-[9px] text-blue-200">MAX</p><p class="text-lg font-bold">6</p></div>
+          </div>
+          <div class="bg-white/10 rounded-lg p-3 text-center">
+            <p class="text-xs text-blue-200 mb-1">Total Quote</p>
+            <p class="text-3xl font-bold">$3,085</p>
+          </div>
+        </div>
+        <!-- Preview - 50% -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(7,'desktop')" id="desk-7" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(7,'mobile')" id="mob-7" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="preview-desktop-7" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002 | For John</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-4">Hi Sarah! 👋</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                <div class="flex justify-between py-2"><span>Blankets</span><span class="font-medium">$150</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 flex justify-between text-lg font-bold"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              <div class="mt-8 text-center"><button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve Estimate</button></div>
+            </div>
+          </div>
+          <div id="preview-mobile-7" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">Feb 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! 👋</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Base</span><span>$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span>$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Assembly</span><span>$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span>$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+                  <div class="mt-4 text-center"><button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION H: Enhanced D (Collapsible Sections) ══════════ -->
+    <div id="opt8" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full">Option H</span>
+        <span class="text-sm text-slate-600">Enhanced D with 45/55 split. Priority cards (Resources + Pricing) always visible. Other sections collapsible.</span>
+      </div>
+      <div class="grid grid-cols-[45%_1fr] gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Editor - 45% Collapsible -->
+        <div class="h-full flex flex-col">
+          <!-- Priority Cards (Always Visible) -->
+          <div class="space-y-2 mb-2">
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-blue-900">⭐ Resources (Priority)</h3>
+                <span class="text-[9px] text-blue-600 bg-blue-200 px-2 py-0.5 rounded-full">PINNED</span>
+              </div>
+              <div class="grid grid-cols-4 gap-2 text-center">
+                <div><p class="text-[10px] text-blue-600">TRUCKS</p><p class="text-lg font-bold text-blue-900">1</p></div>
+                <div><p class="text-[10px] text-blue-600">TEAM</p><p class="text-lg font-bold text-blue-900">2</p></div>
+                <div><p class="text-[10px] text-blue-600">MIN</p><p class="text-lg font-bold text-blue-900">4</p></div>
+                <div><p class="text-[10px] text-blue-600">MAX</p><p class="text-lg font-bold text-blue-900">6</p></div>
+              </div>
+            </div>
+            <div class="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-green-900">⭐ Pricing Summary</h3>
+                <span class="text-2xl font-bold text-green-700">$3,085</span>
+              </div>
+              <div class="flex gap-2 text-[10px] text-green-700">
+                <span>$1,800 Base</span><span>•</span><span>$650 Packing</span><span>•</span><span>$250 Assembly</span>
+              </div>
+            </div>
+          </div>
+          <!-- Scrollable/Collapsible Sections -->
+          <div class="flex-1 overflow-y-auto pr-1 scroll-area space-y-2">
+            <div class="bg-white rounded-lg border">
+              <div class="p-3 border-b bg-slate-50 flex items-center justify-between cursor-pointer hover:bg-slate-100">
+                <h3 class="text-xs font-semibold flex items-center gap-2"><span class="text-slate-400">▼</span> Quote Info</h3>
+                <span class="text-[9px] text-slate-400">EXPANDED</span>
+              </div>
+              <div class="p-3">
+                <div class="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                  <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                  <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+                  <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+                  <div><label class="text-[10px] text-slate-400">Sales Rep</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border">
+              <div class="p-3 border-b bg-slate-50 flex items-center justify-between cursor-pointer hover:bg-slate-100">
+                <h3 class="text-xs font-semibold flex items-center gap-2"><span class="text-slate-400">▼</span> Stops</h3>
+                <button class="text-blue-600 text-[10px]">+ Add</button>
+              </div>
+              <div class="p-3">
+                <div class="space-y-1">
+                  <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin:</span> 123 Oak St, Austin TX</div>
+                  <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest:</span> 456 Pine Ave, Dallas TX</div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border">
+              <div class="p-3 border-b bg-slate-50 flex items-center justify-between cursor-pointer hover:bg-slate-100">
+                <h3 class="text-xs font-semibold flex items-center gap-2"><span class="text-slate-400">▼</span> Line Items</h3>
+                <button class="text-blue-600 text-[10px]">+ Add</button>
+              </div>
+              <div class="p-3">
+                <div class="space-y-1">
+                  <div class="flex justify-between text-[11px] py-1 border-b"><span>Long Distance Base</span><span>$1,800</span></div>
+                  <div class="flex justify-between text-[11px] py-1 border-b"><span>Packing Service</span><span>$650</span></div>
+                  <div class="flex justify-between text-[11px] py-1 border-b"><span>Disassembly</span><span>$250</span></div>
+                  <div class="flex justify-between text-[11px] py-1"><span>Blankets</span><span>$150</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border">
+              <div class="p-2 bg-slate-50 flex items-center justify-between cursor-pointer hover:bg-slate-100">
+                <h3 class="text-xs font-semibold flex items-center gap-2"><span class="text-slate-400">▶</span> Notes</h3>
+                <span class="text-[9px] text-slate-400">COLLAPSED</span>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border">
+              <div class="p-3 border-b bg-slate-50 flex items-center justify-between cursor-pointer hover:bg-slate-100">
+                <h3 class="text-xs font-semibold flex items-center gap-2"><span class="text-slate-400">▼</span> Sections</h3>
+                <a class="text-[10px] text-blue-600">Builder →</a>
+              </div>
+              <div class="p-3">
+                <div class="space-y-1">
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span>👁</span></div>
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span>👁</span></div>
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Testimonials</span><span>👁</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Preview - 55% -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(8,'desktop')" id="desk-8" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(8,'mobile')" id="mob-8" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="preview-desktop-8" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002 | For John</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-4">Hi Sarah! 👋</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Packing</span><span class="font-medium">$650</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Disassembly</span><span class="font-medium">$250</span></div>
+                <div class="flex justify-between py-2"><span>Blankets</span><span class="font-medium">$150</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 flex justify-between text-lg font-bold"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              <div class="mt-8 text-center"><button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve Estimate</button></div>
+            </div>
+          </div>
+          <div id="preview-mobile-8" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">Feb 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! 👋</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Base</span><span>$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span>$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Assembly</span><span>$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span>$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+                  <div class="mt-4 text-center"><button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION I: Three-Column Smart Layout ══════════ -->
+    <div id="opt9" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-green-700 bg-green-50 px-3 py-1 rounded-full">Option I</span>
+        <span class="text-sm text-slate-600">Three columns: Left rail (200px) for Resources/Total/Sections. Middle (380px) for forms. Right for preview.</span>
+      </div>
+      <div class="flex gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Left Rail - 200px -->
+        <div class="w-[200px] min-w-[200px] space-y-2 overflow-y-auto h-full pr-1 scroll-area">
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3 shadow-sm">
+            <h3 class="text-[11px] font-bold text-blue-900 mb-2 text-center">📊 Resources</h3>
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div><p class="text-[9px] text-blue-600">TRUCKS</p><p class="text-xl font-bold text-blue-900">1</p></div>
+              <div><p class="text-[9px] text-blue-600">TEAM</p><p class="text-xl font-bold text-blue-900">2</p></div>
+              <div><p class="text-[9px] text-blue-600">MIN</p><p class="text-lg font-bold text-blue-900">4</p></div>
+              <div><p class="text-[9px] text-blue-600">MAX</p><p class="text-lg font-bold text-blue-900">6</p></div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-3 shadow-sm text-center">
+            <h3 class="text-[11px] font-bold text-green-900 mb-1">💰 Total</h3>
+            <p class="text-3xl font-bold text-green-700">$3,085</p>
+            <p class="text-[9px] text-green-600 mt-1">4 line items</p>
+          </div>
+          <div class="bg-white rounded-lg border p-2">
+            <h3 class="text-[10px] font-semibold mb-2 text-center">📄 Sections</h3>
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-1 text-[10px] px-2 py-1 hover:bg-blue-50 rounded"><span class="text-blue-500">👁</span><span>Hero</span></div>
+              <div class="flex items-center gap-1 text-[10px] px-2 py-1 hover:bg-blue-50 rounded"><span class="text-blue-500">👁</span><span>Pricing</span></div>
+              <div class="flex items-center gap-1 text-[10px] px-2 py-1 hover:bg-blue-50 rounded"><span class="text-blue-500">👁</span><span>Testimonials</span></div>
+              <div class="flex items-center gap-1 text-[10px] px-2 py-1 hover:bg-blue-50 rounded"><span class="text-blue-500">👁</span><span>Approval</span></div>
+            </div>
+            <button class="w-full mt-2 py-1 text-[10px] border border-dashed rounded text-blue-600">+ Add</button>
+          </div>
+          <a href="#" class="block text-center text-[10px] text-blue-600 hover:underline">Open Full Builder →</a>
+        </div>
+        <!-- Middle Column - 380px Forms -->
+        <div class="w-[380px] min-w-[380px] space-y-2 overflow-y-auto h-full pr-1 scroll-area">
+          <div class="bg-white rounded-lg border p-3">
+            <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+            <div class="space-y-1.5">
+              <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+              <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Sales Rep</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Lead Status</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>None</option></select></div>
+              <div><label class="text-[10px] text-slate-400">Crew</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Unassigned</option></select></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+            <div class="space-y-1">
+              <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin:</span> 123 Oak St, Austin TX</div>
+              <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest:</span> 456 Pine Ave, Dallas TX</div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] py-1 border-b"><span>Long Distance Base</span><span class="font-medium">$1,800</span></div>
+              <div class="flex justify-between text-[11px] py-1 border-b"><span>Packing Service</span><span class="font-medium">$650</span></div>
+              <div class="flex justify-between text-[11px] py-1 border-b"><span>Disassembly/Assembly</span><span class="font-medium">$250</span></div>
+              <div class="flex justify-between text-[11px] py-1"><span>Blankets (15x$10)</span><span class="font-medium">$150</span></div>
+            </div>
+            <div class="border-t mt-2 pt-2 flex justify-between text-xs font-bold"><span>Subtotal</span><span>$2,850</span></div>
+            <div class="flex justify-between text-xs"><span class="text-slate-500">Tax</span><span>$235.13</span></div>
+          </div>
+          <div class="bg-white rounded-lg border p-3">
+            <h3 class="text-xs font-semibold mb-2">Notes</h3>
+            <textarea class="w-full text-[11px] border rounded p-2 h-20 resize-none" placeholder="Internal notes..."></textarea>
+            <textarea class="w-full text-[11px] border rounded p-2 h-16 resize-none mt-1.5" placeholder="Customer notes..."></textarea>
+          </div>
+        </div>
+        <!-- Preview - Flex (rest of space) -->
+        <div class="flex-1 h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(9,'desktop')" id="desk-9" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(9,'mobile')" id="mob-9" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="preview-desktop-9" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002 | For John</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-4">Hi Sarah! 👋</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team. Here's everything you need to know about your upcoming move.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Est. Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing Details</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Long Distance Base</span><span class="font-medium">$1,800.00</span></div>
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Packing Service</span><span class="font-medium">$650.00</span></div>
+                <div class="flex justify-between py-2 border-b"><span class="text-sm">Disassembly/Assembly</span><span class="font-medium">$250.00</span></div>
+                <div class="flex justify-between py-2"><span class="text-sm">Blankets & Padding</span><span class="font-medium">$150.00</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 space-y-2">
+                <div class="flex justify-between"><span class="text-slate-500">Subtotal</span><span>$2,850.00</span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Tax (8.25%)</span><span>$235.13</span></div>
+                <div class="flex justify-between text-lg font-bold pt-2 border-t"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              </div>
+              <div class="mt-8 text-center py-6 bg-slate-50 rounded-lg">
+                <button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve Estimate</button>
+              </div>
+            </div>
+          </div>
+          <div id="preview-mobile-9" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">February 14, 2026</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! 👋</h3>
+                  <p class="text-slate-600 text-xs mb-4">Thanks for choosing our team.</p>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px] text-slate-500">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px] text-slate-500">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px] text-slate-500">Hours</p></div>
+                  </div>
+                  <h3 class="text-sm font-semibold mb-2">Pricing</h3>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Base</span><span>$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span>$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Assembly</span><span>$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span>$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+                  <div class="mt-4 text-center"><button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION J: Two-Column + Resources Header ══════════ -->
+    <div id="opt10" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-full">Option J</span>
+        <span class="text-sm text-slate-600">Two-column editor. Resources + Total as spanning header card at top (always visible).</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Editor - 50% -->
+        <div class="h-full overflow-hidden flex flex-col">
+          <!-- Resources Header (Spanning) -->
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3 shadow-sm mb-2">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-bold text-blue-900 flex items-center gap-1"><span>📊</span> Resources</h3>
+              <div class="text-right">
+                <p class="text-xs text-blue-600">Total Quote</p>
+                <p class="text-2xl font-bold text-blue-900">$3,085</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-4 gap-3 text-center">
+              <div><p class="text-[10px] text-blue-600 font-medium">TRUCKS</p><p class="text-xl font-bold text-blue-900">1</p></div>
+              <div><p class="text-[10px] text-blue-600 font-medium">TEAM</p><p class="text-xl font-bold text-blue-900">2</p></div>
+              <div><p class="text-[10px] text-blue-600 font-medium">MIN HRS</p><p class="text-xl font-bold text-blue-900">4</p></div>
+              <div><p class="text-[10px] text-blue-600 font-medium">MAX HRS</p><p class="text-xl font-bold text-blue-900">6</p></div>
+            </div>
+          </div>
+          <!-- Two-Column Editor Below -->
+          <div class="flex-1 overflow-y-auto pr-1 scroll-area">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-white rounded-lg border p-3">
+                <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+                <div class="space-y-1.5">
+                  <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                  <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+                  <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg border p-3">
+                <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+                <div class="space-y-1">
+                  <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin</span><br>123 Oak St</div>
+                  <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest</span><br>456 Pine Ave</div>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg border p-3 col-span-2">
+                <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+                <table class="w-full text-[11px]">
+                  <thead><tr class="text-slate-400"><th class="text-left py-1">Item</th><th class="text-center w-14">Qty</th><th class="text-right w-20">Price</th><th class="text-right w-20">Total</th></tr></thead>
+                  <tbody>
+                    <tr class="border-b"><td class="py-1">Long Distance Base</td><td class="text-center">1</td><td class="text-right">$1,800</td><td class="text-right">$1,800</td></tr>
+                    <tr class="border-b"><td class="py-1">Packing Service</td><td class="text-center">1</td><td class="text-right">$650</td><td class="text-right">$650</td></tr>
+                    <tr class="border-b"><td class="py-1">Disassembly</td><td class="text-center">1</td><td class="text-right">$250</td><td class="text-right">$250</td></tr>
+                    <tr><td class="py-1">Blankets</td><td class="text-center">15</td><td class="text-right">$10</td><td class="text-right">$150</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="bg-white rounded-lg border p-3">
+                <h3 class="text-xs font-semibold mb-2">Notes</h3>
+                <textarea class="w-full text-[11px] border rounded p-2 h-20 resize-none" placeholder="Internal notes..."></textarea>
+              </div>
+              <div class="bg-white rounded-lg border p-3">
+                <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Builder →</a></div>
+                <div class="flex flex-col gap-1">
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span>👁</span></div>
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span>👁</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Preview - 50% -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(10,'desktop')" id="desk-10" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(10,'mobile')" id="mob-10" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="preview-desktop-10" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-4">Hi Sarah! 👋</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span>Base</span><span>$1,800</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Packing</span><span>$650</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Assembly</span><span>$250</span></div>
+                <div class="flex justify-between py-2"><span>Blankets</span><span>$150</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 flex justify-between text-lg font-bold"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              <div class="mt-8 text-center"><button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve</button></div>
+            </div>
+          </div>
+          <div id="preview-mobile-10" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">Feb 14</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! 👋</h3>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px]">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px]">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px]">Hours</p></div>
+                  </div>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Base</span><span>$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span>$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Assembly</span><span>$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span>$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+                  <div class="mt-4 text-center"><button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION K: Two-Column + Resources in Left Column ══════════ -->
+    <div id="opt11" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-full">Option K</span>
+        <span class="text-sm text-slate-600">Two-column editor. Resources card in left column at top, stacked with Quote Info below.</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Editor - 50% -->
+        <div class="overflow-y-auto h-full pr-1 scroll-area">
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Left Column with Resources First -->
+            <div class="space-y-3">
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3 shadow-sm">
+                <h3 class="text-xs font-bold text-blue-900 mb-2 flex items-center gap-1"><span>📊</span> Resources</h3>
+                <div class="grid grid-cols-2 gap-2 text-center mb-2">
+                  <div><p class="text-[10px] text-blue-600">TRUCKS</p><p class="text-xl font-bold text-blue-900">1</p></div>
+                  <div><p class="text-[10px] text-blue-600">TEAM</p><p class="text-xl font-bold text-blue-900">2</p></div>
+                  <div><p class="text-[10px] text-blue-600">MIN</p><p class="text-lg font-bold text-blue-900">4</p></div>
+                  <div><p class="text-[10px] text-blue-600">MAX</p><p class="text-lg font-bold text-blue-900">6</p></div>
+                </div>
+                <div class="bg-blue-900/10 rounded p-2 text-center">
+                  <p class="text-[9px] text-blue-600">TOTAL</p>
+                  <p class="text-xl font-bold text-blue-900">$3,085</p>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg border p-3">
+                <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+                <div class="space-y-1.5">
+                  <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                  <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+                  <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg border p-3">
+                <h3 class="text-xs font-semibold mb-2">Notes</h3>
+                <textarea class="w-full text-[11px] border rounded p-2 h-24 resize-none" placeholder="Internal notes..."></textarea>
+              </div>
+            </div>
+            <!-- Right Column -->
+            <div class="space-y-3">
+              <div class="bg-white rounded-lg border p-3">
+                <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+                <div class="space-y-1">
+                  <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin</span><br>123 Oak St, Austin</div>
+                  <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest</span><br>456 Pine Ave</div>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg border p-3">
+                <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Builder →</a></div>
+                <div class="flex flex-col gap-1">
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span>👁</span></div>
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span>👁</span></div>
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Testimonials</span><span>👁</span></div>
+                </div>
+                <button class="w-full mt-2 py-1 text-[10px] border border-dashed rounded text-slate-500">+ Add</button>
+              </div>
+            </div>
+            <!-- Spanning Line Items -->
+            <div class="bg-white rounded-lg border p-3 col-span-2">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <table class="w-full text-[11px]">
+                <thead><tr class="text-slate-400"><th class="text-left py-1">Description</th><th class="text-center w-14">Qty</th><th class="text-right w-20">Price</th><th class="text-right w-20">Total</th></tr></thead>
+                <tbody>
+                  <tr class="border-b"><td class="py-1">Long Distance Base</td><td class="text-center">1</td><td class="text-right">$1,800</td><td class="text-right">$1,800</td></tr>
+                  <tr class="border-b"><td class="py-1">Packing Service</td><td class="text-center">1</td><td class="text-right">$650</td><td class="text-right">$650</td></tr>
+                  <tr class="border-b"><td class="py-1">Disassembly</td><td class="text-center">1</td><td class="text-right">$250</td><td class="text-right">$250</td></tr>
+                  <tr><td class="py-1">Blankets</td><td class="text-center">15</td><td class="text-right">$10</td><td class="text-right">$150</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- Preview - 50% -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(11,'desktop')" id="desk-11" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(11,'mobile')" id="mob-11" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="preview-desktop-11" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-4">Hi Sarah! 👋</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span>Base</span><span>$1,800</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Packing</span><span>$650</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Assembly</span><span>$250</span></div>
+                <div class="flex justify-between py-2"><span>Blankets</span><span>$150</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 flex justify-between text-lg font-bold"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              <div class="mt-8 text-center"><button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve</button></div>
+            </div>
+          </div>
+          <div id="preview-mobile-11" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">Feb 14</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! 👋</h3>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px]">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px]">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px]">Hours</p></div>
+                  </div>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Base</span><span>$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span>$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Assembly</span><span>$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span>$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+                  <div class="mt-4 text-center"><button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION L: Two-Column + Horizontal Resource Bar ══════════ -->
+    <div id="opt12" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-full">Option L</span>
+        <span class="text-sm text-slate-600">Two-column editor. Resources as slim horizontal bar across top (all metrics inline).</span>
+      </div>
+      <div class="grid grid-cols-2 gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Editor - 50% -->
+        <div class="h-full overflow-hidden flex flex-col">
+          <!-- Horizontal Resource Bar -->
+          <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-2 shadow-sm mb-2 flex items-center justify-between text-white">
+            <div class="flex items-center gap-4">
+              <span class="text-xs font-bold">📊 Resources:</span>
+              <div class="flex items-center gap-3 text-sm">
+                <div class="flex items-center gap-1"><span class="text-blue-200 text-xs">Trucks</span><span class="font-bold">1</span></div>
+                <span class="text-blue-300">•</span>
+                <div class="flex items-center gap-1"><span class="text-blue-200 text-xs">Team</span><span class="font-bold">2</span></div>
+                <span class="text-blue-300">•</span>
+                <div class="flex items-center gap-1"><span class="text-blue-200 text-xs">Hours</span><span class="font-bold">4-6</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 bg-white/10 rounded px-3 py-1">
+              <span class="text-xs text-blue-200">Total:</span>
+              <span class="text-xl font-bold">$3,085</span>
+            </div>
+          </div>
+          <!-- Two-Column Editor Below -->
+          <div class="flex-1 overflow-y-auto pr-1 scroll-area">
+            <div class="space-y-3">
+              <!-- Top row: Quote Info + Stops -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white rounded-lg border p-3">
+                  <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+                  <div class="space-y-1.5">
+                    <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                    <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+                    <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+                  </div>
+                </div>
+                <div class="bg-white rounded-lg border p-3">
+                  <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+                  <div class="space-y-1">
+                    <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin</span><br>123 Oak St</div>
+                    <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest</span><br>456 Pine Ave</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Full-width Line Items -->
+              <div class="bg-white rounded-lg border p-3">
+                <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+                <table class="w-full text-[11px]">
+                  <thead><tr class="text-slate-400"><th class="text-left py-1">Item</th><th class="text-center w-14">Qty</th><th class="text-right w-20">Price</th><th class="text-right w-20">Total</th></tr></thead>
+                  <tbody>
+                    <tr class="border-b"><td class="py-1">Long Distance Base</td><td class="text-center">1</td><td class="text-right">$1,800</td><td class="text-right">$1,800</td></tr>
+                    <tr class="border-b"><td class="py-1">Packing Service</td><td class="text-center">1</td><td class="text-right">$650</td><td class="text-right">$650</td></tr>
+                    <tr class="border-b"><td class="py-1">Disassembly</td><td class="text-center">1</td><td class="text-right">$250</td><td class="text-right">$250</td></tr>
+                    <tr><td class="py-1">Blankets</td><td class="text-center">15</td><td class="text-right">$10</td><td class="text-right">$150</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Full-width Notes with Tabs -->
+              <div class="bg-white rounded-lg border overflow-hidden">
+                <div class="border-b">
+                  <div class="flex gap-0" id="notesTabL">
+                    <button onclick="switchNoteTab('internal')" id="tab-internal-L" class="relative px-4 py-2.5 text-[13px] font-medium border-b-2 border-slate-800 text-slate-800">
+                      Internal
+                      <span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    </button>
+                    <button onclick="switchNoteTab('customer')" id="tab-customer-L" class="relative px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600">
+                      Customer
+                      <span class="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    </button>
+                    <button onclick="switchNoteTab('crew')" id="tab-crew-L" class="relative px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600">
+                      Crew Notes
+                    </button>
+                    <button onclick="switchNoteTab('feedback')" id="tab-feedback-L" class="relative px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600">
+                      Crew Feedback
+                    </button>
+                  </div>
+                </div>
+                <div class="px-5 pb-5">
+                  <div id="content-internal-L" class="mt-3">
+                    <p class="text-[11px] text-slate-400 italic mb-2">Note (Visible to office only) • <span class="text-blue-600">Synced with estimate</span></p>
+                    <textarea class="w-full min-h-[150px] text-sm border rounded p-3" placeholder="Internal notes...">Customer called asking about pricing options. May need financing. Follow up on Tuesday.</textarea>
+                  </div>
+                  <div id="content-customer-L" class="mt-3 hidden">
+                    <p class="text-[11px] text-slate-400 italic mb-2">Visible to customer • <span class="text-blue-600">Synced with estimate</span></p>
+                    <textarea class="w-full min-h-[150px] text-sm border rounded p-3" placeholder="Customer-facing notes...">Thank you for choosing our moving services! We've included packing materials and assembly in your estimate. Please review and let us know if you have any questions.</textarea>
+                  </div>
+                  <div id="content-crew-L" class="mt-3 hidden">
+                    <p class="text-[11px] text-slate-400 italic mb-2">Instructions for the crew • <span class="text-blue-600">Synced with estimate</span></p>
+                    <textarea class="w-full min-h-[150px] text-sm border rounded p-3" placeholder="Crew instructions...">Heavy furniture on 2nd floor - bring extra blankets. Customer has pets, close doors when entering. Parking available in driveway.</textarea>
+                  </div>
+                  <div id="content-feedback-L" class="mt-3 hidden">
+                    <p class="text-[11px] text-slate-400 italic mb-2">Crew feedback (read-only) • <span class="text-blue-600">Synced with estimate</span></p>
+                    <div class="min-h-[150px] rounded-md border bg-slate-50 p-3 text-sm text-slate-400">No crew feedback yet.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Half-width Sections -->
+              <div class="bg-white rounded-lg border p-3" style="max-width: 50%;">
+                <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Open Full Builder →</a></div>
+                <div class="flex flex-col gap-1">
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span>👁</span></div>
+                  <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span>👁</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Preview - 50% -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(12,'desktop')" id="desk-12" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(12,'mobile')" id="mob-12" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="preview-desktop-12" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-16 px-8">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm mb-4">#EST-002</div>
+              <h2 class="text-4xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-blue-100">February 14, 2026</p>
+            </div>
+            <div class="p-8 bg-white">
+              <h3 class="text-lg font-semibold mb-4">Hi Sarah! 👋</h3>
+              <p class="text-slate-600 text-sm mb-6">Thanks for choosing our team.</p>
+              <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">1</p><p class="text-xs text-slate-500">Trucks</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">2</p><p class="text-xs text-slate-500">Movers</p></div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold text-blue-600">6</p><p class="text-xs text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-lg font-semibold mb-4">Pricing</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b"><span>Base</span><span>$1,800</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Packing</span><span>$650</span></div>
+                <div class="flex justify-between py-2 border-b"><span>Assembly</span><span>$250</span></div>
+                <div class="flex justify-between py-2"><span>Blankets</span><span>$150</span></div>
+              </div>
+              <div class="border-t mt-4 pt-4 flex justify-between text-lg font-bold"><span>Total</span><span class="text-blue-600">$3,085.13</span></div>
+              <div class="mt-8 text-center"><button class="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg text-lg">Approve</button></div>
+            </div>
+          </div>
+          <div id="preview-mobile-12" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">Feb 14</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! 👋</h3>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px]">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px]">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px]">Hours</p></div>
+                  </div>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Base</span><span>$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span>$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Assembly</span><span>$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span>$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+                  <div class="mt-4 text-center"><button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTION M: Two-Column + Resources Sidebar ══════════ -->
+    <div id="opt13" class="hidden fade-in">
+      <div class="mb-3 flex items-center gap-3">
+        <span class="text-sm font-bold text-purple-700 bg-purple-50 px-3 py-1 rounded-full">Option M</span>
+        <span class="text-sm text-slate-600">Three-panel layout. Narrow sidebar (180px) for Resources/Total, two-column editor middle, preview right.</span>
+      </div>
+      <div class="grid grid-cols-[180px_1fr_1fr] gap-4 items-start" style="height:calc(100vh - 240px)">
+        <!-- Resources Sidebar -->
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-3 shadow-sm h-full overflow-y-auto scroll-area">
+          <h3 class="text-[11px] font-bold text-blue-900 mb-3 text-center">📊 Resources</h3>
+          <div class="space-y-3">
+            <div class="bg-white/50 rounded p-2 text-center">
+              <p class="text-[9px] text-blue-600 font-medium">TRUCKS</p>
+              <p class="text-2xl font-bold text-blue-900">1</p>
+            </div>
+            <div class="bg-white/50 rounded p-2 text-center">
+              <p class="text-[9px] text-blue-600 font-medium">TEAM</p>
+              <p class="text-2xl font-bold text-blue-900">2</p>
+            </div>
+            <div class="bg-white/50 rounded p-2 text-center">
+              <p class="text-[9px] text-blue-600 font-medium">MIN HRS</p>
+              <p class="text-xl font-bold text-blue-900">4</p>
+            </div>
+            <div class="bg-white/50 rounded p-2 text-center">
+              <p class="text-[9px] text-blue-600 font-medium">MAX HRS</p>
+              <p class="text-xl font-bold text-blue-900">6</p>
+            </div>
+          </div>
+          <div class="mt-4 bg-gradient-to-br from-green-600 to-green-700 rounded-lg p-3 text-white text-center shadow">
+            <p class="text-[9px] text-green-100">TOTAL QUOTE</p>
+            <p class="text-2xl font-bold">$3,085</p>
+          </div>
+        </div>
+        <!-- Two-Column Editor -->
+        <div class="overflow-y-auto h-full pr-1 scroll-area">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Quote Info</h3>
+              <div class="space-y-1.5">
+                <div><label class="text-[10px] text-slate-400">Number</label><p class="text-xs font-medium">EST-002</p></div>
+                <div><label class="text-[10px] text-slate-400">Type</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Long Distance</option></select></div>
+                <div><label class="text-[10px] text-slate-400">Source</label><select class="w-full text-[11px] border rounded px-1.5 py-0.5"><option>Website</option></select></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Stops</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <div class="space-y-1">
+                <div class="p-2 bg-green-50 rounded text-[11px]"><span class="text-green-700 font-medium">Origin</span><br>123 Oak St</div>
+                <div class="p-2 bg-red-50 rounded text-[11px]"><span class="text-red-700 font-medium">Dest</span><br>456 Pine Ave</div>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border p-3 col-span-2">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Line Items</h3><button class="text-blue-600 text-[10px]">+ Add</button></div>
+              <table class="w-full text-[11px]">
+                <thead><tr class="text-slate-400"><th class="text-left py-1">Item</th><th class="text-center w-14">Qty</th><th class="text-right w-20">Price</th><th class="text-right w-20">Total</th></tr></thead>
+                <tbody>
+                  <tr class="border-b"><td class="py-1">Long Distance Base</td><td class="text-center">1</td><td class="text-right">$1,800</td><td class="text-right">$1,800</td></tr>
+                  <tr class="border-b"><td class="py-1">Packing Service</td><td class="text-center">1</td><td class="text-right">$650</td><td class="text-right">$650</td></tr>
+                  <tr class="border-b"><td class="py-1">Disassembly</td><td class="text-center">1</td><td class="text-right">$250</td><td class="text-right">$250</td></tr>
+                  <tr><td class="py-1">Blankets</td><td class="text-center">15</td><td class="text-right">$10</td><td class="text-right">$150</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <h3 class="text-xs font-semibold mb-2">Notes</h3>
+              <textarea class="w-full text-[11px] border rounded p-2 h-20 resize-none" placeholder="Internal notes..."></textarea>
+            </div>
+            <div class="bg-white rounded-lg border p-3">
+              <div class="flex justify-between items-center mb-2"><h3 class="text-xs font-semibold">Sections</h3><a class="text-[10px] text-blue-600">Builder →</a></div>
+              <div class="flex flex-col gap-1">
+                <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Hero</span><span>👁</span></div>
+                <div class="flex justify-between text-[11px] px-2 py-1 hover:bg-slate-50 rounded"><span>Pricing</span><span>👁</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Preview -->
+        <div class="h-full overflow-hidden rounded-lg border bg-white">
+          <div class="bg-slate-800 px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="flex gap-1.5"><div class="w-3 h-3 rounded-full bg-red-400"></div><div class="w-3 h-3 rounded-full bg-yellow-400"></div><div class="w-3 h-3 rounded-full bg-green-400"></div></div>
+              <span class="text-xs text-slate-400 ml-1">Customer Preview</span>
+            </div>
+            <div class="flex items-center gap-0.5 bg-slate-700 rounded-md p-0.5">
+              <button onclick="setDevice(13,'desktop')" id="desk-13" class="p-1.5 rounded bg-slate-500 text-white transition-colors" title="Desktop">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+              </button>
+              <button onclick="setDevice(13,'mobile')" id="mob-13" class="p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors" title="Mobile">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="preview-desktop-13" class="overflow-y-auto h-[calc(100%-36px)] scroll-area">
+            <div class="preview-frame text-white text-center py-12 px-6">
+              <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+              <h2 class="text-3xl font-bold mb-2">Estimate EST-002</h2>
+              <p class="text-sm text-blue-100">Feb 14, 2026</p>
+            </div>
+            <div class="p-6 bg-white">
+              <h3 class="text-base font-semibold mb-3">Hi Sarah! 👋</h3>
+              <p class="text-slate-600 text-sm mb-5">Thanks for choosing us.</p>
+              <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="text-center p-3 bg-blue-50 rounded-lg"><p class="text-xl font-bold text-blue-600">1</p><p class="text-[11px] text-slate-500">Trucks</p></div>
+                <div class="text-center p-3 bg-blue-50 rounded-lg"><p class="text-xl font-bold text-blue-600">2</p><p class="text-[11px] text-slate-500">Movers</p></div>
+                <div class="text-center p-3 bg-blue-50 rounded-lg"><p class="text-xl font-bold text-blue-600">6</p><p class="text-[11px] text-slate-500">Hours</p></div>
+              </div>
+              <h3 class="text-base font-semibold mb-3">Pricing</h3>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between py-1.5 border-b"><span>Base</span><span>$1,800</span></div>
+                <div class="flex justify-between py-1.5 border-b"><span>Packing</span><span>$650</span></div>
+                <div class="flex justify-between py-1.5 border-b"><span>Assembly</span><span>$250</span></div>
+                <div class="flex justify-between py-1.5"><span>Blankets</span><span>$150</span></div>
+              </div>
+              <div class="border-t mt-3 pt-3 flex justify-between font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+              <div class="mt-6 text-center"><button class="px-6 py-2.5 bg-green-600 text-white font-semibold rounded-lg">Approve</button></div>
+            </div>
+          </div>
+          <div id="preview-mobile-13" class="hidden bg-slate-100 h-[calc(100%-36px)] flex justify-center items-start py-6 overflow-y-auto">
+            <div class="w-[375px] rounded-[2.5rem] border-[8px] border-slate-900 overflow-hidden shadow-2xl bg-white flex-shrink-0">
+              <div class="bg-slate-900 flex justify-center py-2"><div class="w-24 h-1.5 bg-slate-700 rounded-full"></div></div>
+              <div class="max-h-[750px] overflow-y-auto scroll-area">
+                <div class="preview-frame text-white text-center py-8 px-4">
+                  <div class="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs mb-3">#EST-002</div>
+                  <h2 class="text-2xl font-bold mb-1">Estimate EST-002</h2>
+                  <p class="text-sm text-blue-100">Feb 14</p>
+                </div>
+                <div class="p-4 bg-white">
+                  <h3 class="text-sm font-semibold mb-2">Hi Sarah! 👋</h3>
+                  <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">1</p><p class="text-[10px]">Trucks</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">2</p><p class="text-[10px]">Movers</p></div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg"><p class="text-lg font-bold text-blue-600">6</p><p class="text-[10px]">Hours</p></div>
+                  </div>
+                  <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between py-1 border-b"><span>Base</span><span>$1,800</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Packing</span><span>$650</span></div>
+                    <div class="flex justify-between py-1 border-b"><span>Assembly</span><span>$250</span></div>
+                    <div class="flex justify-between py-1"><span>Blankets</span><span>$150</span></div>
+                  </div>
+                  <div class="border-t mt-2 pt-2 flex justify-between text-sm font-bold"><span>Total</span><span class="text-blue-600">$3,085</span></div>
+                  <div class="mt-4 text-center"><button class="px-6 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg">Approve</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function show(n) {
+      for (let i = 1; i <= 13; i++) {
+        document.getElementById("opt" + i).classList.add("hidden");
+        // Reset to default button style (gray for A-E, green for F-I, purple for J-M)
+        if (i <= 5) {
+          document.getElementById("btn" + i).className = "opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-slate-100 text-slate-600 hover:bg-slate-200";
+        } else if (i <= 9) {
+          document.getElementById("btn" + i).className = "opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-green-100 text-green-700 hover:bg-green-200";
+        } else {
+          document.getElementById("btn" + i).className = "opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-purple-100 text-purple-700 hover:bg-purple-200";
+        }
+      }
+      document.getElementById("opt" + n).classList.remove("hidden");
+      document.getElementById("btn" + n).className = "opt-btn px-4 py-2 text-sm rounded-lg font-medium bg-blue-600 text-white";
+    }
+
+    // Device toggle for preview (Desktop / Mobile)
+    function setDevice(optNum, device) {
+      var desktop = document.getElementById("preview-desktop-" + optNum);
+      var mobile = document.getElementById("preview-mobile-" + optNum);
+      var deskBtn = document.getElementById("desk-" + optNum);
+      var mobBtn = document.getElementById("mob-" + optNum);
+
+      if (device === "desktop") {
+        desktop.classList.remove("hidden");
+        mobile.classList.add("hidden");
+        deskBtn.className = "p-1.5 rounded bg-slate-500 text-white transition-colors";
+        mobBtn.className = "p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors";
+      } else {
+        desktop.classList.add("hidden");
+        mobile.classList.remove("hidden");
+        deskBtn.className = "p-1.5 rounded text-slate-400 hover:text-slate-300 transition-colors";
+        mobBtn.className = "p-1.5 rounded bg-slate-500 text-white transition-colors";
+      }
+    }
+
+    // Tab switching for Option C
+    function setTab(tab) {
+      ["details", "pricing", "page"].forEach(t => {
+        document.getElementById("panel-" + t).classList.add("hidden");
+        document.getElementById("tab-" + t).className = "tab-btn flex-1 px-3 py-2.5 text-xs font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-700";
+      });
+      document.getElementById("panel-" + tab).classList.remove("hidden");
+      document.getElementById("tab-" + tab).className = "tab-btn flex-1 px-3 py-2.5 text-xs font-medium text-blue-600 border-b-2 border-blue-600";
+    }
+
+    // Tab switching for Option L notes
+    function switchNoteTab(tab) {
+      const tabs = ["internal", "customer", "crew", "feedback"];
+      tabs.forEach(t => {
+        const tabEl = document.getElementById("tab-" + t + "-L");
+        const contentEl = document.getElementById("content-" + t + "-L");
+        if (tabEl && contentEl) {
+          if (t === tab) {
+            tabEl.className = "relative px-4 py-2.5 text-[13px] font-medium border-b-2 border-slate-800 text-slate-800";
+            contentEl.classList.remove("hidden");
+          } else {
+            tabEl.className = "relative px-4 py-2.5 text-[13px] font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600";
+            contentEl.classList.add("hidden");
+          }
+        }
+      });
+    }
+
+    // Option E - Mini sidebar panel toggle
+    let activePanel = null;
+    function togglePanel(panel) {
+      const sidebar = document.getElementById("mini-sidebar");
+      const expanded = document.getElementById("expanded-panel");
+      const panels = ["quote", "stops", "resources", "pricing", "notes", "sections"];
+
+      if (activePanel === panel) {
+        expanded.classList.add("hidden");
+        sidebar.style.width = "60px";
+        activePanel = null;
+        return;
+      }
+
+      panels.forEach(p => document.getElementById("epanel-" + p).classList.add("hidden"));
+      document.getElementById("epanel-" + panel).classList.remove("hidden");
+      expanded.classList.remove("hidden");
+      sidebar.style.width = "320px";
+      activePanel = panel;
+    }
+  </script>
+
+</body>
+</html>

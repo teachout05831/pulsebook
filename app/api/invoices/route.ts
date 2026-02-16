@@ -1,105 +1,204 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mockInvoices } from "./data";
-import type { Invoice } from "@/types";
+import { getAuthCompany, AuthError } from "@/lib/auth/getAuthCompany";
+
+function escapeLike(s: string): string {
+  return s.replace(/[%_\\]/g, "\\$&");
+}
+
+const INVOICE_FIELDS = "id, company_id, customer_id, job_id, estimate_id, invoice_number, status, issue_date, due_date, line_items, subtotal, tax_rate, tax_amount, total, amount_paid, amount_due, payments, notes, terms, address, created_at, updated_at";
+
+const INVOICE_LIST_FIELDS = "id, customer_id, job_id, invoice_number, status, issue_date, due_date, total, amount_paid, amount_due";
 
 // GET /api/invoices - List invoices with pagination, search, and filtering
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const page = parseInt(searchParams.get("_page") || "1", 10);
-  const limit = parseInt(searchParams.get("_limit") || "10", 10);
-  const search = searchParams.get("q") || "";
-  const status = searchParams.get("status") || "";
-  const customerId = searchParams.get("customerId") || "";
+  try {
+    const { companyId, supabase } = await getAuthCompany();
 
-  // Filter invoices
-  let filtered = [...mockInvoices];
+    const searchParams = request.nextUrl.searchParams;
+    const page = parseInt(searchParams.get("_page") || "1", 10);
+    const limit = parseInt(searchParams.get("_limit") || "10", 10);
+    const search = searchParams.get("q") || "";
+    const status = searchParams.get("status") || "";
+    const customerId = searchParams.get("customerId") || "";
+    const dateFrom = searchParams.get("dateFrom") || "";
+    const dateTo = searchParams.get("dateTo") || "";
+    const offset = (page - 1) * limit;
 
-  // Search filter
-  if (search) {
-    const searchLower = search.toLowerCase();
-    filtered = filtered.filter(
-      (inv) =>
-        inv.customerName.toLowerCase().includes(searchLower) ||
-        inv.invoiceNumber.toLowerCase().includes(searchLower)
+    let query = supabase
+      .from("invoices")
+      .select(`${INVOICE_LIST_FIELDS}, customers(name), jobs(title)`, { count: "exact" })
+      .eq("company_id", companyId);
+
+    if (search) {
+      const safe = escapeLike(search);
+      query = query.or(`invoice_number.ilike.%${safe}%`);
+    }
+    if (status) {
+      query = query.eq("status", status);
+    }
+    if (customerId) {
+      query = query.eq("customer_id", customerId);
+    }
+    if (dateFrom) {
+      query = query.gte("issue_date", dateFrom);
+    }
+    if (dateTo) {
+      query = query.lte("issue_date", dateTo);
+    }
+
+    query = query
+      .order("issue_date", { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      return NextResponse.json({ error: "Failed to fetch invoices" }, { status: 500 });
+    }
+
+    // Count unpaid invoices
+    const unpaidCount = (data || []).filter(
+      (inv) => inv.status !== "paid" && inv.status !== "cancelled" && inv.amount_due > 0
+    ).length;
+
+    const invoices = (data || []).map((inv) => {
+      const customer = Array.isArray(inv.customers) ? inv.customers[0] : inv.customers;
+      const job = Array.isArray(inv.jobs) ? inv.jobs[0] : inv.jobs;
+      return {
+        id: inv.id,
+        customerId: inv.customer_id,
+        customerName: customer?.name || "",
+        jobId: inv.job_id || null,
+        jobTitle: job?.title || null,
+        invoiceNumber: inv.invoice_number,
+        status: inv.status,
+        issueDate: inv.issue_date,
+        dueDate: inv.due_date,
+        total: inv.total,
+        amountPaid: inv.amount_paid,
+        amountDue: inv.amount_due,
+      };
+    });
+
+    return NextResponse.json(
+      { data: invoices, total: count || 0, unpaidCount },
+      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=30" } }
     );
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+    }
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
-
-  // Status filter
-  if (status) {
-    filtered = filtered.filter((inv) => inv.status === status);
-  }
-
-  // Customer filter
-  if (customerId) {
-    filtered = filtered.filter((inv) => inv.customerId === customerId);
-  }
-
-  // Sort by issue date descending (most recent first)
-  filtered.sort((a, b) => new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime());
-
-  // Pagination
-  const total = filtered.length;
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedInvoices = filtered.slice(start, end);
-
-  return NextResponse.json({
-    data: paginatedInvoices,
-    total,
-  });
 }
 
 // POST /api/invoices - Create a new invoice
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  try {
+    const { companyId, supabase } = await getAuthCompany();
 
-  // Generate new invoice number
-  const maxNum = mockInvoices.reduce((max, inv) => {
-    const num = parseInt(inv.invoiceNumber.replace("INV-", ""), 10);
-    return num > max ? num : max;
-  }, 0);
-  const newInvoiceNumber = `INV-${String(maxNum + 1).padStart(3, "0")}`;
+    const body = await request.json();
 
-  // Calculate totals from line items
-  const lineItems = body.lineItems || [];
-  const subtotal = lineItems.reduce((sum: number, item: { total: number }) => sum + item.total, 0);
-  const taxRate = body.taxRate || 8;
-  const taxAmount = subtotal * (taxRate / 100);
-  const total = subtotal + taxAmount;
+    // Ownership check: verify customer belongs to this company
+    if (body.customerId) {
+      const { data: customer } = await supabase
+        .from("customers")
+        .select("company_id")
+        .eq("id", body.customerId)
+        .single();
 
-  const newInvoice: Invoice = {
-    id: String(mockInvoices.length + 1),
-    companyId: "demo-tenant",
-    customerId: body.customerId,
-    customerName: body.customerName,
-    jobId: body.jobId || null,
-    estimateId: body.estimateId || null,
-    invoiceNumber: newInvoiceNumber,
-    status: body.status || "draft",
-    issueDate: body.issueDate || new Date().toISOString().split("T")[0],
-    dueDate: body.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-    lineItems: lineItems.map((item: { description: string; quantity: number; unitPrice: number; total: number }, index: number) => ({
-      id: String(index + 1),
-      description: item.description,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-      total: item.total,
-    })),
-    subtotal,
-    taxRate,
-    taxAmount,
-    total,
-    amountPaid: 0,
-    amountDue: total,
-    payments: [],
-    notes: body.notes || null,
-    terms: body.terms || null,
-    address: body.address || null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+      if (!customer || customer.company_id !== companyId) {
+        return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+      }
+    }
 
-  mockInvoices.push(newInvoice);
+    // Generate invoice number
+    const { data: lastInvoice } = await supabase
+      .from("invoices")
+      .select("invoice_number")
+      .eq("company_id", companyId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
 
-  return NextResponse.json({ data: newInvoice }, { status: 201 });
+    let nextNum = 1;
+    if (lastInvoice?.invoice_number) {
+      const match = lastInvoice.invoice_number.match(/INV-(\d+)/);
+      if (match) nextNum = parseInt(match[1], 10) + 1;
+    }
+    const invoiceNumber = `INV-${String(nextNum).padStart(3, "0")}`;
+
+    // Calculate totals
+    const lineItems = body.lineItems || [];
+    const subtotal = lineItems.reduce((sum: number, item: { total: number }) => sum + item.total, 0);
+    const taxRate = body.taxRate || 8;
+    const taxAmount = subtotal * (taxRate / 100);
+    const total = subtotal + taxAmount;
+
+    const { data, error } = await supabase
+      .from("invoices")
+      .insert({
+        company_id: companyId,
+        customer_id: body.customerId,
+        job_id: body.jobId || null,
+        estimate_id: body.estimateId || null,
+        invoice_number: invoiceNumber,
+        status: body.status || "draft",
+        issue_date: body.issueDate || new Date().toISOString().split("T")[0],
+        due_date: body.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        line_items: lineItems,
+        subtotal,
+        tax_rate: taxRate,
+        tax_amount: taxAmount,
+        total,
+        amount_paid: 0,
+        amount_due: total,
+        payments: [],
+        notes: body.notes || null,
+        terms: body.terms || null,
+        address: body.address || null,
+      })
+      .select(`${INVOICE_FIELDS}, customers(name)`)
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: "Failed to create invoice" }, { status: 500 });
+    }
+
+    // Handle Supabase join result
+    const customerPost = Array.isArray(data.customers) ? data.customers[0] : data.customers;
+
+    const invoice = {
+      id: data.id,
+      companyId: data.company_id,
+      customerId: data.customer_id,
+      customerName: customerPost?.name || "",
+      jobId: data.job_id,
+      estimateId: data.estimate_id,
+      invoiceNumber: data.invoice_number,
+      status: data.status,
+      issueDate: data.issue_date,
+      dueDate: data.due_date,
+      lineItems: data.line_items || [],
+      subtotal: data.subtotal,
+      taxRate: data.tax_rate,
+      taxAmount: data.tax_amount,
+      total: data.total,
+      amountPaid: data.amount_paid,
+      amountDue: data.amount_due,
+      payments: data.payments || [],
+      notes: data.notes,
+      terms: data.terms,
+      address: data.address,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    };
+
+    return NextResponse.json({ data: invoice }, { status: 201 });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+    }
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
 }

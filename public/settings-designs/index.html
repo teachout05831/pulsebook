@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings Page Redesign Options</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f172a;
+    color: white;
+    min-height: 100vh;
+    padding: 60px 40px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  .header p {
+    color: #94a3b8;
+    font-size: 16px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .design-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .design-card:hover {
+    border-color: #3b82f6;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+
+  .design-card .preview {
+    height: 200px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .design-card .preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Visual previews for each design */
+  .preview-1 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    padding: 20px !important;
+  }
+
+  .preview-1 .mini-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .preview-1 .mini-card .dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+
+  .preview-1 .mini-card .line {
+    height: 6px;
+    border-radius: 3px;
+    background: #e2e8f0;
+  }
+
+  .preview-1 .mini-card .line.short { width: 60%; }
+
+  .preview-2 {
+    display: flex !important;
+    padding: 0 !important;
+  }
+
+  .preview-2 .p-sidebar {
+    width: 80px;
+    background: white;
+    border-right: 1px solid #e2e8f0;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .preview-2 .p-sidebar .p-item {
+    height: 8px;
+    border-radius: 4px;
+    background: #e2e8f0;
+  }
+
+  .preview-2 .p-sidebar .p-item.active { background: #2563eb; }
+
+  .preview-2 .p-content {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preview-2 .p-content .p-block {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    height: 32px;
+  }
+
+  .preview-2 .p-content .p-block.lg { height: 60px; }
+
+  .preview-3 {
+    display: flex !important;
+    flex-direction: column;
+    padding: 16px !important;
+    gap: 12px;
+  }
+
+  .preview-3 .p-tabs {
+    display: flex;
+    gap: 4px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .preview-3 .p-tab {
+    flex: 1;
+    height: 24px;
+    border-radius: 5px;
+    background: transparent;
+  }
+
+  .preview-3 .p-tab.active { background: #2563eb; }
+
+  .preview-3 .p-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .preview-3 .p-section {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    flex: 1;
+  }
+
+  .preview-4 {
+    display: flex !important;
+    flex-direction: column;
+    padding: 16px !important;
+    gap: 6px;
+  }
+
+  .preview-4 .p-acc {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+  }
+
+  .preview-4 .p-acc .p-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    margin-right: 8px;
+  }
+
+  .preview-4 .p-acc .p-line {
+    height: 6px;
+    width: 60px;
+    background: #e2e8f0;
+    border-radius: 3px;
+  }
+
+  .preview-4 .p-acc.open {
+    height: 80px;
+    border-color: #2563eb;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+  }
+
+  .preview-5 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 20px !important;
+  }
+
+  .preview-5 .p-cat {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .preview-5 .p-cat .p-cat-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+  }
+
+  .preview-5 .p-cat .p-cat-line {
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 3px;
+  }
+
+  .preview-5 .p-cat .p-cat-line.med { width: 75%; }
+  .preview-5 .p-cat .p-cat-line.short { width: 50%; }
+
+  .design-card .info {
+    padding: 20px 24px 24px;
+  }
+
+  .design-card .info .tag {
+    display: inline-block;
+    background: #334155;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .design-card .info .tag.recommended {
+    background: rgba(59,130,246,0.2);
+    color: #60a5fa;
+  }
+
+  .design-card .info h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .design-card .info p {
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .design-card .info .pros {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .design-card .info .pro {
+    background: rgba(16,185,129,0.1);
+    color: #34d399;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 32px 16px; }
+    .header h1 { font-size: 26px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>Settings Page Redesign</h1>
+    <p>5 design options - click any card to view the full interactive prototype</p>
+  </div>
+
+  <div class="grid">
+    <a class="design-card" href="design-1-card-hub.html">
+      <div class="preview preview-1" style="background: #f1f5f9;">
+        <div class="mini-card"><div class="dot" style="background: #eff6ff;"></div><div class="line"></div><div class="line short"></div></div>
+        <div class="mini-card"><div class="dot" style="background: #ecfdf5;"></div><div class="line"></div><div class="line short"></div></div>
+        <div class="mini-card"><div class="dot" style="background: #f5f3ff;"></div><div class="line"></div><div class="line short"></div></div>
+        <div class="mini-card"><div class="dot" style="background: #fffbeb;"></div><div class="line"></div><div class="line short"></div></div>
+        <div class="mini-card"><div class="dot" style="background: #fdf2f8;"></div><div class="line"></div><div class="line short"></div></div>
+        <div class="mini-card"><div class="dot" style="background: #ecfeff;"></div><div class="line"></div><div class="line short"></div></div>
+      </div>
+      <div class="info">
+        <span class="tag recommended">Recommended</span>
+        <h2>Design 1: Card Hub</h2>
+        <p>Grid of category cards on the landing page. Each card navigates to a focused sub-page.</p>
+        <div class="pros">
+          <span class="pro">Most mobile-friendly</span>
+          <span class="pro">Clean & scannable</span>
+          <span class="pro">Easy to scale</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="design-card" href="design-2-sidebar-nav.html">
+      <div class="preview preview-2" style="background: #f1f5f9;">
+        <div class="p-sidebar">
+          <div class="p-item active"></div>
+          <div class="p-item"></div>
+          <div class="p-item"></div>
+          <div class="p-item" style="margin-top: 8px;"></div>
+          <div class="p-item"></div>
+          <div class="p-item" style="margin-top: 8px;"></div>
+          <div class="p-item"></div>
+          <div class="p-item"></div>
+        </div>
+        <div class="p-content">
+          <div class="p-block"></div>
+          <div class="p-block lg"></div>
+          <div class="p-block"></div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="tag">Classic</span>
+        <h2>Design 2: Sidebar Navigation</h2>
+        <p>Persistent sidebar with section links. Content shows one section at a time. Mobile: slide-out drawer.</p>
+        <div class="pros">
+          <span class="pro">Quick switching</span>
+          <span class="pro">Familiar pattern</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="design-card" href="design-3-grouped-tabs.html">
+      <div class="preview preview-3" style="background: #f1f5f9;">
+        <div class="p-tabs">
+          <div class="p-tab active"></div>
+          <div class="p-tab"></div>
+          <div class="p-tab"></div>
+          <div class="p-tab"></div>
+        </div>
+        <div class="p-sections">
+          <div class="p-section"></div>
+          <div class="p-section"></div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="tag">Compact</span>
+        <h2>Design 3: Grouped Tabs</h2>
+        <p>Horizontal tabs grouping related settings (General, Business, Customization, Integrations).</p>
+        <div class="pros">
+          <span class="pro">70% less visible sections</span>
+          <span class="pro">Logical grouping</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="design-card" href="design-4-accordion.html">
+      <div class="preview preview-4" style="background: #f1f5f9;">
+        <div class="p-acc"><div class="p-dot" style="background: #eff6ff;"></div><div class="p-line"></div></div>
+        <div class="p-acc open"><div style="display:flex;align-items:center;gap:8px;"><div class="p-dot" style="background: #ecfdf5;width:16px;height:16px;border-radius:4px;"></div><div class="p-line" style="height:6px;width:60px;background:#e2e8f0;border-radius:3px;"></div></div><div style="flex:1;background:#f8fafc;border-radius:4px;margin-top:6px;"></div></div>
+        <div class="p-acc"><div class="p-dot" style="background: #f5f3ff;"></div><div class="p-line"></div></div>
+        <div class="p-acc"><div class="p-dot" style="background: #fffbeb;"></div><div class="p-line"></div></div>
+      </div>
+      <div class="info">
+        <span class="tag">Minimal change</span>
+        <h2>Design 4: Accordion Sections</h2>
+        <p>Collapsible sections on a single page. One section open at a time with search.</p>
+        <div class="pros">
+          <span class="pro">All sections visible</span>
+          <span class="pro">Least code change</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="design-card" href="design-5-two-level.html">
+      <div class="preview preview-5" style="background: #f1f5f9;">
+        <div class="p-cat">
+          <div class="p-cat-icon" style="background: #eff6ff;"></div>
+          <div class="p-cat-line"></div>
+          <div class="p-cat-line med"></div>
+          <div class="p-cat-line short"></div>
+        </div>
+        <div class="p-cat">
+          <div class="p-cat-icon" style="background: #ecfdf5;"></div>
+          <div class="p-cat-line"></div>
+          <div class="p-cat-line med"></div>
+          <div class="p-cat-line short"></div>
+        </div>
+        <div class="p-cat">
+          <div class="p-cat-icon" style="background: #f5f3ff;"></div>
+          <div class="p-cat-line"></div>
+          <div class="p-cat-line med"></div>
+          <div class="p-cat-line short"></div>
+        </div>
+        <div class="p-cat">
+          <div class="p-cat-icon" style="background: #fffbeb;"></div>
+          <div class="p-cat-line"></div>
+          <div class="p-cat-line med"></div>
+          <div class="p-cat-line short"></div>
+        </div>
+      </div>
+      <div class="info">
+        <span class="tag">Enterprise</span>
+        <h2>Design 5: Two-Level Categories</h2>
+        <p>4 category cards on home, each opens a sub-page with its own sidebar navigation.</p>
+        <div class="pros">
+          <span class="pro">Most organized</span>
+          <span class="pro">Scales well</span>
+          <span class="pro">Two-tier hierarchy</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</body>
+</html>

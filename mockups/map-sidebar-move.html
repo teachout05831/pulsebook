@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispatch Map View - Move Demo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column;">
+
+<!-- Top bar (mimics dispatch header) -->
+<div style="height: 48px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; padding: 0 16px; gap: 12px; flex-shrink: 0;">
+  <div style="font-size: 14px; font-weight: 600; color: #111;">Dispatch</div>
+  <div style="display: flex; gap: 4px; margin-left: 16px;">
+    <div style="padding: 4px 10px; font-size: 11px; background: #f3f4f6; border-radius: 4px; color: #666; cursor: pointer;">Timeline</div>
+    <div style="padding: 4px 10px; font-size: 11px; background: #f3f4f6; border-radius: 4px; color: #666; cursor: pointer;">Board</div>
+    <div style="padding: 4px 10px; font-size: 11px; background: #eff6ff; border-radius: 4px; color: #2563eb; font-weight: 600; border: 1px solid #bfdbfe;">Map</div>
+    <div style="padding: 4px 10px; font-size: 11px; background: #f3f4f6; border-radius: 4px; color: #666; cursor: pointer;">Kanban</div>
+  </div>
+  <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+    <div style="font-size: 12px; color: #666;">Feb 10, 2026</div>
+    <div style="display: flex; gap: 2px;">
+      <button style="padding: 4px 8px; font-size: 11px; background: #fff; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">&lt;</button>
+      <button style="padding: 4px 8px; font-size: 11px; background: #fff; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">Today</button>
+      <button style="padding: 4px 8px; font-size: 11px; background: #fff; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">&gt;</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main content: Map + Sidebar -->
+<div style="flex: 1; display: flex; overflow: hidden; position: relative;">
+
+  <!-- Map area -->
+  <div style="flex: 1; position: relative;">
+    <div id="map" style="width: 100%; height: 100%;"></div>
+
+    <!-- Route controls overlay (mimics existing) -->
+    <div style="position: absolute; top: 12px; right: 260px; z-index: 500; display: flex; gap: 6px;">
+      <div style="background: #fff; border-radius: 6px; padding: 6px 10px; font-size: 11px; color: #555; box-shadow: 0 1px 4px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 4px; cursor: pointer;">
+        <span style="font-size: 13px;">&#128739;</span> Routes
+      </div>
+    </div>
+
+    <!-- Map legend overlay -->
+    <div style="position: absolute; bottom: 12px; left: 12px; z-index: 500; background: #fff; border-radius: 6px; padding: 8px 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.12);">
+      <div style="font-size: 9px; font-weight: 600; color: #888; text-transform: uppercase; margin-bottom: 4px;">Legend</div>
+      <div style="display: flex; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 4px; font-size: 10px; color: #555;"><div style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></div>Crew Alpha</div>
+        <div style="display: flex; align-items: center; gap: 4px; font-size: 10px; color: #555;"><div style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></div>Crew Beta</div>
+        <div style="display: flex; align-items: center; gap: 4px; font-size: 10px; color: #555;"><div style="width: 8px; height: 8px; border-radius: 50%; background: #6b7280;"></div>Unassigned</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar (right side, 260px like real one) -->
+  <div id="sidebar" style="width: 260px; border-left: 1px solid #e5e7eb; background: #fff; overflow-y: auto; flex-shrink: 0; position: relative;">
+
+    <!-- Header -->
+    <div style="padding: 8px 12px; border-bottom: 1px solid #eee; font-size: 11px; font-weight: 600; color: #555; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: #fff; z-index: 2;">
+      <span id="total-count">TODAY'S JOBS (7)</span>
+    </div>
+
+    <!-- === CREW ALPHA === -->
+    <div id="header-alpha" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f9fafb; border-bottom: 1px solid #eee;">
+      <div style="width: 10px; height: 10px; border-radius: 3px; background: #3b82f6;"></div>
+      <span style="font-size: 11px; font-weight: 600; color: #1f2937;">Crew Alpha</span>
+      <span id="count-alpha" style="font-size: 10px; color: #999; margin-left: auto;">3 jobs</span>
+    </div>
+
+    <div id="job-j1" data-crew="alpha" class="job-row" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; position: relative; cursor: pointer;">
+      <button onclick="openMenu('j1', 'alpha')" style="width: 22px; height: 22px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #9ca3af;" title="Move job">&#10132;</button>
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #3b82f6; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">1</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 12px; font-weight: 500; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Kitchen Remodel</div>
+        <div style="font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">1234 Oak Ave, Phoenix</div>
+        <div style="font-size: 10px; color: #666;">8:00 AM</div>
+      </div>
+    </div>
+
+    <div id="job-j2" data-crew="alpha" class="job-row" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; position: relative; cursor: pointer;">
+      <button onclick="openMenu('j2', 'alpha')" style="width: 22px; height: 22px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #9ca3af;" title="Move job">&#10132;</button>
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #3b82f6; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">2</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 12px; font-weight: 500; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Bathroom Tile Install</div>
+        <div style="font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">567 Pine St, Tempe</div>
+        <div style="font-size: 10px; color: #666;">10:30 AM</div>
+      </div>
+    </div>
+
+    <div id="job-j3" data-crew="alpha" class="job-row" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; position: relative; cursor: pointer;">
+      <button onclick="openMenu('j3', 'alpha')" style="width: 22px; height: 22px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #9ca3af;" title="Move job">&#10132;</button>
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #3b82f6; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">3</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 12px; font-weight: 500; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Deck Repair</div>
+        <div style="font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">890 Elm Dr, Scottsdale</div>
+        <div style="font-size: 10px; color: #666;">1:00 PM</div>
+      </div>
+    </div>
+
+    <!-- === CREW BETA === -->
+    <div id="header-beta" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f9fafb; border-bottom: 1px solid #eee;">
+      <div style="width: 10px; height: 10px; border-radius: 3px; background: #10b981;"></div>
+      <span style="font-size: 11px; font-weight: 600; color: #1f2937;">Crew Beta</span>
+      <span id="count-beta" style="font-size: 10px; color: #999; margin-left: auto;">2 jobs</span>
+    </div>
+
+    <div id="job-j4" data-crew="beta" class="job-row" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; position: relative; cursor: pointer;">
+      <button onclick="openMenu('j4', 'beta')" style="width: 22px; height: 22px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #9ca3af;" title="Move job">&#10132;</button>
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #10b981; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">1</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 12px; font-weight: 500; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Window Replacement</div>
+        <div style="font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">321 Maple Ln, Mesa</div>
+        <div style="font-size: 10px; color: #666;">9:00 AM</div>
+      </div>
+    </div>
+
+    <div id="job-j5" data-crew="beta" class="job-row" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; position: relative; cursor: pointer;">
+      <button onclick="openMenu('j5', 'beta')" style="width: 22px; height: 22px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #9ca3af;" title="Move job">&#10132;</button>
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #10b981; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">2</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 12px; font-weight: 500; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Fence Install</div>
+        <div style="font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">654 Birch Rd, Gilbert</div>
+        <div style="font-size: 10px; color: #666;">2:00 PM</div>
+      </div>
+    </div>
+
+    <!-- === UNASSIGNED === -->
+    <div id="header-unassigned" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f9fafb; border-bottom: 1px solid #eee;">
+      <div style="width: 10px; height: 10px; border-radius: 3px; background: #6b7280;"></div>
+      <span style="font-size: 11px; font-weight: 600; color: #1f2937;">Unassigned</span>
+      <span id="count-unassigned" style="font-size: 10px; color: #999; margin-left: auto;">2 jobs</span>
+    </div>
+
+    <div id="job-j6" data-crew="unassigned" class="job-row" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; position: relative; cursor: pointer;">
+      <button onclick="openMenu('j6', 'unassigned')" style="width: 22px; height: 22px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #9ca3af;" title="Move job">&#10132;</button>
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #6b7280; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">1</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 12px; font-weight: 500; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Roof Inspection</div>
+        <div style="font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">111 Cedar Ct, Chandler</div>
+        <div style="font-size: 10px; color: #666;">Unscheduled</div>
+      </div>
+    </div>
+
+    <div id="job-j7" data-crew="unassigned" class="job-row" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; position: relative; cursor: pointer;">
+      <button onclick="openMenu('j7', 'unassigned')" style="width: 22px; height: 22px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; color: #9ca3af;" title="Move job">&#10132;</button>
+      <div style="width: 26px; height: 26px; border-radius: 50%; background: #6b7280; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">2</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 12px; font-weight: 500; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">HVAC Maintenance</div>
+        <div style="font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">222 Walnut Blvd, Tempe</div>
+        <div style="font-size: 10px; color: #666;">Unscheduled</div>
+      </div>
+    </div>
+
+  </div><!-- end sidebar -->
+</div><!-- end main content -->
+
+<!-- The floating popover menu -->
+<div id="popover" style="display: none; position: absolute; width: 170px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 4px; z-index: 9999;">
+  <div style="font-size: 10px; font-weight: 600; color: #888; padding: 6px 10px 4px; text-transform: uppercase; letter-spacing: 0.03em;">Move to</div>
+  <div id="opt-alpha"  onclick="moveJob('alpha')"      style="display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; color: #333;"><div style="width: 9px; height: 9px; border-radius: 3px; background: #3b82f6;"></div>Crew Alpha<span id="check-alpha" style="margin-left: auto; color: #3b82f6; font-size: 12px; display: none;">&#10003;</span></div>
+  <div id="opt-beta"   onclick="moveJob('beta')"       style="display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; color: #333;"><div style="width: 9px; height: 9px; border-radius: 3px; background: #10b981;"></div>Crew Beta<span id="check-beta" style="margin-left: auto; color: #10b981; font-size: 12px; display: none;">&#10003;</span></div>
+  <hr style="border: none; border-top: 1px solid #f3f4f6; margin: 3px 0;">
+  <div id="opt-unassigned" onclick="moveJob('unassigned')" style="display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; color: #888;"><div style="width: 9px; height: 9px; border-radius: 3px; background: #6b7280;"></div>Unassign</div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; display: none; z-index: 10000; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">
+  <span style="color: #4ade80; margin-right: 6px;">&#10003;</span>
+  <span id="toast-text"></span>
+</div>
+
+<script>
+// ── Job location data for map pins ──
+var jobLocations = {
+  j1: { lat: 33.4942, lng: -112.0740, title: 'Kitchen Remodel' },
+  j2: { lat: 33.4255, lng: -111.9400, title: 'Bathroom Tile Install' },
+  j3: { lat: 33.5092, lng: -111.8988, title: 'Deck Repair' },
+  j4: { lat: 33.4152, lng: -111.8315, title: 'Window Replacement' },
+  j5: { lat: 33.3528, lng: -111.7890, title: 'Fence Install' },
+  j6: { lat: 33.3062, lng: -111.8413, title: 'Roof Inspection' },
+  j7: { lat: 33.4255, lng: -111.9600, title: 'HVAC Maintenance' }
+};
+
+var crewColors = {
+  alpha: '#3b82f6',
+  beta: '#10b981',
+  unassigned: '#6b7280'
+};
+
+var crewNames = {
+  alpha: 'Crew Alpha',
+  beta: 'Crew Beta',
+  unassigned: 'Unassigned'
+};
+
+// ── Initialize Leaflet map ──
+var myMap = L.map('map', { zoomControl: true }).setView([33.42, -111.92], 11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap'
+}).addTo(myMap);
+
+// ── Create map markers ──
+var markers = {};
+
+function getJobCrew(jobId) {
+  var el = document.getElementById('job-' + jobId);
+  return el ? el.dataset.crew : 'unassigned';
+}
+
+function createNumberIcon(number, color) {
+  return L.divIcon({
+    className: '',
+    html: '<div style="width:28px;height:28px;border-radius:50%;background:' + color + ';color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3);border:2px solid #fff;">' + number + '</div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+}
+
+function initMarkers() {
+  var crewJobCounts = { alpha: 0, beta: 0, unassigned: 0 };
+  var jobIds = ['j1','j2','j3','j4','j5','j6','j7'];
+
+  for (var i = 0; i < jobIds.length; i++) {
+    var jid = jobIds[i];
+    var loc = jobLocations[jid];
+    var crew = getJobCrew(jid);
+    crewJobCounts[crew]++;
+    var num = crewJobCounts[crew];
+    var icon = createNumberIcon(num, crewColors[crew]);
+    markers[jid] = L.marker([loc.lat, loc.lng], { icon: icon }).addTo(myMap);
+    markers[jid].bindTooltip(loc.title, { direction: 'top', offset: [0, -14] });
+  }
+}
+
+function updateMarkers() {
+  var crewJobCounts = { alpha: 0, beta: 0, unassigned: 0 };
+  var jobIds = ['j1','j2','j3','j4','j5','j6','j7'];
+
+  for (var i = 0; i < jobIds.length; i++) {
+    var jid = jobIds[i];
+    var crew = getJobCrew(jid);
+    crewJobCounts[crew]++;
+    var num = crewJobCounts[crew];
+    var icon = createNumberIcon(num, crewColors[crew]);
+    markers[jid].setIcon(icon);
+  }
+}
+
+initMarkers();
+
+// ── Sidebar interaction ──
+var activeJobId = null;
+var activeJobCrew = null;
+
+// Hover effects on popover items
+var opts = document.querySelectorAll('#popover div[id^="opt-"]');
+for (var i = 0; i < opts.length; i++) {
+  opts[i].onmouseenter = function() { this.style.background = '#f3f4f6'; };
+  opts[i].onmouseleave = function() {
+    var crewId = this.id.replace('opt-', '');
+    if (crewId === activeJobCrew) {
+      this.style.background = '#eff6ff';
+    } else {
+      this.style.background = '';
+    }
+  };
+}
+
+function openMenu(jobId, currentCrew) {
+  activeJobId = jobId;
+  activeJobCrew = currentCrew;
+
+  // Show checkmark on current crew
+  document.getElementById('check-alpha').style.display = (currentCrew === 'alpha') ? 'inline' : 'none';
+  document.getElementById('check-beta').style.display = (currentCrew === 'beta') ? 'inline' : 'none';
+
+  // Highlight current crew option
+  document.getElementById('opt-alpha').style.background = (currentCrew === 'alpha') ? '#eff6ff' : '';
+  document.getElementById('opt-beta').style.background = (currentCrew === 'beta') ? '#eff6ff' : '';
+  document.getElementById('opt-unassigned').style.background = (currentCrew === 'unassigned') ? '#f3f4f6' : '';
+
+  // Position popover to the left of the sidebar (over the map)
+  var jobEl = document.getElementById('job-' + jobId);
+  var rect = jobEl.getBoundingClientRect();
+  var popover = document.getElementById('popover');
+  popover.style.display = 'block';
+  popover.style.top = (rect.top + window.scrollY + (rect.height / 2) - 60) + 'px';
+  popover.style.left = (rect.left - 178) + 'px';
+}
+
+function closeMenu() {
+  document.getElementById('popover').style.display = 'none';
+  activeJobId = null;
+  activeJobCrew = null;
+}
+
+function moveJob(targetCrew) {
+  if (!activeJobId) return;
+  if (targetCrew === activeJobCrew) {
+    closeMenu();
+    return;
+  }
+
+  var jobEl = document.getElementById('job-' + activeJobId);
+  var oldCrew = activeJobCrew;
+
+  // Move the DOM element to new crew group
+  var targetHeader = document.getElementById('header-' + targetCrew);
+  var nextSibling = targetHeader.nextElementSibling;
+
+  while (nextSibling && nextSibling.dataset && nextSibling.dataset.crew === targetCrew) {
+    nextSibling = nextSibling.nextElementSibling;
+  }
+
+  if (nextSibling) {
+    nextSibling.parentNode.insertBefore(jobEl, nextSibling);
+  } else {
+    document.getElementById('sidebar').appendChild(jobEl);
+  }
+
+  jobEl.dataset.crew = targetCrew;
+
+  // Flash highlight
+  jobEl.style.background = '#ecfdf5';
+  jobEl.style.borderLeft = '3px solid ' + crewColors[targetCrew];
+  setTimeout(function() {
+    jobEl.style.background = '';
+    jobEl.style.borderLeft = '';
+  }, 1500);
+
+  // Update badge colors
+  var allDivs = jobEl.getElementsByTagName('div');
+  for (var d = 0; d < allDivs.length; d++) {
+    if (allDivs[d].style.borderRadius === '50%') {
+      allDivs[d].style.background = crewColors[targetCrew];
+      break;
+    }
+  }
+
+  updateCounts();
+  renumberJobs();
+  updateMarkers();
+
+  var msg = targetCrew === 'unassigned' ? 'Job unassigned' : 'Moved to ' + crewNames[targetCrew];
+  showToast(msg);
+  closeMenu();
+}
+
+function updateCounts() {
+  var crews = ['alpha', 'beta', 'unassigned'];
+  for (var c = 0; c < crews.length; c++) {
+    var crewId = crews[c];
+    var count = document.querySelectorAll('[data-crew="' + crewId + '"]').length;
+    var countEl = document.getElementById('count-' + crewId);
+    if (countEl) {
+      countEl.textContent = count + ' job' + (count !== 1 ? 's' : '');
+    }
+    var headerEl = document.getElementById('header-' + crewId);
+    if (headerEl) {
+      headerEl.style.display = count > 0 ? 'flex' : 'none';
+    }
+  }
+}
+
+function renumberJobs() {
+  var crews = ['alpha', 'beta', 'unassigned'];
+  for (var c = 0; c < crews.length; c++) {
+    var crewId = crews[c];
+    var jobEls = document.querySelectorAll('[data-crew="' + crewId + '"]');
+    for (var j = 0; j < jobEls.length; j++) {
+      var allDivs = jobEls[j].getElementsByTagName('div');
+      for (var d = 0; d < allDivs.length; d++) {
+        if (allDivs[d].style.borderRadius === '50%') {
+          allDivs[d].textContent = (j + 1).toString();
+          break;
+        }
+      }
+    }
+  }
+}
+
+function showToast(msg) {
+  var toast = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(function() {
+    toast.style.display = 'none';
+  }, 2500);
+}
+
+// Close popover when clicking outside
+document.addEventListener('click', function(e) {
+  var popover = document.getElementById('popover');
+  if (popover.style.display === 'block') {
+    if (!popover.contains(e.target) && !e.target.closest('button[onclick^="openMenu"]')) {
+      closeMenu();
+    }
+  }
+});
+
+// Highlight sidebar job when clicking (not the move button)
+var jobRows = document.querySelectorAll('.job-row');
+for (var r = 0; r < jobRows.length; r++) {
+  jobRows[r].addEventListener('click', function(e) {
+    if (e.target.tagName === 'BUTTON') return;
+    // Remove previous selection
+    var all = document.querySelectorAll('.job-row');
+    for (var a = 0; a < all.length; a++) {
+      all[a].style.background = '';
+      all[a].style.borderLeft = '';
+    }
+    this.style.background = '#eff6ff';
+    this.style.borderLeft = '3px solid #2563eb';
+  });
+}
+</script>
+
+</body>
+</html>

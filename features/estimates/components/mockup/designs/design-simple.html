@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Estimate Detail</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f9fafb;color:#111827;font-size:14px;line-height:1.5}
+    a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
+    select,input,textarea{font-family:inherit;font-size:inherit}
+    textarea{resize:vertical}
+
+    /* Header */
+    .header{background:white;border-bottom:1px solid #e5e7eb;padding:16px 24px}
+    .header-inner{max-width:1200px;margin:0 auto}
+    .header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+    .header-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .customer-name{font-size:15px;font-weight:600;color:#111827}
+    .est-number{font-size:20px;font-weight:700;color:#111827}
+    .badge{font-size:11px;font-weight:600;padding:2px 10px;border-radius:9999px;display:inline-flex;align-items:center;gap:5px}
+    .badge-dot{width:6px;height:6px;border-radius:50%}
+    .badge-green{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}
+    .badge-green .badge-dot{background:#059669}
+    .followup{font-size:12px;color:#6b7280}
+
+    /* Action buttons */
+    .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .icon-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;border-radius:8px;background:white;cursor:pointer;color:#6b7280;transition:all 0.15s}
+    .icon-btn:hover{border-color:#d1d5db;color:#111827;background:#f9fafb}
+    .icon-btn svg{width:16px;height:16px}
+    .book-btn{background:#111827;color:white;border:none;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.15s}
+    .book-btn:hover{background:#1f2937}
+    .book-btn svg{width:12px;height:12px}
+
+    /* Dropdown */
+    .dropdown{position:relative}
+    .dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);background:white;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.1);min-width:180px;z-index:50;overflow:hidden;padding:4px}
+    .dropdown-menu.show{display:block}
+    .dropdown-item{padding:8px 12px;font-size:13px;cursor:pointer;border-radius:6px;color:#374151}
+    .dropdown-item:hover{background:#f3f4f6}
+
+    /* Layout */
+    .layout{max-width:1200px;margin:0 auto;padding:20px 24px;display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+
+    /* Cards */
+    .section{background:white;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+    .section-title{font-size:13px;font-weight:600;color:#111827}
+
+    /* Sidebar field rows */
+    .field-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:13px}
+    .field-row:last-child{border:none}
+    .field-label{color:#6b7280;font-size:12px}
+    .field-row select{border:none;background:none;color:#2563eb;font-size:13px;font-weight:500;cursor:pointer;text-align:right;padding:0;appearance:auto}
+
+    /* Resource boxes */
+    .resources{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+    .resource{text-align:center;padding:10px 4px;background:#f9fafb;border-radius:8px;border:1px solid #f3f4f6}
+    .resource-label{font-size:10px;color:#6b7280;text-transform:uppercase;font-weight:600;letter-spacing:0.04em}
+    .resource-value{font-size:18px;font-weight:700;color:#111827;margin-top:2px}
+
+    /* Pricing rows */
+    .price-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}
+    .price-row a{font-weight:500}
+    .price-divider{border-top:1px solid #f3f4f6;margin:4px 0}
+
+    /* Tabs */
+    .tabs{display:flex;border-bottom:1px solid #e5e7eb;overflow-x:auto}
+    .tab{padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;color:#9ca3af;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;position:relative;transition:color 0.15s}
+    .tab.active{color:#111827;border-bottom-color:#111827}
+    .tab:hover{color:#6b7280}
+    .tab-dot{width:5px;height:5px;border-radius:50%;background:#ef4444;position:absolute;top:6px;right:8px}
+    .tab-panel{display:none;padding:16px 20px}
+    .tab-panel.active{display:block}
+
+    /* Stops */
+    .stop-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f9fafb;font-size:13px;flex-wrap:wrap}
+    .stop-row:last-child{border:none}
+    .stop-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .stop-type{width:72px;font-size:12px;flex-shrink:0}
+    .stop-tag{font-size:11px;color:#6b7280;background:#f3f4f6;padding:2px 8px;border-radius:9999px}
+    .route-badge{font-size:11px;color:#6b7280;background:#f3f4f6;padding:2px 8px;border-radius:9999px}
+
+    /* Job card */
+    .job-card{border:1px solid #e5e7eb;border-radius:10px;padding:12px 16px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;transition:border-color 0.15s}
+    .job-card:hover{border-color:#d1d5db}
+
+    /* Total bar */
+    .total-bar{background:#111827;color:white;padding:14px 20px;display:flex;justify-content:space-between;align-items:baseline}
+    .total-label{font-size:14px;font-weight:600}
+    .total-amount{font-size:22px;font-weight:700}
+
+    /* Sticky sidebar */
+    .sidebar{position:sticky;top:20px}
+
+    /* Slide panels */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:90;display:none;opacity:0;transition:opacity 0.2s}
+    .overlay.show{display:block;opacity:1}
+    .panel{position:fixed;top:0;right:0;width:min(380px,90vw);height:100vh;background:white;box-shadow:-4px 0 20px rgba(0,0,0,0.08);z-index:100;transform:translateX(100%);transition:transform 0.25s ease;overflow-y:auto}
+    .panel.open{transform:translateX(0)}
+    .panel-header{padding:16px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white}
+    .panel-header h3{font-size:15px;font-weight:600}
+    .panel-close{background:none;border:none;font-size:20px;cursor:pointer;color:#9ca3af;padding:4px}
+    .panel-close:hover{color:#111827}
+    .panel-body{padding:20px}
+
+    /* Responsive */
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr;padding:16px}
+      .sidebar{position:static}
+    }
+    @media(max-width:480px){
+      .resources{grid-template-columns:repeat(2,1fr)}
+      .header{padding:12px 16px}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-top">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="customer-name">Kasandra Butler</span>
+          <span class="badge badge-green"><span class="badge-dot"></span>Opportunity</span>
+        </div>
+        <span class="followup">Follow-up: <a href="#">+ Create</a></span>
+      </div>
+      <div class="header-bottom">
+        <span class="est-number">Estimate #67653</span>
+        <div class="actions">
+          <button class="icon-btn" onclick="openPanel('docs')" title="Documents">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="openPanel('versions')" title="Previous Versions">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="openPanel('activity')" title="Activity">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </button>
+          <div class="dropdown">
+            <button class="book-btn" onclick="document.getElementById('bookMenu').classList.toggle('show')">
+              Book
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="dropdown-menu" id="bookMenu">
+              <div class="dropdown-item">Take Payment</div>
+              <div class="dropdown-item">Mark Lost</div>
+              <div class="dropdown-item">Preview Estimate</div>
+              <div class="dropdown-item">Send Estimate</div>
+              <div class="dropdown-item">Duplicate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- ===== LEFT: MAIN CONTENT ===== -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Jobs -->
+      <div class="section" style="padding:16px 20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <span class="section-title">Jobs</span>
+          <a href="#" style="font-size:12px;font-weight:500;">+ Add Job</a>
+        </div>
+        <div class="job-card">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#374151;">Job 67653-1</div>
+            <span style="font-size:11px;color:#9ca3af;">Unscheduled</span>
+          </div>
+          <select style="border:none;font-size:13px;color:#2563eb;font-weight:500;cursor:pointer;background:none;">
+            <option selected>Moving</option><option>Packing</option><option>Storage</option><option>Cleaning</option><option>Repair</option>
+          </select>
+          <a href="#" style="font-size:13px;">Feb 27, 2026</a>
+          <span style="font-weight:600;font-size:15px;margin-left:auto;">$425.00</span>
+        </div>
+      </div>
+
+      <!-- Stops / Addresses -->
+      <div class="section" style="padding:16px 20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span class="section-title">Stops</span>
+            <a href="#" style="font-size:12px;">Map</a>
+            <span class="route-badge"><b>RT</b> 1h 6m / 57mi</span>
+            <span class="route-badge"><b>O&rarr;D</b> 0h / 0mi</span>
+            <span class="route-badge"><b>Travel</b> 1h 6m</span>
+          </div>
+          <a href="#" style="font-size:12px;font-weight:500;">+ Add Stop</a>
+        </div>
+        <div class="stop-row">
+          <span class="stop-dot" style="background:#d1d5db;"></span>
+          <span class="stop-type" style="color:#9ca3af;">Office</span>
+          <span style="flex:1;min-width:140px;">1237 S Val Vista Dr, Mesa, AZ 85204</span>
+        </div>
+        <div class="stop-row">
+          <span class="stop-dot" style="background:#2563eb;"></span>
+          <a href="#" class="stop-type" style="font-weight:600;">Origin</a>
+          <span style="flex:1;min-width:140px;">Phoenix, Arizona 85015</span>
+          <span class="stop-tag">Apartment</span>
+        </div>
+        <div class="stop-row">
+          <span class="stop-dot" style="background:#16a34a;"></span>
+          <a href="#" class="stop-type" style="font-weight:600;">Destination</a>
+          <span style="flex:1;min-width:140px;">Phoenix, Arizona 85041</span>
+          <span class="stop-tag">House</span>
+        </div>
+        <div class="stop-row">
+          <span class="stop-dot" style="background:#d1d5db;"></span>
+          <span class="stop-type" style="color:#9ca3af;">Office</span>
+          <span style="flex:1;min-width:140px;">1237 S Val Vista Dr, Mesa, AZ 85204</span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="section">
+        <div class="tabs" id="noteTabs">
+          <div class="tab active" data-tab="internal" onclick="switchTab('internal')" style="position:relative;">Internal<span class="tab-dot"></span></div>
+          <div class="tab" data-tab="customer" onclick="switchTab('customer')" style="position:relative;">Customer<span class="tab-dot"></span></div>
+          <div class="tab" data-tab="crew" onclick="switchTab('crew')">Crew Notes</div>
+          <div class="tab" data-tab="feedback" onclick="switchTab('feedback')">Crew Feedback</div>
+        </div>
+        <div class="tab-panel active" id="panel-internal">
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:8px;font-style:italic;">Visible to office only</div>
+          <textarea style="width:100%;min-height:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px;outline:none;transition:border-color 0.15s;" onfocus="this.style.borderColor='#9ca3af'" onblur="this.style.borderColor='#e5e7eb'">2 major street less than a mile
+apartment to another apartment
+1st floor to a 2nd floor apartment
+no appliances boxes and furniture
+$150
+$125</textarea>
+        </div>
+        <div class="tab-panel" id="panel-customer">
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:8px;font-style:italic;">Visible to customer</div>
+          <textarea style="width:100%;min-height:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px;outline:none;" onfocus="this.style.borderColor='#9ca3af'" onblur="this.style.borderColor='#e5e7eb'">Thank you for choosing us! Please have items boxed and ready by 8 AM on move day.</textarea>
+        </div>
+        <div class="tab-panel" id="panel-crew">
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:8px;font-style:italic;">Instructions for crew</div>
+          <textarea style="width:100%;min-height:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px;outline:none;" onfocus="this.style.borderColor='#9ca3af'" onblur="this.style.borderColor='#e5e7eb'">Bring extra blankets. Narrow staircase at pickup location.</textarea>
+        </div>
+        <div class="tab-panel" id="panel-feedback">
+          <div style="font-size:11px;color:#9ca3af;margin-bottom:8px;font-style:italic;">Crew feedback (read-only)</div>
+          <div style="min-height:140px;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:13px;color:#9ca3af;background:#f9fafb;">No crew feedback yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT: SIDEBAR ===== -->
+    <div class="sidebar" style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Quote Info -->
+      <div class="section" style="padding:16px 20px;">
+        <div class="section-title" style="margin-bottom:8px;">Quote Info</div>
+        <div class="field-row"><span class="field-label">Number</span><span style="font-weight:600;">67653</span></div>
+        <div class="field-row"><span class="field-label">Type</span><select><option selected>Local</option><option>Long Distance</option><option>Commercial</option></select></div>
+        <div class="field-row"><span class="field-label">Source</span><select><option>Website</option><option selected>Equate Media</option><option>Referral</option><option>Google Ads</option></select></div>
+        <div class="field-row"><span class="field-label">Sales</span><select><option selected>Daniela</option><option>Mike T.</option><option>Sarah C.</option></select></div>
+        <div class="field-row"><span class="field-label">Estimator</span><select><option selected>Unassigned</option><option>Daniela</option><option>Mike T.</option></select></div>
+        <div class="field-row"><span class="field-label">Branch</span><select><option selected>ARM Moving</option><option>North</option></select></div>
+        <div class="field-row"><span class="field-label">Region</span><select><option selected>None</option><option>Central</option><option>East</option></select></div>
+        <div class="field-row"><span class="field-label">Tags</span><a href="#" style="font-size:12px;">+ Add</a></div>
+        <div class="field-row"><span class="field-label">Lead Status</span><select><option selected>None</option><option>New</option><option>Contacted</option><option>Qualified</option><option>Proposal</option><option>Won</option><option>Lost</option></select></div>
+      </div>
+
+      <!-- Pricing -->
+      <div class="section" style="overflow:hidden;">
+        <div style="padding:16px 20px;">
+          <div class="section-title" style="margin-bottom:12px;">Pricing</div>
+
+          <!-- Resources -->
+          <div class="resources">
+            <div class="resource"><div class="resource-label">Trucks</div><div class="resource-value">1</div></div>
+            <div class="resource"><div class="resource-label">Crew</div><div class="resource-value">2</div></div>
+            <div class="resource"><div class="resource-label">Hours</div><div class="resource-value">2h</div></div>
+            <div class="resource"><div class="resource-label">Rate</div><div class="resource-value" style="font-size:15px;">$150<span style="font-size:11px;font-weight:500;color:#6b7280">/hr</span></div></div>
+          </div>
+
+          <!-- Size -->
+          <div style="margin-bottom:14px;">
+            <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:4px;">Size</div>
+            <select style="width:100%;border:1px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:13px;background:white;outline:none;">
+              <option selected>2 Bedroom Apartment (900-1400 SQFT)</option><option>Studio</option><option>1 Bedroom</option><option>3 Bedroom</option><option>House 4BR+</option>
+            </select>
+          </div>
+
+          <!-- Estimate Type / Binding -->
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #f3f4f6;">
+            <div>
+              <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">Estimate Type</div>
+              <select style="border:none;font-size:13px;color:#2563eb;font-weight:500;cursor:pointer;padding:0;"><option selected>Hourly</option><option>Flat Rate</option></select>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">Binding Type</div>
+              <select style="border:none;font-size:13px;color:#2563eb;font-weight:500;cursor:pointer;padding:0;"><option selected>Non-Binding</option><option>Binding</option></select>
+            </div>
+          </div>
+
+          <!-- Line items -->
+          <div class="price-row"><a href="#">Moving Services</a><span style="font-weight:500;">$300.00</span></div>
+          <div class="price-row"><a href="#">Materials</a><span style="color:#d1d5db;">&mdash;</span></div>
+          <div class="price-row"><a href="#">Additional Services</a><span style="color:#d1d5db;">&mdash;</span></div>
+          <div class="price-row"><a href="#">Trip Fee</a><span style="font-weight:500;">$125.00</span></div>
+          <div class="price-row"><a href="#">Valuation</a><span style="color:#d1d5db;">&mdash;</span></div>
+          <div class="price-divider"></div>
+          <div class="price-row"><span style="font-weight:600;">Subtotal</span><span style="font-weight:600;">$425.00</span></div>
+          <div class="price-row"><a href="#">Sales Tax</a><span style="color:#d1d5db;">&mdash;</span></div>
+          <div class="price-divider"></div>
+          <div class="price-row"><span style="font-weight:600;">Estimated Total</span><span style="font-weight:600;">$425.00</span></div>
+          <div class="price-row"><a href="#">Payments</a><span style="color:#d1d5db;">&mdash;</span></div>
+          <div class="price-divider"></div>
+          <div class="price-row"><span style="font-weight:700;">Balance</span><span style="font-weight:700;">$425.00</span></div>
+        </div>
+        <div class="total-bar">
+          <span class="total-label">Estimated Price</span>
+          <span class="total-amount">$425.00</span>
+        </div>
+      </div>
+
+      <!-- Tasks -->
+      <div class="section" style="padding:16px 20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="section-title">Tasks</span>
+          <a href="#" style="font-size:12px;">+ Add</a>
+        </div>
+        <p style="text-align:center;color:#9ca3af;font-size:12px;padding:12px 0;">No tasks yet</p>
+      </div>
+
+      <!-- Estimates / Deliveries -->
+      <div class="section" style="padding:16px 20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="section-title">Estimates / Deliveries</span>
+          <a href="#" style="font-size:12px;">+ Add</a>
+        </div>
+        <p style="text-align:center;color:#9ca3af;font-size:12px;padding:12px 0;">No events yet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE PANELS ===== -->
+  <div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+  <div class="panel" id="panel-docs">
+    <div class="panel-header"><h3>Documents</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+    <div class="panel-body">
+      <div style="padding:10px 0;border-bottom:1px solid #f3f4f6;"><div style="font-size:13px;font-weight:500;">Estimate</div><div style="font-size:12px;color:#f59e0b;">Signature Requested</div></div>
+      <div style="padding:10px 0;border-bottom:1px solid #f3f4f6;"><div style="font-size:13px;font-weight:500;">Invoice</div><div style="font-size:12px;color:#9ca3af;">Not Started</div></div>
+      <div style="padding:10px 0;"><div style="font-size:13px;font-weight:500;">Work Order</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-versions">
+    <div class="panel-header"><h3>Previous Versions</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+    <div class="panel-body">
+      <div style="font-size:13px;font-weight:500;">67653 - Estimate</div>
+      <div style="font-size:12px;color:#9ca3af;">Sent 2/3/2026</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-activity">
+    <div class="panel-header"><h3>Activity</h3><button class="panel-close" onclick="closePanel()">&times;</button></div>
+    <div class="panel-body" style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;gap:10px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#2563eb;margin-top:5px;flex-shrink:0;"></span>
+        <div><div style="font-size:13px;">Estimate created</div><div style="font-size:12px;color:#9ca3af;">Feb 2, 2026</div></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-top:5px;flex-shrink:0;"></span>
+        <div><div style="font-size:13px;">Sent to customer</div><div style="font-size:12px;color:#9ca3af;">Feb 3, 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JS ===== -->
+  <script>
+    // Tabs
+    function switchTab(name) {
+      document.querySelectorAll('#noteTabs .tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector(`[data-tab="${name}"]`).classList.add('active');
+      document.getElementById('panel-' + name).classList.add('active');
+    }
+
+    // Book dropdown
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.dropdown')) document.getElementById('bookMenu').classList.remove('show');
+    });
+
+    // Panels
+    function openPanel(name) {
+      closePanel();
+      document.getElementById('overlay').classList.add('show');
+      document.getElementById('panel-' + name).classList.add('open');
+    }
+    function closePanel() {
+      document.getElementById('overlay').classList.remove('show');
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('open'));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mobile Dispatch - Map Toggle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: #0f172a;
+      min-height: 100vh;
+    }
+    .phone-frame {
+      width: 375px;
+      height: 812px;
+      background: #ffffff;
+      border-radius: 40px;
+      border: 8px solid #334155;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .notch {
+      width: 150px;
+      height: 30px;
+      background: #334155;
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+    }
+    .scroll-container {
+      height: calc(100% - 0px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-container::-webkit-scrollbar { display: none; }
+    .map-bg {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 30%, #93c5fd 60%, #dbeafe 100%);
+      position: relative;
+    }
+    .map-bg::before {
+      content: '';
+      position: absolute;
+      top: 20%;
+      left: 10%;
+      width: 80%;
+      height: 60%;
+      border: 2px dashed #93c5fd;
+      border-radius: 8px;
+      opacity: 0.5;
+    }
+    .map-pin {
+      position: absolute;
+      transform: translate(-50%, -100%);
+    }
+    .minimize-bar {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .minimize-bar:hover {
+      background: #e2e8f0;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-8 gap-12">
+
+  <!-- Phone 1: Map Expanded -->
+  <div>
+    <div class="text-center mb-4">
+      <span class="text-white font-semibold text-sm bg-blue-600 px-3 py-1 rounded-full">Map Expanded</span>
+    </div>
+    <div class="phone-frame">
+      <div class="notch"></div>
+
+      <!-- Header -->
+      <div class="bg-white px-3 py-2.5 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h1 class="text-base font-semibold text-gray-900">Dispatch Center</h1>
+          <div class="flex items-center gap-1.5">
+            <button class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </button>
+            <button class="p-1.5 rounded-lg bg-blue-600 text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Area (Expanded) -->
+      <div class="map-bg relative" style="height: 280px;">
+        <!-- Map pins -->
+        <div class="map-pin" style="top: 35%; left: 30%;">
+          <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white">1</div>
+        </div>
+        <div class="map-pin" style="top: 55%; left: 60%;">
+          <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white">2</div>
+        </div>
+        <div class="map-pin" style="top: 25%; left: 70%;">
+          <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white">3</div>
+        </div>
+        <div class="map-pin" style="top: 65%; left: 25%;">
+          <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white">4</div>
+        </div>
+        <div class="map-pin" style="top: 45%; left: 50%;">
+          <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg border-2 border-white">5</div>
+        </div>
+
+        <!-- Map controls -->
+        <div class="absolute top-3 right-3 flex flex-col gap-1.5">
+          <button class="w-8 h-8 bg-white rounded-lg shadow-md flex items-center justify-center text-gray-700">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+          </button>
+          <button class="w-8 h-8 bg-white rounded-lg shadow-md flex items-center justify-center text-gray-700">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Map label -->
+        <div class="absolute top-3 left-3 bg-white/90 backdrop-blur rounded-lg px-2.5 py-1.5 shadow-sm">
+          <span class="text-xs font-medium text-gray-700">5 jobs on map</span>
+        </div>
+      </div>
+
+      <!-- MINIMIZE BUTTON - The key feature -->
+      <div class="minimize-bar bg-gray-100 border-b border-gray-200 flex items-center justify-center py-2 gap-2">
+        <div class="w-8 h-1 bg-gray-300 rounded-full"></div>
+        <span class="text-xs text-gray-500 font-medium">Minimize Map</span>
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+        </svg>
+      </div>
+
+      <!-- Job list below map -->
+      <div class="scroll-container bg-gray-50 px-3 py-2">
+        <!-- Job items -->
+        <div class="bg-white rounded-lg border border-gray-200 p-3 mb-2 flex items-center gap-3">
+          <div class="w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">1</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-sm text-gray-900 truncate">AC Repair - Not Cooling</div>
+            <div class="text-xs text-gray-500">9:00 AM • Smith Residence</div>
+          </div>
+          <span class="text-xs text-red-600 font-medium flex-shrink-0">Urgent</span>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 p-3 mb-2 flex items-center gap-3">
+          <div class="w-7 h-7 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">2</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-sm text-gray-900 truncate">Johnson Family Move</div>
+            <div class="text-xs text-gray-500">In Progress • 1:23:45</div>
+          </div>
+          <span class="text-xs text-yellow-600 font-medium flex-shrink-0">Active</span>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 p-3 mb-2 flex items-center gap-3">
+          <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">3</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-sm text-gray-900 truncate">Furnace Installation</div>
+            <div class="text-xs text-gray-500">11:30 AM • Johnson Home</div>
+          </div>
+          <span class="text-xs text-blue-600 font-medium flex-shrink-0">Scheduled</span>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 p-3 mb-2 flex items-center gap-3">
+          <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">4</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-sm text-gray-900 truncate">Annual Maintenance</div>
+            <div class="text-xs text-gray-500">2:00 PM • Wilson Residence</div>
+          </div>
+          <span class="text-xs text-blue-600 font-medium flex-shrink-0">Scheduled</span>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 p-3 mb-2 flex items-center gap-3 opacity-50">
+          <div class="w-7 h-7 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">5</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-sm text-gray-900 truncate">HVAC Inspection</div>
+            <div class="text-xs text-gray-500">8:00 AM • Brown Family</div>
+          </div>
+          <span class="text-xs text-green-600 font-medium flex-shrink-0">Done</span>
+        </div>
+
+        <div class="h-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phone 2: Map Minimized -->
+  <div>
+    <div class="text-center mb-4">
+      <span class="text-white font-semibold text-sm bg-gray-600 px-3 py-1 rounded-full">Map Minimized</span>
+    </div>
+    <div class="phone-frame">
+      <div class="notch"></div>
+
+      <!-- Header -->
+      <div class="bg-white px-3 py-2.5 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h1 class="text-base font-semibold text-gray-900">Dispatch Center</h1>
+          <div class="flex items-center gap-1.5">
+            <button class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </button>
+            <button class="p-1.5 rounded-lg bg-blue-600 text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MINIMIZED MAP BAR - Collapsed state -->
+      <div class="minimize-bar bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 flex items-center px-3 py-2.5 gap-3">
+        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <span class="text-sm font-medium text-blue-900">Map View</span>
+          <span class="text-xs text-blue-600 ml-2">5 jobs</span>
+        </div>
+        <button class="flex items-center gap-1 px-2.5 py-1 bg-blue-600 text-white rounded-lg text-xs font-medium">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+          Expand
+        </button>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="flex items-center gap-3 px-3 py-2 bg-gray-50 border-b border-gray-200 overflow-x-auto">
+        <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+          <span class="font-semibold text-gray-900">3</span>
+          <span class="text-gray-500">Unassigned</span>
+        </span>
+        <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+          <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+          <span class="font-semibold text-gray-900">4</span>
+          <span class="text-gray-500">Active</span>
+        </span>
+        <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+          <span class="font-semibold text-gray-900">5</span>
+          <span class="text-gray-500">Scheduled</span>
+        </span>
+        <span class="flex items-center gap-1.5 text-xs whitespace-nowrap">
+          <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+          <span class="font-semibold text-gray-900">2</span>
+          <span class="text-gray-500">Done</span>
+        </span>
+      </div>
+
+      <!-- Full job cards area - much more room now! -->
+      <div class="scroll-container bg-gray-50 px-3 py-3">
+
+        <!-- Urgent Card -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3">
+          <div class="h-1 bg-red-500"></div>
+          <div class="p-3">
+            <div class="flex items-start justify-between mb-2">
+              <div>
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="text-xs px-1.5 py-0.5 bg-red-100 text-red-700 rounded font-medium">URGENT</span>
+                  <span class="text-xs text-gray-400">9:00 AM</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 text-sm">AC Repair - Not Cooling</h3>
+                <p class="text-xs text-gray-500">Smith Residence</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              </svg>
+              123 Main St, Suite 4B
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-red-600 font-medium">Unassigned</span>
+              <div class="flex gap-1.5">
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium">Assign</button>
+                <button class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium">Start</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3">
+          <div class="h-1 bg-yellow-500"></div>
+          <div class="p-3">
+            <div class="flex items-start justify-between mb-2">
+              <div>
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="text-xs px-1.5 py-0.5 bg-yellow-100 text-yellow-700 rounded font-medium">IN PROGRESS</span>
+                  <span class="text-xs text-blue-600 font-mono">1:23:45</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 text-sm">Johnson Family Move</h3>
+                <p class="text-xs text-gray-500">Local Residential Move</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              </svg>
+              123 Oak St → 456 Pine Ave
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex -space-x-1.5">
+                <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium border-2 border-white">MT</div>
+                <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium border-2 border-white">SC</div>
+              </div>
+              <div class="flex gap-1.5">
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium">View</button>
+                <button class="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-medium">Complete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scheduled -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3">
+          <div class="h-1 bg-blue-500"></div>
+          <div class="p-3">
+            <div class="flex items-start justify-between mb-2">
+              <div>
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded font-medium">SCHEDULED</span>
+                  <span class="text-xs text-gray-400">11:30 AM</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 text-sm">Furnace Installation</h3>
+                <p class="text-xs text-gray-500">Johnson Home</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium">MT</div>
+                <span class="text-xs text-gray-500">Mike T. • ~3 hrs</span>
+              </div>
+              <button class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium">Start</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Another Scheduled -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3">
+          <div class="h-1 bg-blue-500"></div>
+          <div class="p-3">
+            <div class="flex items-start justify-between mb-2">
+              <div>
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded font-medium">SCHEDULED</span>
+                  <span class="text-xs text-gray-400">2:00 PM</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 text-sm">Annual Maintenance</h3>
+                <p class="text-xs text-gray-500">Wilson Residence</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px] font-medium">JW</div>
+                <span class="text-xs text-gray-500">James W. • ~1 hr</span>
+              </div>
+              <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium">View</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-3 opacity-50">
+          <div class="h-1 bg-green-500"></div>
+          <div class="p-3">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 rounded font-medium">COMPLETED</span>
+            </div>
+            <h3 class="font-semibold text-gray-900 text-sm">HVAC Inspection</h3>
+            <div class="text-xs text-gray-500 mt-1">Brown Family • Completed 9:15 AM</div>
+          </div>
+        </div>
+
+        <div class="h-8"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back link -->
+  <a href="index.html" class="fixed bottom-8 left-8 text-slate-400 hover:text-white flex items-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+    Back to mockups
+  </a>
+
+  <!-- Description -->
+  <div class="fixed top-8 left-1/2 -translate-x-1/2 max-w-md text-center">
+    <h2 class="text-white font-semibold mb-1">Map Toggle - Expand / Minimize</h2>
+    <p class="text-slate-400 text-sm">Left: Map expanded with pins and job list. Right: Map minimized to a single bar, giving full space to job cards. Tap the bar to toggle.</p>
+  </div>
+
+</body>
+</html>

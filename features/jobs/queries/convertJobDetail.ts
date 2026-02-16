@@ -1,0 +1,52 @@
+import type { JobDetail } from "@/types/job";
+
+export function convertJobDetail(d: Record<string, unknown>): JobDetail {
+  const customer = Array.isArray(d.customers) ? d.customers[0] : d.customers;
+
+  return {
+    id: d.id as string,
+    companyId: d.company_id as string,
+    customerId: d.customer_id as string,
+    customerName: ((customer as Record<string, unknown>)?.name as string) || "",
+    title: d.title as string,
+    description: d.description as string | null,
+    status: d.status as JobDetail["status"],
+    scheduledDate: d.scheduled_date as string,
+    scheduledTime: d.scheduled_time as string | null,
+    arrivalWindow: (d.arrival_window as string) || null,
+    estimatedDuration: d.estimated_duration as number | null,
+    address: d.address as string | null,
+    assignedTo: d.assigned_to as string | null,
+    assignedCrewId: d.assigned_crew_id as string | null,
+    dispatchedAt: d.dispatched_at as string | null,
+    notes: d.notes as string | null,
+    customFields: (d.custom_fields as Record<string, unknown>) || {},
+    tags: (d.tags as string[]) || [],
+    isRecurringTemplate: (d.is_recurring_template as boolean) || false,
+    parentJobId: d.parent_job_id as string | null,
+    recurrenceConfig: d.recurrence_config as JobDetail["recurrenceConfig"],
+    instanceDate: d.instance_date as string | null,
+    lineItems: (d.line_items as JobDetail["lineItems"]) || [],
+    pricingModel: (d.pricing_model as JobDetail["pricingModel"]) || "flat",
+    resources: (d.resources as JobDetail["resources"]) || {
+      trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, customFields: {},
+    },
+    subtotal: (d.subtotal as number) || 0,
+    taxRate: (d.tax_rate as number) || 0,
+    taxAmount: (d.tax_amount as number) || 0,
+    total: (d.total as number) || 0,
+    depositType: d.deposit_type as JobDetail["depositType"],
+    depositAmount: (d.deposit_amount as number) || 0,
+    depositPaid: (d.deposit_paid as number) || 0,
+    appliedFees: (d.applied_fees as JobDetail["appliedFees"]) || [],
+    sourceEstimateId: d.source_estimate_id as string | null,
+    internalNotes: d.internal_notes as string | null,
+    customerNotes: d.customer_notes as string | null,
+    crewNotes: d.crew_notes as string | null,
+    crewFeedback: d.crew_feedback as string | null,
+    latitude: (d.latitude as number) || null,
+    longitude: (d.longitude as number) || null,
+    createdAt: d.created_at as string,
+    updatedAt: d.updated_at as string,
+  };
+}

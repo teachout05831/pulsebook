@@ -1,0 +1,6 @@
+export { getCurrentSalesperson } from './getCurrentSalesperson'
+export { getSalespersonGoal } from './getSalespersonGoal'
+export { getGoalProgress } from './getGoalProgress'
+export { getTodayStats } from './getTodayStats'
+export { getWeekStats } from './getWeekStats'
+export { getRecentWins } from './getRecentWins'

@@ -26,6 +26,7 @@ export interface Invoice {
   customerId: string;
   customerName: string;
   jobId: string | null;
+  jobTitle: string | null;
   estimateId: string | null;
   invoiceNumber: string;
   status: InvoiceStatus;

@@ -3,6 +3,7 @@ export type TeamMemberRole = "admin" | "technician" | "office";
 export interface TeamMember {
   id: string;
   companyId: string;
+  userId: string | null;
   name: string;
   email: string;
   phone: string;

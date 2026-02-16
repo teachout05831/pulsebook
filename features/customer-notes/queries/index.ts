@@ -1,0 +1,1 @@
+export { getCustomerNotes } from './getCustomerNotes'

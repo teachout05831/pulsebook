@@ -1,0 +1,29 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import type { TimeSlot } from "../types/booking";
+import type { CapacityStatus } from "../utils/capacity";
+
+interface AvailabilityData {
+  date: string;
+  slots: TimeSlot[];
+  capacity: { total: number; used: number; remaining: number; status: CapacityStatus };
+}
+
+export function useBookingAvailability(token: string) {
+  const [data, setData] = useState<AvailabilityData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSlots = useCallback(async (date: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/scheduling/public/${token}/availability?date=${date}`);
+      if (res.ok) { const json = await res.json(); setData(json); }
+      else { const json = await res.json().catch(() => ({})); setError(json.error || "Failed to load"); }
+    } catch { setError("Network error"); } finally { setIsLoading(false); }
+  }, [token]);
+
+  return { data, isLoading, error, fetchSlots };
+}

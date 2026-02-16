@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estimate Page - V3 Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; margin: 0; color: #1e293b; }
+
+    /* Cards */
+    .card { background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; }
+    .card-pad { padding: 1rem 1.25rem; }
+
+    /* Field rows in Quote Info */
+    .fi { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0; font-size: 0.8125rem; }
+    .fi-label { color: #64748b; font-weight: 500; }
+    .fi select { border: none; background: none; color: #2563eb; font-size: 0.8125rem; font-weight: 500; cursor: pointer; text-align: right; }
+    .fi a { color: #2563eb; font-weight: 500; text-decoration: none; }
+    .fi a:hover { text-decoration: underline; }
+
+    /* Buttons */
+    .btn-sm { font-size: 0.75rem; font-weight: 500; padding: 0.375rem 0.75rem; border-radius: 0.375rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.375rem; transition: all 0.15s; }
+    .btn-fill { background: #1e293b; color: white; border: none; }
+    .btn-fill:hover { background: #334155; }
+    .btn-green { background: #16a34a; color: white; border: none; }
+    .btn-green:hover { background: #15803d; }
+    .btn-out { background: white; color: #475569; border: 1px solid #e2e8f0; }
+    .btn-out:hover { background: #f1f5f9; }
+    .btn-ghost { background: none; border: none; color: #64748b; cursor: pointer; padding: 0.25rem; }
+    .btn-ghost:hover { color: #1e293b; }
+
+    /* Icon button */
+    .ico-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: white; cursor: pointer; }
+    .ico-btn:hover { background: #f1f5f9; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+    .tab { padding: 0.625rem 1rem; font-size: 0.8125rem; font-weight: 500; cursor: pointer; color: #94a3b8; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; position: relative; }
+    .tab.on { color: #1e293b; border-bottom-color: #1e293b; }
+    .tab .noti { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; position: absolute; top: 6px; right: 4px; }
+    .tp { display: none; padding-top: 0.75rem; }
+    .tp.on { display: block; }
+
+    /* Pricing rows */
+    .pr { display: flex; justify-content: space-between; padding: 0.375rem 0; font-size: 0.8125rem; }
+    .pr a { color: #2563eb; text-decoration: none; }
+    .pr a:hover { text-decoration: underline; }
+    .pr .dash { color: #cbd5e1; }
+
+    /* Stop dots */
+    .sdot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Dropdown */
+    .dd { position: relative; display: inline-block; }
+    .dd-menu { display: none; position: absolute; right: 0; top: calc(100% + 4px); background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 8px 24px rgba(0,0,0,0.12); min-width: 190px; z-index: 50; overflow: hidden; }
+    .dd-menu.show { display: block; }
+    .dd-item { padding: 0.625rem 1rem; font-size: 0.8125rem; cursor: pointer; }
+    .dd-item:hover { background: #f1f5f9; }
+
+    /* Slide panel */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 90; display: none; }
+    .overlay.show { display: block; }
+    .spanel { position: fixed; top: 0; right: -100%; width: min(380px, 90vw); height: 100vh; background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.12); z-index: 100; transition: right 0.25s ease; overflow-y: auto; }
+    .spanel.open { right: 0; }
+    .sp-head { background: #1e293b; color: white; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; }
+    .sp-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+
+    /* Total bar */
+    .total-bar { background: #1e40af; color: white; border-radius: 0 0 0.75rem 0.75rem; padding: 0.75rem 1.25rem; margin-top: -1px; }
+
+    /* Responsive: stack on mobile */
+    @media (max-width: 1024px) {
+      .layout-3 { grid-template-columns: 1fr !important; }
+      .layout-3 > * { order: 0; }
+      .layout-3 .col-center { order: -1; } /* center content first on mobile */
+    }
+    @media (max-width: 640px) {
+      .hdr-actions { flex-wrap: wrap; gap: 0.5rem; }
+      .tabs { gap: 0; }
+      .tab { padding: 0.5rem 0.625rem; font-size: 0.75rem; }
+      .resource-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <div style="background:white;border-bottom:1px solid #e2e8f0;">
+    <div style="max-width:1400px;margin:0 auto;padding:1rem 1.25rem;">
+      <!-- Customer row -->
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+        <div class="flex items-center gap-2">
+          <h2 style="font-size:1.125rem;font-weight:700;margin:0;">
+            <a href="#" style="color:inherit;text-decoration:none;">Kasandra Butler</a>
+          </h2>
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.6875rem;color:#16a34a;font-weight:600;background:#f0fdf4;padding:2px 8px;border-radius:9999px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#16a34a;"></span>
+            Opportunity
+          </span>
+        </div>
+        <div style="font-size:0.75rem;color:#64748b;text-align:right;">
+          <span>Next Follow-up: </span>
+          <a href="#" style="color:#2563eb;">+ Create Follow-up</a>
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:#64748b;display:flex;flex-wrap:wrap;gap:1rem;margin-bottom:0.75rem;">
+        <span>(602) 621-3041</span>
+        <span>kbutler532@gmail.com</span>
+      </div>
+
+      <!-- Estimate title + actions -->
+      <div class="flex flex-wrap items-center justify-between gap-3 hdr-actions">
+        <h1 style="font-size:1.25rem;font-weight:700;margin:0;">Estimate #67653</h1>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button class="ico-btn" title="Documents" onclick="openPanel('docs')">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </button>
+          <button class="ico-btn" title="History" onclick="openPanel('history')">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </button>
+          <button class="ico-btn" title="Activity" onclick="openPanel('activity')">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </button>
+          <div class="dd">
+            <button class="btn-sm btn-green" onclick="toggleDD()">
+              Book
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="dd-menu" id="ddMenu">
+              <div class="dd-item">Take Payment</div>
+              <div class="dd-item">Mark Lost</div>
+              <div class="dd-item">Preview Estimate</div>
+              <div class="dd-item">Send Estimate</div>
+              <div class="dd-item">Duplicate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 3-COLUMN LAYOUT ===== -->
+  <div style="max-width:1400px;margin:0 auto;padding:1rem 1.25rem;">
+    <div class="layout-3" style="display:grid;grid-template-columns:230px 1fr 280px;gap:1rem;align-items:start;">
+
+      <!-- ===== LEFT: Quote Info ===== -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="card card-pad">
+          <div class="flex items-center justify-between mb-3">
+            <span style="font-size:0.8125rem;font-weight:600;">Quote Info</span>
+            <span style="font-size:0.6875rem;color:#16a34a;font-weight:500;">Opportunity</span>
+          </div>
+          <div class="fi"><span class="fi-label">Number</span><span style="font-weight:600;">67653</span></div>
+          <div class="fi"><span class="fi-label">Type</span><select><option selected>Local</option><option>Long Distance</option><option>Commercial</option><option>Packing</option><option>Labor Only</option></select></div>
+          <div class="fi"><span class="fi-label">Source</span><select><option>Website</option><option selected>Equate Media</option><option>Referral</option><option>Google Ads</option><option>Phone Call</option><option>Walk-in</option></select></div>
+          <div class="fi"><span class="fi-label">Sales</span><select><option selected>Daniela</option><option>Mike T.</option><option>Sarah C.</option></select></div>
+          <div class="fi"><span class="fi-label">Estimator</span><select><option selected>Unassigned</option><option>Daniela</option><option>Mike T.</option></select></div>
+          <div class="fi"><span class="fi-label">Branch</span><select><option selected>ARM Moving</option><option>North</option></select></div>
+          <div class="fi"><span class="fi-label">Region</span><select><option selected>None</option><option>Central</option><option>East</option></select></div>
+          <div class="fi"><span class="fi-label">Tags</span><a href="#">+</a></div>
+          <div class="fi"><span class="fi-label">Lead Status</span><select><option selected>None</option><option>New</option><option>Contacted</option><option>Qualified</option><option>Proposal</option><option>Won</option><option>Lost</option></select></div>
+        </div>
+
+        <!-- Tasks -->
+        <div class="card card-pad">
+          <div class="flex items-center justify-between mb-2">
+            <span style="font-size:0.8125rem;font-weight:600;">Tasks</span>
+            <a href="#" style="color:#2563eb;font-size:0.75rem;">+</a>
+          </div>
+          <p style="text-align:center;color:#94a3b8;font-size:0.75rem;padding:0.75rem 0;">No tasks yet</p>
+        </div>
+
+      </div>
+
+      <!-- ===== CENTER: Jobs + Stops + Notes ===== -->
+      <div class="col-center" style="display:flex;flex-direction:column;gap:1rem;">
+
+        <!-- Jobs -->
+        <div class="card card-pad">
+          <div class="flex items-center justify-between mb-3">
+            <span style="font-size:0.875rem;font-weight:600;">Jobs</span>
+            <a href="#" style="color:#2563eb;font-size:0.75rem;">+ Add Job</a>
+          </div>
+          <div style="border:2px solid #16a34a;border-radius:0.5rem;padding:0.75rem;display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;">
+            <div>
+              <div style="font-size:0.6875rem;color:#64748b;">Job 67653-1</div>
+              <span style="font-size:0.625rem;background:#f1f5f9;padding:2px 6px;border-radius:3px;color:#64748b;">Unscheduled</span>
+            </div>
+            <select style="border:none;font-size:0.8125rem;color:#2563eb;font-weight:500;cursor:pointer;background:none;"><option selected>Moving</option><option>Packing</option><option>Storage</option></select>
+            <a href="#" style="color:#2563eb;font-size:0.8125rem;">Feb 27, 2026</a>
+            <span style="font-weight:600;font-size:0.875rem;margin-left:auto;">$425.00</span>
+          </div>
+        </div>
+
+        <!-- Stops -->
+        <div class="card card-pad">
+          <div class="flex flex-wrap items-center gap-3 mb-3">
+            <span style="font-size:0.875rem;font-weight:600;">Stops</span>
+            <a href="#" style="color:#2563eb;font-size:0.75rem;">Map</a>
+            <span style="font-size:0.6875rem;color:#64748b;"><b>RT</b> 1h 6m / 57mi</span>
+            <span style="font-size:0.6875rem;color:#64748b;"><b>O&rarr;D</b> 0h / 0mi</span>
+            <span style="font-size:0.6875rem;color:#64748b;"><b>Travel</b> 1h 6m</span>
+            <a href="#" style="color:#2563eb;font-size:0.75rem;margin-left:auto;">+</a>
+          </div>
+
+          <div style="display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #f1f5f9;">
+              <span class="sdot" style="background:#94a3b8;"></span>
+              <span style="font-size:0.8125rem;color:#94a3b8;width:80px;">Office</span>
+              <span style="font-size:0.8125rem;">1237 S Val Vista Dr, Mesa, AZ 85204</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;">
+              <span class="sdot" style="background:#3b82f6;"></span>
+              <a href="#" style="font-size:0.8125rem;color:#2563eb;font-weight:500;width:80px;">Origin</a>
+              <span style="font-size:0.8125rem;flex:1;min-width:150px;">Phoenix, Arizona 85015</span>
+              <span style="font-size:0.6875rem;color:#64748b;">Apartment</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;">
+              <span class="sdot" style="background:#16a34a;"></span>
+              <a href="#" style="font-size:0.8125rem;color:#2563eb;font-weight:500;width:80px;">Destination</a>
+              <span style="font-size:0.8125rem;flex:1;min-width:150px;">Phoenix, Arizona 85041</span>
+              <span style="font-size:0.6875rem;color:#64748b;">House</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+              <span class="sdot" style="background:#94a3b8;"></span>
+              <span style="font-size:0.8125rem;color:#94a3b8;width:80px;">Office</span>
+              <span style="font-size:0.8125rem;">1237 S Val Vista Dr, Mesa, AZ 85204</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="card">
+          <div class="tabs" id="ntabs">
+            <div class="tab on" data-t="int" onclick="stab('int')">Internal<span class="noti"></span></div>
+            <div class="tab" data-t="cust" onclick="stab('cust')">Customer<span class="noti"></span></div>
+            <div class="tab" data-t="crew" onclick="stab('crew')">Crew Notes</div>
+            <div class="tab" data-t="fb" onclick="stab('fb')">Crew Feedback</div>
+          </div>
+          <div style="padding:0 1.25rem 1.25rem;">
+            <div class="tp on" id="tp-int">
+              <p style="font-size:0.6875rem;color:#94a3b8;font-style:italic;margin-bottom:0.5rem;">Note (Visible to office only)</p>
+              <textarea style="width:100%;min-height:150px;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;resize:vertical;">2 major street less than a mile
+apartment to another apartment
+1st floor to a 2nd floor apartment
+no appliances boxes and furniture
+$150
+$125</textarea>
+            </div>
+            <div class="tp" id="tp-cust">
+              <p style="font-size:0.6875rem;color:#94a3b8;font-style:italic;margin-bottom:0.5rem;">Visible to customer</p>
+              <textarea style="width:100%;min-height:150px;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;resize:vertical;">Thank you for choosing us! Please have all items boxed and ready by 8 AM on moving day.</textarea>
+            </div>
+            <div class="tp" id="tp-crew">
+              <p style="font-size:0.6875rem;color:#94a3b8;font-style:italic;margin-bottom:0.5rem;">Instructions for the crew</p>
+              <textarea style="width:100%;min-height:150px;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;resize:vertical;">Bring extra blankets, narrow staircase at pickup. Use freight elevator at destination.</textarea>
+            </div>
+            <div class="tp" id="tp-fb">
+              <p style="font-size:0.6875rem;color:#94a3b8;font-style:italic;margin-bottom:0.5rem;">Crew feedback (read-only)</p>
+              <div style="min-height:150px;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;color:#94a3b8;background:#f8fafc;">No crew feedback yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== RIGHT: Pricing ===== -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+
+        <!-- Resources card -->
+        <div class="card card-pad">
+          <div style="font-size:0.8125rem;font-weight:600;margin-bottom:0.75rem;">Resources</div>
+          <div class="resource-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;text-align:center;">
+            <div style="background:#f8fafc;border-radius:0.375rem;padding:0.5rem;">
+              <div style="font-size:0.625rem;color:#64748b;text-transform:uppercase;margin-bottom:2px;">Trucks</div>
+              <select style="border:none;background:none;font-size:1rem;font-weight:700;text-align:center;cursor:pointer;width:100%;color:#1e293b;padding:0;">
+                <option>0</option><option selected>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              </select>
+            </div>
+            <div style="background:#f8fafc;border-radius:0.375rem;padding:0.5rem;">
+              <div style="font-size:0.625rem;color:#64748b;text-transform:uppercase;margin-bottom:2px;">Team</div>
+              <select style="border:none;background:none;font-size:1rem;font-weight:700;text-align:center;cursor:pointer;width:100%;color:#1e293b;padding:0;">
+                <option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+              </select>
+            </div>
+            <div style="background:#f8fafc;border-radius:0.375rem;padding:0.5rem;">
+              <div style="font-size:0.625rem;color:#64748b;text-transform:uppercase;margin-bottom:2px;">Hours</div>
+              <select style="border:none;background:none;font-size:1rem;font-weight:700;text-align:center;cursor:pointer;width:100%;color:#1e293b;padding:0;">
+                <option>1h</option><option selected>2h</option><option>3h</option><option>4h</option><option>5h</option><option>6h</option><option>8h</option><option>10h</option><option>12h</option>
+              </select>
+            </div>
+            <div style="background:#f0fdf4;border-radius:0.375rem;padding:0.5rem;">
+              <div style="font-size:0.625rem;color:#16a34a;text-transform:uppercase;margin-bottom:2px;">Rate</div>
+              <div style="font-size:1rem;font-weight:700;color:#16a34a;">$150/hr</div>
+            </div>
+          </div>
+          <!-- Service Details -->
+          <div style="margin-top:0.75rem;">
+            <div style="font-size:0.5625rem;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;margin-bottom:0.25rem;">Service Details</div>
+            <select style="width:100%;border:1px solid #e2e8f0;border-radius:0.375rem;padding:0.375rem 0.5rem;font-size:0.8125rem;background:white;">
+              <option selected>2 Bedroom Apartment (900-1400 SQFT)</option>
+              <option>Studio / 1 Bedroom</option>
+              <option>3 Bedroom House</option>
+              <option>4+ Bedroom House</option>
+              <option>Office / Commercial</option>
+              <option>One-Time Cleaning</option>
+              <option>Deep Cleaning</option>
+              <option>Post-Construction Cleanup</option>
+              <option>Custom</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Estimate Type card -->
+        <div class="card card-pad">
+          <div style="display:flex;justify-content:space-between;">
+            <div>
+              <div style="font-size:0.5625rem;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;">Estimate Type</div>
+              <select style="border:none;background:none;font-size:0.8125rem;color:#2563eb;font-weight:500;cursor:pointer;padding:0;">
+                <option selected>Hourly</option><option>Flat Rate</option>
+              </select>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.5625rem;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.05em;">Binding Type</div>
+              <select style="border:none;background:none;font-size:0.8125rem;color:#2563eb;font-weight:500;cursor:pointer;padding:0;text-align:right;">
+                <option selected>Non-Binding</option><option>Binding</option><option>Not-to-Exceed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing card -->
+        <div class="card">
+          <div class="card-pad">
+            <!-- Pricing breakdown -->
+            <div class="pr link"><a href="#">Moving Services</a><span style="font-weight:500;">$300.00</span></div>
+            <div class="pr link"><a href="#">Materials</a><span class="dash">&mdash;</span></div>
+            <div class="pr link"><a href="#">Additional Services</a><span class="dash">&mdash;</span></div>
+            <div class="pr link"><a href="#">Trip Fee</a><span style="font-weight:500;">$125.00</span></div>
+            <div class="pr link"><a href="#">Valuation</a><span class="dash">&mdash;</span></div>
+
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="pr"><span style="font-weight:600;">Subtotal</span><span style="font-weight:600;">$425.00</span></div>
+            <div class="pr link"><a href="#">Sales Tax</a><span class="dash">&mdash;</span></div>
+
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="pr"><span style="font-weight:600;">Estimated Total</span><span style="font-weight:600;">$425.00</span></div>
+            <div class="pr link"><a href="#">Payments</a><span class="dash">&mdash;</span></div>
+
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="pr"><span style="font-weight:700;font-size:0.875rem;">Balance</span><span style="font-weight:700;font-size:0.875rem;">$425.00</span></div>
+          </div>
+
+          <!-- Total footer -->
+          <div class="total-bar">
+            <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.25rem;">
+              <span>Moving</span><span>$425.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;">
+              <span style="font-weight:600;">Estimated Price:</span>
+              <span style="font-size:1.25rem;font-weight:700;">$425.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== SLIDE PANELS ===== -->
+  <div class="overlay" id="ov" onclick="cp()"></div>
+
+  <!-- Documents -->
+  <div class="spanel" id="sp-docs">
+    <div class="sp-head"><span style="font-weight:600;">Documents</span><button class="sp-close" onclick="cp()">&times;</button></div>
+    <div style="padding:1.25rem;">
+      <p style="font-size:0.6875rem;font-weight:600;color:#94a3b8;text-transform:uppercase;margin-bottom:0.5rem;">Opportunity</p>
+      <div style="padding:0.5rem 0;border-bottom:1px solid #f1f5f9;font-size:0.8125rem;">
+        <div style="font-weight:500;">Flat Rate Contract</div>
+        <div style="font-size:0.6875rem;color:#94a3b8;">Not Started</div>
+      </div>
+      <div style="padding:0.5rem 0;border-bottom:1px solid #f1f5f9;font-size:0.8125rem;">
+        <div style="font-weight:500;">Estimate</div>
+        <div style="font-size:0.6875rem;color:#f59e0b;">Signature Requested</div>
+      </div>
+      <p style="font-size:0.6875rem;font-weight:600;color:#94a3b8;text-transform:uppercase;margin:1rem 0 0.5rem;">Job 67653-1</p>
+      <div style="padding:0.5rem 0;border-bottom:1px solid #f1f5f9;font-size:0.8125rem;">
+        <div style="font-weight:500;">Hourly Contract</div>
+        <div style="font-size:0.6875rem;color:#94a3b8;">Not Started</div>
+      </div>
+      <div style="padding:0.5rem 0;border-bottom:1px solid #f1f5f9;font-size:0.8125rem;">
+        <div style="font-weight:500;">Invoice</div>
+        <div style="font-size:0.6875rem;color:#94a3b8;">Not Started</div>
+      </div>
+      <div style="padding:0.5rem 0;font-size:0.8125rem;">
+        <div style="font-weight:500;">Work Order</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="spanel" id="sp-history">
+    <div class="sp-head"><span style="font-weight:600;">Previous Versions</span><button class="sp-close" onclick="cp()">&times;</button></div>
+    <div style="padding:1.25rem;">
+      <div style="padding:0.5rem 0;font-size:0.8125rem;">
+        <div style="font-weight:500;">67653 - Estimate</div>
+        <div style="font-size:0.6875rem;color:#94a3b8;">Sent 2/3/2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity -->
+  <div class="spanel" id="sp-activity">
+    <div class="sp-head"><span style="font-weight:600;">Activity</span><button class="sp-close" onclick="cp()">&times;</button></div>
+    <div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;">
+      <div style="display:flex;gap:0.75rem;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;margin-top:5px;flex-shrink:0;"></span>
+        <div><div style="font-size:0.8125rem;">Estimate <b>#67653</b> created</div><div style="font-size:0.6875rem;color:#94a3b8;">Feb 2, 2026 &bull; Daniela</div></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-top:5px;flex-shrink:0;"></span>
+        <div><div style="font-size:0.8125rem;">Estimate <b>sent</b> to customer</div><div style="font-size:0.6875rem;color:#94a3b8;">Feb 3, 2026 &bull; Daniela</div></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#16a34a;margin-top:5px;flex-shrink:0;"></span>
+        <div><div style="font-size:0.8125rem;">Customer <b>viewed</b> estimate</div><div style="font-size:0.6875rem;color:#94a3b8;">Feb 3, 2026</div></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-top:5px;flex-shrink:0;"></span>
+        <div><div style="font-size:0.8125rem;">Price updated to <b>$425</b></div><div style="font-size:0.6875rem;color:#94a3b8;">Feb 5, 2026 &bull; Mike T.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mockup notice -->
+  <div style="max-width:1400px;margin:1rem auto;padding:0 1.25rem;">
+    <div style="border:2px dashed #fbbf24;background:#fffbeb;border-radius:0.5rem;padding:0.75rem;text-align:center;">
+      <p style="font-size:0.8125rem;color:#92400e;font-weight:500;">V3 Mockup - Clean + Mobile Responsive</p>
+      <p style="font-size:0.6875rem;color:#b45309;">Resize browser to see mobile stack. Click Documents/History/Activity buttons. Notes tabs work.</p>
+    </div>
+  </div>
+
+  <script>
+    function stab(t){document.querySelectorAll('#ntabs .tab').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.tp').forEach(e=>e.classList.remove('on'));document.querySelector(`[data-t="${t}"]`).classList.add('on');document.getElementById('tp-'+t).classList.add('on')}
+    function toggleDD(){document.getElementById('ddMenu').classList.toggle('show')}
+    document.addEventListener('click',e=>{if(!e.target.closest('.dd'))document.getElementById('ddMenu').classList.remove('show')})
+    function openPanel(n){cp();document.getElementById('ov').classList.add('show');document.getElementById('sp-'+n).classList.add('open')}
+    function cp(){document.getElementById('ov').classList.remove('show');document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('open'))}
+  </script>
+</body>
+</html>

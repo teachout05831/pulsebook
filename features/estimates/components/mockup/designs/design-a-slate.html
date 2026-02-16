@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Design A - Slate Dark</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;margin:0;color:#1e293b}
+    .fi{display:flex;align-items:center;justify-content:space-between;padding:0.375rem 0;font-size:0.8125rem;border-bottom:1px solid rgba(255,255,255,0.06)}
+    .fi:last-child{border:none}.fi-l{color:#94a3b8;font-size:0.75rem}.fi select{border:none;background:none;color:#60a5fa;font-size:0.8125rem;font-weight:500;cursor:pointer;text-align:right}
+    .pr{display:flex;justify-content:space-between;padding:0.35rem 0;font-size:0.8125rem}.pr a{color:#60a5fa;text-decoration:none}.pr a:hover{text-decoration:underline}
+    .tab{padding:0.5rem 0.875rem;font-size:0.8125rem;font-weight:500;cursor:pointer;color:#94a3b8;border-bottom:2px solid transparent;margin-bottom:-1px;position:relative}
+    .tab.on{color:#1e293b;border-bottom-color:#3b82f6}.tab .d{width:6px;height:6px;border-radius:50%;background:#ef4444;position:absolute;top:4px;right:2px}
+    .tp{display:none;padding-top:0.75rem}.tp.on{display:block}
+    .sdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .ico{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid #334155;border-radius:0.5rem;background:#1e293b;cursor:pointer;color:#94a3b8}
+    .ico:hover{background:#334155;color:white}
+    .dd{position:relative;display:inline-block}.dd-m{display:none;position:absolute;right:0;top:calc(100% + 4px);background:white;border:1px solid #e2e8f0;border-radius:0.5rem;box-shadow:0 8px 24px rgba(0,0,0,0.15);min-width:180px;z-index:50;overflow:hidden}
+    .dd-m.show{display:block}.dd-i{padding:0.5rem 1rem;font-size:0.8125rem;cursor:pointer}.dd-i:hover{background:#f1f5f9}
+    .ov{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:90;display:none}.ov.show{display:block}
+    .sp{position:fixed;top:0;right:-100%;width:min(380px,90vw);height:100vh;background:#0f172a;color:white;box-shadow:-4px 0 24px rgba(0,0,0,0.3);z-index:100;transition:right 0.25s;overflow-y:auto}
+    .sp.open{right:0}.sp-h{background:#1e293b;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0}
+    @media(max-width:1024px){.lay{grid-template-columns:1fr!important}.col-c{order:-1}}
+    @media(max-width:640px){.rg{grid-template-columns:1fr 1fr!important}}
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <div style="background:#0f172a;border-bottom:1px solid #1e293b;padding:0.75rem 1.25rem;color:white;">
+    <div style="max-width:1400px;margin:0 auto;">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+        <div class="flex items-center gap-2">
+          <h2 style="font-size:1.125rem;font-weight:700;margin:0;">Kasandra Butler</h2>
+          <span style="font-size:0.6875rem;color:#34d399;background:rgba(52,211,153,0.1);padding:2px 8px;border-radius:9999px;font-weight:600;display:inline-flex;align-items:center;gap:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#34d399;"></span>Opportunity
+          </span>
+        </div>
+        <span style="font-size:0.75rem;color:#94a3b8;">Follow-up: <a href="#" style="color:#60a5fa;">+ Create</a></span>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h1 style="font-size:1.25rem;font-weight:700;margin:0;">Estimate #67653</h1>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button class="ico" onclick="op('docs')"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></button>
+          <button class="ico" onclick="op('hist')"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></button>
+          <button class="ico" onclick="op('act')"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></button>
+          <div class="dd">
+            <button style="background:#16a34a;color:white;border:none;padding:0.4rem 1rem;border-radius:0.375rem;font-size:0.8125rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.25rem;" onclick="document.getElementById('dm').classList.toggle('show')">Book <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+            <div class="dd-m" id="dm"><div class="dd-i">Take Payment</div><div class="dd-i">Mark Lost</div><div class="dd-i">Preview Estimate</div><div class="dd-i">Send Estimate</div><div class="dd-i">Duplicate</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-COL LAYOUT -->
+  <div style="max-width:1400px;margin:0 auto;padding:1rem 1.25rem;">
+    <div class="lay" style="display:grid;grid-template-columns:230px 1fr 280px;gap:1rem;align-items:start;">
+
+      <!-- LEFT (DARK) -->
+      <div style="display:flex;flex-direction:column;gap:0.75rem;">
+        <div style="background:#1e293b;border-radius:0.75rem;padding:1rem;color:white;">
+          <div style="font-size:0.625rem;text-transform:uppercase;color:#64748b;font-weight:600;letter-spacing:0.05em;margin-bottom:0.5rem;">Quote Info</div>
+          <div class="fi"><span class="fi-l">Number</span><span style="font-weight:600;color:white;">67653</span></div>
+          <div class="fi"><span class="fi-l">Type</span><select><option selected>Local</option><option>Long Distance</option><option>Commercial</option></select></div>
+          <div class="fi"><span class="fi-l">Source</span><select><option>Website</option><option selected>Equate Media</option><option>Referral</option><option>Google Ads</option></select></div>
+          <div class="fi"><span class="fi-l">Sales</span><select><option selected>Daniela</option><option>Mike T.</option><option>Sarah C.</option></select></div>
+          <div class="fi"><span class="fi-l">Estimator</span><select><option selected>Unassigned</option><option>Daniela</option><option>Mike T.</option></select></div>
+          <div class="fi"><span class="fi-l">Branch</span><select><option selected>ARM Moving</option><option>North</option></select></div>
+          <div class="fi"><span class="fi-l">Region</span><select><option selected>None</option><option>Central</option><option>East</option></select></div>
+          <div class="fi"><span class="fi-l">Tags</span><a href="#" style="color:#60a5fa;font-size:0.8125rem;">+</a></div>
+          <div class="fi"><span class="fi-l">Lead Status</span><select><option selected>None</option><option>New</option><option>Contacted</option><option>Qualified</option><option>Proposal</option><option>Won</option><option>Lost</option></select></div>
+        </div>
+        <div style="background:#1e293b;border-radius:0.75rem;padding:1rem;color:white;">
+          <div class="flex items-center justify-between"><span style="font-size:0.75rem;font-weight:600;">Tasks</span><a href="#" style="color:#60a5fa;font-size:0.75rem;">+</a></div>
+          <p style="text-align:center;color:#475569;font-size:0.75rem;padding:0.75rem 0;">No tasks yet</p>
+        </div>
+        <div style="background:#1e293b;border-radius:0.75rem;padding:1rem;color:white;">
+          <div class="flex items-center justify-between"><span style="font-size:0.75rem;font-weight:600;">Estimates / Deliveries</span><a href="#" style="color:#60a5fa;font-size:0.75rem;">+</a></div>
+          <p style="text-align:center;color:#475569;font-size:0.75rem;padding:0.75rem 0;">No events yet</p>
+        </div>
+      </div>
+
+      <!-- CENTER -->
+      <div class="col-c" style="display:flex;flex-direction:column;gap:1rem;">
+        <!-- Jobs -->
+        <div style="background:white;border:1px solid #e2e8f0;border-radius:0.75rem;padding:1rem;">
+          <div class="flex items-center justify-between mb-3"><span style="font-size:0.875rem;font-weight:600;">Jobs</span><a href="#" style="color:#3b82f6;font-size:0.75rem;">+ Add Job</a></div>
+          <div style="border:2px solid #16a34a;border-radius:0.5rem;padding:0.75rem;display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;">
+            <div><div style="font-size:0.6875rem;color:#64748b;">Job 67653-1</div><span style="font-size:0.625rem;background:#f1f5f9;padding:2px 6px;border-radius:3px;color:#64748b;">Unscheduled</span></div>
+            <select style="border:none;font-size:0.8125rem;color:#3b82f6;font-weight:500;cursor:pointer;background:none;"><option selected>Moving</option><option>Packing</option><option>Storage</option></select>
+            <a href="#" style="color:#3b82f6;font-size:0.8125rem;">Feb 27, 2026</a>
+            <span style="font-weight:600;font-size:0.875rem;margin-left:auto;">$425.00</span>
+          </div>
+        </div>
+        <!-- Stops -->
+        <div style="background:white;border:1px solid #e2e8f0;border-radius:0.75rem;padding:1rem;">
+          <div class="flex flex-wrap items-center gap-3 mb-3">
+            <span style="font-size:0.875rem;font-weight:600;">Stops</span>
+            <a href="#" style="color:#3b82f6;font-size:0.75rem;">Map</a>
+            <span style="font-size:0.6875rem;color:#64748b;"><b>RT</b> 1h 6m / 57mi</span>
+            <span style="font-size:0.6875rem;color:#64748b;"><b>O&rarr;D</b> 0h / 0mi</span>
+            <span style="font-size:0.6875rem;color:#64748b;"><b>Travel</b> 1h 6m</span>
+            <a href="#" style="color:#3b82f6;font-size:0.75rem;margin-left:auto;">+</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #f1f5f9;"><span class="sdot" style="background:#94a3b8;"></span><span style="font-size:0.8125rem;color:#94a3b8;width:80px;">Office</span><span style="font-size:0.8125rem;">1237 S Val Vista Dr, Mesa, AZ 85204</span></div>
+          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;"><span class="sdot" style="background:#3b82f6;"></span><a href="#" style="font-size:0.8125rem;color:#3b82f6;width:80px;font-weight:500;">Origin</a><span style="font-size:0.8125rem;flex:1;min-width:120px;">Phoenix, Arizona 85015</span><span style="font-size:0.6875rem;color:#64748b;">Apartment</span></div>
+          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid #f1f5f9;flex-wrap:wrap;"><span class="sdot" style="background:#16a34a;"></span><a href="#" style="font-size:0.8125rem;color:#3b82f6;width:80px;font-weight:500;">Destination</a><span style="font-size:0.8125rem;flex:1;min-width:120px;">Phoenix, Arizona 85041</span><span style="font-size:0.6875rem;color:#64748b;">House</span></div>
+          <div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;"><span class="sdot" style="background:#94a3b8;"></span><span style="font-size:0.8125rem;color:#94a3b8;width:80px;">Office</span><span style="font-size:0.8125rem;">1237 S Val Vista Dr, Mesa, AZ 85204</span></div>
+        </div>
+        <!-- Notes -->
+        <div style="background:white;border:1px solid #e2e8f0;border-radius:0.75rem;">
+          <div style="display:flex;border-bottom:1px solid #e2e8f0;overflow-x:auto;" id="nt">
+            <div class="tab on" data-t="i" onclick="st('i')">Internal<span class="d"></span></div>
+            <div class="tab" data-t="c" onclick="st('c')">Customer<span class="d"></span></div>
+            <div class="tab" data-t="cr" onclick="st('cr')">Crew Notes</div>
+            <div class="tab" data-t="f" onclick="st('f')">Crew Feedback</div>
+          </div>
+          <div style="padding:0 1.25rem 1.25rem;">
+            <div class="tp on" id="tp-i"><p style="font-size:0.6875rem;color:#94a3b8;font-style:italic;margin:0.75rem 0 0.5rem;">Note (Visible to office only)</p><textarea style="width:100%;min-height:140px;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;resize:vertical;">2 major street less than a mile
+apartment to another apartment
+1st floor to a 2nd floor apartment
+no appliances boxes and furniture
+$150
+$125</textarea></div>
+            <div class="tp" id="tp-c"><p style="font-size:0.6875rem;color:#94a3b8;font-style:italic;margin:0.75rem 0 0.5rem;">Visible to customer</p><textarea style="width:100%;min-height:140px;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;resize:vertical;">Thank you for choosing us! Please have items boxed by 8 AM.</textarea></div>
+            <div class="tp" id="tp-cr"><p style="font-size:0.6875rem;color:#94a3b8;font-style:italic;margin:0.75rem 0 0.5rem;">Instructions for crew</p><textarea style="width:100%;min-height:140px;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;resize:vertical;">Bring extra blankets, narrow staircase at pickup.</textarea></div>
+            <div class="tp" id="tp-f"><p style="font-size:0.6875rem;color:#94a3b8;font-style:italic;margin:0.75rem 0 0.5rem;">Crew feedback (read-only)</p><div style="min-height:140px;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;color:#94a3b8;background:#f8fafc;">No crew feedback yet.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT (PRICING) -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div style="background:white;border:1px solid #e2e8f0;border-radius:0.75rem;overflow:hidden;">
+          <div style="padding:1rem 1.25rem;">
+            <!-- Resources -->
+            <div class="rg" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:1rem;">
+              <div style="background:#0f172a;border-radius:0.5rem;padding:0.5rem;text-align:center;color:white;"><div style="font-size:0.5625rem;color:#64748b;text-transform:uppercase;">Trucks</div><div style="font-size:1.125rem;font-weight:700;">1</div></div>
+              <div style="background:#0f172a;border-radius:0.5rem;padding:0.5rem;text-align:center;color:white;"><div style="font-size:0.5625rem;color:#64748b;text-transform:uppercase;">Crew</div><div style="font-size:1.125rem;font-weight:700;">2</div></div>
+              <div style="background:#0f172a;border-radius:0.5rem;padding:0.5rem;text-align:center;color:white;"><div style="font-size:0.5625rem;color:#64748b;text-transform:uppercase;">Hours</div><div style="font-size:1.125rem;font-weight:700;">2h</div></div>
+              <div style="background:#0f172a;border-radius:0.5rem;padding:0.5rem;text-align:center;"><div style="font-size:0.5625rem;color:#64748b;text-transform:uppercase;">Rate</div><div style="font-size:1.125rem;font-weight:700;color:#34d399;">$150/hr</div></div>
+            </div>
+            <!-- Size -->
+            <div style="margin-bottom:1rem;">
+              <div style="font-size:0.5625rem;color:#94a3b8;text-transform:uppercase;font-weight:600;margin-bottom:0.25rem;">Size</div>
+              <select style="width:100%;border:1px solid #e2e8f0;border-radius:0.375rem;padding:0.375rem 0.5rem;font-size:0.8125rem;background:white;">
+                <option selected>2 Bedroom Apartment (900-1400 SQFT)</option><option>1 Bedroom</option><option>3 Bedroom</option><option>Studio</option><option>House 4BR+</option>
+              </select>
+            </div>
+            <!-- Type row -->
+            <div style="display:flex;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:1px solid #f1f5f9;">
+              <div><div style="font-size:0.5625rem;color:#94a3b8;text-transform:uppercase;font-weight:600;">Estimate Type</div><select style="border:none;font-size:0.8125rem;color:#3b82f6;font-weight:500;cursor:pointer;padding:0;"><option selected>Hourly</option><option>Flat Rate</option></select></div>
+              <div style="text-align:right;"><div style="font-size:0.5625rem;color:#94a3b8;text-transform:uppercase;font-weight:600;">Binding Type</div><select style="border:none;font-size:0.8125rem;color:#3b82f6;font-weight:500;cursor:pointer;padding:0;"><option selected>Non-Binding</option><option>Binding</option></select></div>
+            </div>
+            <!-- Pricing -->
+            <div class="pr"><a href="#">Moving Services</a><span style="font-weight:500;">$300.00</span></div>
+            <div class="pr"><a href="#">Materials</a><span style="color:#cbd5e1;">&mdash;</span></div>
+            <div class="pr"><a href="#">Additional Services</a><span style="color:#cbd5e1;">&mdash;</span></div>
+            <div class="pr"><a href="#">Trip Fee</a><span style="font-weight:500;">$125.00</span></div>
+            <div class="pr"><a href="#">Valuation</a><span style="color:#cbd5e1;">&mdash;</span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="pr"><span style="font-weight:600;">Subtotal</span><span style="font-weight:600;">$425.00</span></div>
+            <div class="pr"><a href="#">Sales Tax</a><span style="color:#cbd5e1;">&mdash;</span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="pr"><span style="font-weight:600;">Estimated Total</span><span style="font-weight:600;">$425.00</span></div>
+            <div class="pr"><a href="#">Payments</a><span style="color:#cbd5e1;">&mdash;</span></div>
+            <div style="border-top:1px solid #e2e8f0;margin:0.5rem 0;"></div>
+            <div class="pr"><span style="font-weight:700;">Balance</span><span style="font-weight:700;">$425.00</span></div>
+          </div>
+          <!-- Total footer -->
+          <div style="background:#1e293b;color:white;padding:0.75rem 1.25rem;">
+            <div style="display:flex;justify-content:space-between;font-size:0.8125rem;margin-bottom:0.25rem;"><span>Moving</span><span>$425.00</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-weight:600;">Estimated Price:</span><span style="font-size:1.25rem;font-weight:700;">$425.00</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panels -->
+  <div class="ov" id="ov" onclick="cp()"></div>
+  <div class="sp" id="sp-docs"><div class="sp-h"><span style="font-weight:600;">Documents</span><button onclick="cp()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">&times;</button></div><div style="padding:1.25rem;"><div style="padding:0.5rem 0;border-bottom:1px solid #334155;"><div style="font-size:0.8125rem;font-weight:500;">Estimate</div><div style="font-size:0.6875rem;color:#f59e0b;">Signature Requested</div></div><div style="padding:0.5rem 0;border-bottom:1px solid #334155;"><div style="font-size:0.8125rem;font-weight:500;">Invoice</div><div style="font-size:0.6875rem;color:#64748b;">Not Started</div></div><div style="padding:0.5rem 0;"><div style="font-size:0.8125rem;font-weight:500;">Work Order</div></div></div></div>
+  <div class="sp" id="sp-hist"><div class="sp-h"><span style="font-weight:600;">Previous Versions</span><button onclick="cp()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">&times;</button></div><div style="padding:1.25rem;"><div style="font-size:0.8125rem;font-weight:500;">67653 - Estimate</div><div style="font-size:0.6875rem;color:#94a3b8;">Sent 2/3/2026</div></div></div>
+  <div class="sp" id="sp-act"><div class="sp-h"><span style="font-weight:600;">Activity</span><button onclick="cp()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">&times;</button></div><div style="padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;"><div style="display:flex;gap:0.5rem;"><span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;margin-top:5px;flex-shrink:0;"></span><div><div style="font-size:0.8125rem;">Estimate created</div><div style="font-size:0.6875rem;color:#64748b;">Feb 2, 2026</div></div></div><div style="display:flex;gap:0.5rem;"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-top:5px;flex-shrink:0;"></span><div><div style="font-size:0.8125rem;">Sent to customer</div><div style="font-size:0.6875rem;color:#64748b;">Feb 3, 2026</div></div></div></div></div>
+
+  <div style="text-align:center;padding:1rem;font-size:0.75rem;color:#94a3b8;">Design A - Slate Dark | <a href="index.html" style="color:#3b82f6;">Back to all designs</a></div>
+
+  <script>
+    function st(t){document.querySelectorAll('#nt .tab').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.tp').forEach(e=>e.classList.remove('on'));document.querySelector(`[data-t="${t}"]`).classList.add('on');document.getElementById('tp-'+t).classList.add('on')}
+    document.addEventListener('click',e=>{if(!e.target.closest('.dd'))document.getElementById('dm').classList.remove('show')})
+    function op(n){cp();document.getElementById('ov').classList.add('show');document.getElementById('sp-'+n).classList.add('open')}
+    function cp(){document.getElementById('ov').classList.remove('show');document.querySelectorAll('.sp').forEach(p=>p.classList.remove('open'))}
+  </script>
+</body>
+</html>

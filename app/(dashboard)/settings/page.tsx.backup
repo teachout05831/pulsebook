@@ -1,0 +1,1533 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Building2, FileText, Save, Upload, Wrench, Plus, Pencil, Trash2, Users, Truck, Star, StarOff, Settings2, Tag, ScrollText, Palette, DollarSign } from "lucide-react";
+import { CustomFieldsManager } from "@/features/custom-fields";
+import { PrebuiltFieldsSection } from "@/features/prebuilt-fields";
+import { TechPortalSettings as TechPortalSettingsPanel } from "@/features/tech-portal";
+import { TagsManager } from "@/features/tags";
+import { ContractTemplateList } from "@/features/contracts";
+import { TimeTrackingSettings } from "@/features/contracts/components/TimeTrackingSettings";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import type { Company, CompanySettings, ServiceType, TeamMember, TeamMemberRole } from "@/types";
+import { DISPATCH_VIEWS, type DispatchView, type CompanyDispatchSettings, defaultCompanyDispatchSettings } from "@/types/dispatch";
+
+const industries = [
+  "General Services",
+  "HVAC",
+  "Plumbing",
+  "Electrical",
+  "Landscaping",
+  "Pool Service",
+  "Cleaning",
+  "Pest Control",
+  "Roofing",
+  "Painting",
+  "Construction",
+  "Handyman",
+  "Other",
+];
+
+const paymentTermsOptions = [
+  "Due on Receipt",
+  "Net 15",
+  "Net 30",
+  "Net 45",
+  "Net 60",
+];
+
+const roleOptions: { value: TeamMemberRole; label: string }[] = [
+  { value: "admin", label: "Admin" },
+  { value: "technician", label: "Technician" },
+  { value: "office", label: "Office" },
+];
+
+interface ServiceTypeFormData {
+  name: string;
+  description: string;
+  defaultPrice: string;
+}
+
+const emptyServiceTypeForm: ServiceTypeFormData = {
+  name: "",
+  description: "",
+  defaultPrice: "",
+};
+
+interface TeamMemberFormData {
+  name: string;
+  email: string;
+  phone: string;
+  role: TeamMemberRole;
+}
+
+const emptyTeamMemberForm: TeamMemberFormData = {
+  name: "",
+  email: "",
+  phone: "",
+  role: "technician",
+};
+
+export default function SettingsPage() {
+  const [company, setCompany] = useState<Company | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isSavingBilling, setIsSavingBilling] = useState(false);
+
+  // Service Types state
+  const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([]);
+  const [isLoadingServiceTypes, setIsLoadingServiceTypes] = useState(true);
+  const [isServiceTypeDialogOpen, setIsServiceTypeDialogOpen] = useState(false);
+  const [isDeleteServiceTypeDialogOpen, setIsDeleteServiceTypeDialogOpen] = useState(false);
+  const [editingServiceType, setEditingServiceType] = useState<ServiceType | null>(null);
+  const [deletingServiceType, setDeletingServiceType] = useState<ServiceType | null>(null);
+  const [serviceTypeForm, setServiceTypeForm] = useState<ServiceTypeFormData>(emptyServiceTypeForm);
+  const [isSavingServiceType, setIsSavingServiceType] = useState(false);
+
+  // Team Members state
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [isLoadingTeamMembers, setIsLoadingTeamMembers] = useState(true);
+  const [isTeamMemberDialogOpen, setIsTeamMemberDialogOpen] = useState(false);
+  const [isDeleteTeamMemberDialogOpen, setIsDeleteTeamMemberDialogOpen] = useState(false);
+  const [editingTeamMember, setEditingTeamMember] = useState<TeamMember | null>(null);
+  const [deletingTeamMember, setDeletingTeamMember] = useState<TeamMember | null>(null);
+  const [teamMemberForm, setTeamMemberForm] = useState<TeamMemberFormData>(emptyTeamMemberForm);
+  const [isSavingTeamMember, setIsSavingTeamMember] = useState(false);
+
+  const [profileForm, setProfileForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    website: "",
+    industry: "",
+  });
+
+  const [billingForm, setBillingForm] = useState<CompanySettings>({
+    defaultTaxRate: 8,
+    defaultPaymentTerms: "Net 30",
+    invoicePrefix: "INV-",
+    estimatePrefix: "EST-",
+    defaultInvoiceNotes: "",
+    defaultInvoiceTerms: "",
+    defaultEstimateNotes: "",
+    defaultEstimateTerms: "",
+  });
+
+  // Dispatch settings state
+  const [dispatchSettings, setDispatchSettings] = useState<CompanyDispatchSettings>(defaultCompanyDispatchSettings);
+  const [isSavingDispatch, setIsSavingDispatch] = useState(false);
+
+  // Fetch company data on mount
+  useEffect(() => {
+    const fetchCompany = async () => {
+      try {
+        const res = await fetch("/api/company");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setCompany(data.data);
+        setProfileForm({
+          name: data.data.name || "",
+          email: data.data.email || "",
+          phone: data.data.phone || "",
+          address: data.data.address || "",
+          city: data.data.city || "",
+          state: data.data.state || "",
+          zipCode: data.data.zipCode || "",
+          website: data.data.website || "",
+          industry: data.data.industry || "",
+        });
+        if (data.data.settings) {
+          setBillingForm(data.data.settings);
+        }
+      } catch {
+        setIsError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCompany();
+  }, []);
+
+  // Fetch service types on mount
+  useEffect(() => {
+    const fetchServiceTypes = async () => {
+      try {
+        const res = await fetch("/api/service-types");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setServiceTypes(data.data);
+      } catch {
+        toast.error("Failed to load service types");
+      } finally {
+        setIsLoadingServiceTypes(false);
+      }
+    };
+    fetchServiceTypes();
+  }, []);
+
+  // Fetch team members on mount
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const res = await fetch("/api/team-members");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setTeamMembers(data.data);
+      } catch {
+        toast.error("Failed to load team members");
+      } finally {
+        setIsLoadingTeamMembers(false);
+      }
+    };
+    fetchTeamMembers();
+  }, []);
+
+  const handleProfileChange = (field: string, value: string) => {
+    setProfileForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleBillingChange = (field: keyof CompanySettings, value: string | number) => {
+    setBillingForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSavingProfile(true);
+    try {
+      const res = await fetch("/api/company", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileForm),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      const data = await res.json();
+      setCompany(data.data);
+      toast.success("Company profile updated successfully");
+    } catch {
+      toast.error("Failed to update company profile");
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleSaveBilling = async () => {
+    setIsSavingBilling(true);
+    try {
+      const res = await fetch("/api/company", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings: billingForm }),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      const data = await res.json();
+      setCompany(data.data);
+      toast.success("Billing settings updated successfully");
+    } catch {
+      toast.error("Failed to update billing settings");
+    } finally {
+      setIsSavingBilling(false);
+    }
+  };
+
+  const handleLogoUpload = () => {
+    toast.info("Logo upload functionality will be available in a future update");
+  };
+
+  // Service Type handlers
+  const handleOpenAddServiceType = () => {
+    setEditingServiceType(null);
+    setServiceTypeForm(emptyServiceTypeForm);
+    setIsServiceTypeDialogOpen(true);
+  };
+
+  const handleOpenEditServiceType = (serviceType: ServiceType) => {
+    setEditingServiceType(serviceType);
+    setServiceTypeForm({
+      name: serviceType.name,
+      description: serviceType.description,
+      defaultPrice: serviceType.defaultPrice.toString(),
+    });
+    setIsServiceTypeDialogOpen(true);
+  };
+
+  const handleOpenDeleteServiceType = (serviceType: ServiceType) => {
+    setDeletingServiceType(serviceType);
+    setIsDeleteServiceTypeDialogOpen(true);
+  };
+
+  const handleSaveServiceType = async () => {
+    if (!serviceTypeForm.name.trim()) {
+      toast.error("Service type name is required");
+      return;
+    }
+    if (!serviceTypeForm.defaultPrice || parseFloat(serviceTypeForm.defaultPrice) < 0) {
+      toast.error("Valid default price is required");
+      return;
+    }
+
+    setIsSavingServiceType(true);
+    try {
+      if (editingServiceType) {
+        const res = await fetch(`/api/service-types/${editingServiceType.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: serviceTypeForm.name,
+            description: serviceTypeForm.description,
+            defaultPrice: parseFloat(serviceTypeForm.defaultPrice),
+          }),
+        });
+        if (!res.ok) throw new Error("Failed to update");
+        const data = await res.json();
+        setServiceTypes((prev) =>
+          prev.map((st) => (st.id === editingServiceType.id ? data.data : st))
+        );
+        toast.success("Service type updated successfully");
+      } else {
+        const res = await fetch("/api/service-types", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: serviceTypeForm.name,
+            description: serviceTypeForm.description,
+            defaultPrice: parseFloat(serviceTypeForm.defaultPrice),
+          }),
+        });
+        if (!res.ok) throw new Error("Failed to create");
+        const data = await res.json();
+        setServiceTypes((prev) => [...prev, data.data].sort((a, b) => a.name.localeCompare(b.name)));
+        toast.success("Service type created successfully");
+      }
+      setIsServiceTypeDialogOpen(false);
+      setServiceTypeForm(emptyServiceTypeForm);
+      setEditingServiceType(null);
+    } catch {
+      toast.error(editingServiceType ? "Failed to update service type" : "Failed to create service type");
+    } finally {
+      setIsSavingServiceType(false);
+    }
+  };
+
+  const handleDeleteServiceType = async () => {
+    if (!deletingServiceType) return;
+
+    try {
+      const res = await fetch(`/api/service-types/${deletingServiceType.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      setServiceTypes((prev) => prev.filter((st) => st.id !== deletingServiceType.id));
+      toast.success("Service type deleted successfully");
+    } catch {
+      toast.error("Failed to delete service type");
+    } finally {
+      setIsDeleteServiceTypeDialogOpen(false);
+      setDeletingServiceType(null);
+    }
+  };
+
+  // Team Member handlers
+  const handleOpenAddTeamMember = () => {
+    setEditingTeamMember(null);
+    setTeamMemberForm(emptyTeamMemberForm);
+    setIsTeamMemberDialogOpen(true);
+  };
+
+  const handleOpenEditTeamMember = (teamMember: TeamMember) => {
+    setEditingTeamMember(teamMember);
+    setTeamMemberForm({
+      name: teamMember.name,
+      email: teamMember.email,
+      phone: teamMember.phone,
+      role: teamMember.role,
+    });
+    setIsTeamMemberDialogOpen(true);
+  };
+
+  const handleOpenDeleteTeamMember = (teamMember: TeamMember) => {
+    setDeletingTeamMember(teamMember);
+    setIsDeleteTeamMemberDialogOpen(true);
+  };
+
+  const handleToggleTeamMemberStatus = async (teamMember: TeamMember) => {
+    try {
+      const res = await fetch(`/api/team-members/${teamMember.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !teamMember.isActive }),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      const data = await res.json();
+      setTeamMembers((prev) =>
+        prev.map((tm) => (tm.id === teamMember.id ? data.data : tm))
+      );
+      toast.success(
+        teamMember.isActive
+          ? "Team member deactivated successfully"
+          : "Team member activated successfully"
+      );
+    } catch {
+      toast.error("Failed to update team member status");
+    }
+  };
+
+  const handleSaveTeamMember = async () => {
+    if (!teamMemberForm.name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+    if (!teamMemberForm.email.trim()) {
+      toast.error("Email is required");
+      return;
+    }
+    if (!teamMemberForm.role) {
+      toast.error("Role is required");
+      return;
+    }
+
+    setIsSavingTeamMember(true);
+    try {
+      if (editingTeamMember) {
+        const res = await fetch(`/api/team-members/${editingTeamMember.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(teamMemberForm),
+        });
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to update");
+        }
+        const data = await res.json();
+        setTeamMembers((prev) =>
+          prev.map((tm) => (tm.id === editingTeamMember.id ? data.data : tm))
+        );
+        toast.success("Team member updated successfully");
+      } else {
+        const res = await fetch("/api/team-members", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(teamMemberForm),
+        });
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to create");
+        }
+        const data = await res.json();
+        setTeamMembers((prev) => [...prev, data.data].sort((a, b) => a.name.localeCompare(b.name)));
+        toast.success("Team member added successfully");
+      }
+      setIsTeamMemberDialogOpen(false);
+      setTeamMemberForm(emptyTeamMemberForm);
+      setEditingTeamMember(null);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save team member");
+    } finally {
+      setIsSavingTeamMember(false);
+    }
+  };
+
+  const handleDeleteTeamMember = async () => {
+    if (!deletingTeamMember) return;
+
+    try {
+      const res = await fetch(`/api/team-members/${deletingTeamMember.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      setTeamMembers((prev) => prev.filter((tm) => tm.id !== deletingTeamMember.id));
+      toast.success("Team member deleted successfully");
+    } catch {
+      toast.error("Failed to delete team member");
+    } finally {
+      setIsDeleteTeamMemberDialogOpen(false);
+      setDeletingTeamMember(null);
+    }
+  };
+
+  // Dispatch settings handlers
+  const handleToggleView = (viewId: DispatchView) => {
+    setDispatchSettings((prev) => {
+      const isEnabled = prev.enabledViews.includes(viewId);
+      let newEnabledViews: DispatchView[];
+
+      if (isEnabled) {
+        // Don't allow disabling all views
+        if (prev.enabledViews.length <= 1) {
+          toast.error("At least one view must be enabled");
+          return prev;
+        }
+        newEnabledViews = prev.enabledViews.filter((v) => v !== viewId);
+        // If we're disabling the default view, set a new default
+        if (prev.defaultView === viewId) {
+          return {
+            ...prev,
+            enabledViews: newEnabledViews,
+            defaultView: newEnabledViews[0],
+          };
+        }
+      } else {
+        newEnabledViews = [...prev.enabledViews, viewId];
+      }
+
+      return {
+        ...prev,
+        enabledViews: newEnabledViews,
+      };
+    });
+  };
+
+  const handleSetDefaultView = (viewId: DispatchView) => {
+    if (!dispatchSettings.enabledViews.includes(viewId)) {
+      toast.error("Enable the view first before setting it as default");
+      return;
+    }
+    setDispatchSettings((prev) => ({
+      ...prev,
+      defaultView: viewId,
+    }));
+  };
+
+  const handleSaveDispatchSettings = async () => {
+    setIsSavingDispatch(true);
+    try {
+      // In a real app, this would save to the API
+      // For now, we'll just simulate success
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      toast.success("Dispatch settings saved successfully");
+    } catch {
+      toast.error("Failed to save dispatch settings");
+    } finally {
+      setIsSavingDispatch(false);
+    }
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(price);
+  };
+
+  const getRoleBadgeVariant = (role: TeamMemberRole) => {
+    switch (role) {
+      case "admin":
+        return "default";
+      case "technician":
+        return "secondary";
+      case "office":
+        return "outline";
+      default:
+        return "secondary";
+    }
+  };
+
+  if (isError) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Settings</h1>
+          <p className="text-muted-foreground">Configure your business settings.</p>
+        </div>
+        <Card>
+          <CardContent className="p-8 text-center">
+            <p className="text-destructive">Failed to load company settings. Please try again.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <p className="text-muted-foreground">Configure your business settings.</p>
+      </div>
+
+      {/* Company Profile Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Company Profile
+          </CardTitle>
+          <CardDescription>
+            Update your company information. This appears on invoices and estimates.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {isLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : (
+            <>
+              {/* Logo Upload */}
+              <div className="space-y-2">
+                <Label>Company Logo</Label>
+                <div className="flex items-center gap-4">
+                  <div className="h-20 w-20 rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center bg-muted">
+                    {company?.logoUrl ? (
+                      <img
+                        src={company.logoUrl}
+                        alt="Company logo"
+                        className="h-full w-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <Building2 className="h-8 w-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <Button variant="outline" onClick={handleLogoUpload}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Logo
+                  </Button>
+                </div>
+              </div>
+
+              {/* Company Name */}
+              <div className="space-y-2">
+                <Label htmlFor="name">Company Name *</Label>
+                <Input
+                  id="name"
+                  value={profileForm.name}
+                  onChange={(e) => handleProfileChange("name", e.target.value)}
+                  placeholder="Your Company Name"
+                />
+              </div>
+
+              {/* Industry */}
+              <div className="space-y-2">
+                <Label htmlFor="industry">Industry</Label>
+                <Select
+                  value={profileForm.industry}
+                  onValueChange={(value) => handleProfileChange("industry", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select industry" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {industries.map((industry) => (
+                      <SelectItem key={industry} value={industry}>
+                        {industry}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Contact Information */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profileForm.email}
+                    onChange={(e) => handleProfileChange("email", e.target.value)}
+                    placeholder="contact@company.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={profileForm.phone}
+                    onChange={(e) => handleProfileChange("phone", e.target.value)}
+                    placeholder="(555) 123-4567"
+                  />
+                </div>
+              </div>
+
+              {/* Website */}
+              <div className="space-y-2">
+                <Label htmlFor="website">Website</Label>
+                <Input
+                  id="website"
+                  value={profileForm.website}
+                  onChange={(e) => handleProfileChange("website", e.target.value)}
+                  placeholder="https://yourcompany.com"
+                />
+              </div>
+
+              {/* Address */}
+              <div className="space-y-2">
+                <Label htmlFor="address">Street Address</Label>
+                <Input
+                  id="address"
+                  value={profileForm.address}
+                  onChange={(e) => handleProfileChange("address", e.target.value)}
+                  placeholder="123 Main Street"
+                />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    value={profileForm.city}
+                    onChange={(e) => handleProfileChange("city", e.target.value)}
+                    placeholder="Austin"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state">State</Label>
+                  <Input
+                    id="state"
+                    value={profileForm.state}
+                    onChange={(e) => handleProfileChange("state", e.target.value)}
+                    placeholder="TX"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="zipCode">ZIP Code</Label>
+                  <Input
+                    id="zipCode"
+                    value={profileForm.zipCode}
+                    onChange={(e) => handleProfileChange("zipCode", e.target.value)}
+                    placeholder="78701"
+                  />
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex justify-end pt-4">
+                <Button onClick={handleSaveProfile} disabled={isSavingProfile}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {isSavingProfile ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Invoice & Estimate Settings Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Invoice & Estimate Settings
+          </CardTitle>
+          <CardDescription>
+            Configure default values for invoices and estimates.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {isLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          ) : (
+            <>
+              {/* Tax Rate and Payment Terms */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="taxRate">Default Tax Rate (%)</Label>
+                  <Input
+                    id="taxRate"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={billingForm.defaultTaxRate}
+                    onChange={(e) => handleBillingChange("defaultTaxRate", parseFloat(e.target.value) || 0)}
+                    placeholder="8"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="paymentTerms">Default Payment Terms</Label>
+                  <Select
+                    value={billingForm.defaultPaymentTerms}
+                    onValueChange={(value) => handleBillingChange("defaultPaymentTerms", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select terms" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {paymentTermsOptions.map((term) => (
+                        <SelectItem key={term} value={term}>
+                          {term}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Number Prefixes */}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="invoicePrefix">Invoice Number Prefix</Label>
+                  <Input
+                    id="invoicePrefix"
+                    value={billingForm.invoicePrefix}
+                    onChange={(e) => handleBillingChange("invoicePrefix", e.target.value)}
+                    placeholder="INV-"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Example: {billingForm.invoicePrefix}001
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="estimatePrefix">Estimate Number Prefix</Label>
+                  <Input
+                    id="estimatePrefix"
+                    value={billingForm.estimatePrefix}
+                    onChange={(e) => handleBillingChange("estimatePrefix", e.target.value)}
+                    placeholder="EST-"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Example: {billingForm.estimatePrefix}001
+                  </p>
+                </div>
+              </div>
+
+              {/* Default Invoice Notes/Terms */}
+              <div className="space-y-4">
+                <h4 className="font-medium">Default Invoice Text</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="invoiceNotes">Default Notes</Label>
+                    <Textarea
+                      id="invoiceNotes"
+                      value={billingForm.defaultInvoiceNotes}
+                      onChange={(e) => handleBillingChange("defaultInvoiceNotes", e.target.value)}
+                      placeholder="Thank you for your business!"
+                      rows={3}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="invoiceTerms">Default Terms</Label>
+                    <Textarea
+                      id="invoiceTerms"
+                      value={billingForm.defaultInvoiceTerms}
+                      onChange={(e) => handleBillingChange("defaultInvoiceTerms", e.target.value)}
+                      placeholder="Payment due within 30 days of invoice date."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Default Estimate Notes/Terms */}
+              <div className="space-y-4">
+                <h4 className="font-medium">Default Estimate Text</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="estimateNotes">Default Notes</Label>
+                    <Textarea
+                      id="estimateNotes"
+                      value={billingForm.defaultEstimateNotes}
+                      onChange={(e) => handleBillingChange("defaultEstimateNotes", e.target.value)}
+                      placeholder="Thank you for considering our services."
+                      rows={3}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="estimateTerms">Default Terms</Label>
+                    <Textarea
+                      id="estimateTerms"
+                      value={billingForm.defaultEstimateTerms}
+                      onChange={(e) => handleBillingChange("defaultEstimateTerms", e.target.value)}
+                      placeholder="This estimate is valid for 30 days."
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex justify-end pt-4">
+                <Button onClick={handleSaveBilling} disabled={isSavingBilling}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {isSavingBilling ? "Saving..." : "Save Billing Settings"}
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Service Types Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5" />
+                Service Types
+              </CardTitle>
+              <CardDescription>
+                Configure the types of services you offer. These can be selected when creating estimates and invoices.
+              </CardDescription>
+            </div>
+            <Button onClick={handleOpenAddServiceType}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Service Type
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoadingServiceTypes ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : serviceTypes.length === 0 ? (
+            <div className="text-center py-8">
+              <Wrench className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No service types configured yet.</p>
+              <Button variant="outline" className="mt-4" onClick={handleOpenAddServiceType}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Your First Service Type
+              </Button>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead className="text-right">Default Price</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="w-[100px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {serviceTypes.map((serviceType) => (
+                  <TableRow key={serviceType.id}>
+                    <TableCell className="font-medium">{serviceType.name}</TableCell>
+                    <TableCell className="text-muted-foreground max-w-[300px] truncate">
+                      {serviceType.description || "-"}
+                    </TableCell>
+                    <TableCell className="text-right">{formatPrice(serviceType.defaultPrice)}</TableCell>
+                    <TableCell>
+                      <Badge variant={serviceType.isActive ? "default" : "secondary"}>
+                        {serviceType.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenEditServiceType(serviceType)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenDeleteServiceType(serviceType)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Team Members Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Team Members
+              </CardTitle>
+              <CardDescription>
+                Manage your team members. They can be assigned to jobs and have different roles.
+              </CardDescription>
+            </div>
+            <Button onClick={handleOpenAddTeamMember}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Team Member
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoadingTeamMembers ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : teamMembers.length === 0 ? (
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No team members added yet.</p>
+              <Button variant="outline" className="mt-4" onClick={handleOpenAddTeamMember}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Your First Team Member
+              </Button>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="w-[140px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {teamMembers.map((teamMember) => (
+                  <TableRow key={teamMember.id}>
+                    <TableCell className="font-medium">{teamMember.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{teamMember.email}</TableCell>
+                    <TableCell className="text-muted-foreground">{teamMember.phone || "-"}</TableCell>
+                    <TableCell>
+                      <Badge variant={getRoleBadgeVariant(teamMember.role)}>
+                        {teamMember.role.charAt(0).toUpperCase() + teamMember.role.slice(1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={teamMember.isActive ? "default" : "secondary"}>
+                        {teamMember.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenEditTeamMember(teamMember)}
+                          title="Edit"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleToggleTeamMemberStatus(teamMember)}
+                          title={teamMember.isActive ? "Deactivate" : "Activate"}
+                        >
+                          {teamMember.isActive ? "Deactivate" : "Activate"}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleOpenDeleteTeamMember(teamMember)}
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Tech Portal Section */}
+      <TechPortalSettingsPanel />
+
+      {/* Custom Fields Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings2 className="h-5 w-5" />
+            Custom Fields
+          </CardTitle>
+          <CardDescription>
+            Define custom fields for customers and jobs. Fields are grouped into sections and appear on create/edit forms.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <PrebuiltFieldsSection />
+          <CustomFieldsManager />
+        </CardContent>
+      </Card>
+
+      {/* Tags Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Tag className="h-5 w-5" />
+            Customer Tags
+          </CardTitle>
+          <CardDescription>
+            Manage tags to categorize and filter customers.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TagsManager />
+        </CardContent>
+      </Card>
+
+      {/* Job Tags Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Tag className="h-5 w-5" />
+            Job Tags
+          </CardTitle>
+          <CardDescription>
+            Manage tags to categorize and filter jobs.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TagsManager entityType="job" />
+        </CardContent>
+      </Card>
+
+      {/* Contract Templates Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ScrollText className="h-5 w-5" />
+            Contract Templates
+          </CardTitle>
+          <CardDescription>
+            Design reusable contract templates with drag-and-drop blocks. Templates are used when creating contracts for jobs.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ContractTemplateList />
+        </CardContent>
+      </Card>
+
+      {/* Time Tracking Settings */}
+      <TimeTrackingSettings />
+
+      {/* Estimate Page Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            Brand Kit
+          </CardTitle>
+          <CardDescription>
+            Configure your company branding for estimate pages — logo, colors, fonts, certifications, and social links.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <a href="/settings/brand-kit">
+            <Button variant="outline">Manage Brand Kit</Button>
+          </a>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            Rate Card
+          </CardTitle>
+          <CardDescription>
+            Manage your standard pricing and rate cards used in estimate page templates.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <a href="/settings/rate-card">
+            <Button variant="outline">Manage Rate Cards</Button>
+          </a>
+        </CardContent>
+      </Card>
+
+      {/* Dispatch Settings Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Truck className="h-5 w-5" />
+            Dispatch Center Settings
+          </CardTitle>
+          <CardDescription>
+            Configure which dispatch views are available and set the default view for your team.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* View Configuration */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Available Views</h3>
+              <p className="text-sm text-muted-foreground">
+                Enable views your team can access
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {DISPATCH_VIEWS.map((view) => {
+                const isEnabled = dispatchSettings.enabledViews.includes(view.id);
+                const isDefault = dispatchSettings.defaultView === view.id;
+
+                return (
+                  <div
+                    key={view.id}
+                    className={`relative rounded-lg border p-4 transition-colors ${
+                      isEnabled ? "border-primary bg-primary/5" : "border-muted bg-muted/30"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-medium">{view.label}</h4>
+                          {isDefault && (
+                            <Badge variant="secondary" className="text-xs">
+                              Default
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {view.description}
+                        </p>
+                        <Badge variant="outline" className="mt-2 text-xs capitalize">
+                          {view.tier}
+                        </Badge>
+                      </div>
+                      <Switch
+                        checked={isEnabled}
+                        onCheckedChange={() => handleToggleView(view.id)}
+                        aria-label={`Enable ${view.label}`}
+                      />
+                    </div>
+                    {isEnabled && !isDefault && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2 h-7 text-xs"
+                        onClick={() => handleSetDefaultView(view.id)}
+                      >
+                        <Star className="mr-1 h-3 w-3" />
+                        Set as Default
+                      </Button>
+                    )}
+                    {isEnabled && isDefault && (
+                      <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+                        <Star className="h-3 w-3 fill-current text-yellow-500" />
+                        This is the default view
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Additional Settings */}
+          <div className="space-y-4 border-t pt-4">
+            <h3 className="font-semibold">Additional Options</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Show Statistics Bar</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Display job counts at the top of dispatch views
+                  </p>
+                </div>
+                <Switch
+                  checked={dispatchSettings.showStatsBar}
+                  onCheckedChange={(checked) =>
+                    setDispatchSettings((prev) => ({ ...prev, showStatsBar: checked }))
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Show Technician Filter</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Allow filtering jobs by technician
+                  </p>
+                </div>
+                <Switch
+                  checked={dispatchSettings.showTechnicianFilter}
+                  onCheckedChange={(checked) =>
+                    setDispatchSettings((prev) => ({ ...prev, showTechnicianFilter: checked }))
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Enable Drag &amp; Drop</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Allow rescheduling and reassigning jobs via drag and drop
+                  </p>
+                </div>
+                <Switch
+                  checked={dispatchSettings.allowDragDrop}
+                  onCheckedChange={(checked) =>
+                    setDispatchSettings((prev) => ({ ...prev, allowDragDrop: checked }))
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="refreshInterval">Auto-Refresh Interval</Label>
+                  <p className="text-xs text-muted-foreground">
+                    How often to refresh data (0 = manual only)
+                  </p>
+                </div>
+                <Select
+                  value={dispatchSettings.refreshInterval.toString()}
+                  onValueChange={(value) =>
+                    setDispatchSettings((prev) => ({
+                      ...prev,
+                      refreshInterval: parseInt(value),
+                    }))
+                  }
+                >
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Manual</SelectItem>
+                    <SelectItem value="15">15 seconds</SelectItem>
+                    <SelectItem value="30">30 seconds</SelectItem>
+                    <SelectItem value="60">1 minute</SelectItem>
+                    <SelectItem value="300">5 minutes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end border-t pt-4">
+            <Button onClick={handleSaveDispatchSettings} disabled={isSavingDispatch}>
+              <Save className="mr-2 h-4 w-4" />
+              {isSavingDispatch ? "Saving..." : "Save Dispatch Settings"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Add/Edit Service Type Dialog */}
+      <Dialog open={isServiceTypeDialogOpen} onOpenChange={setIsServiceTypeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingServiceType ? "Edit Service Type" : "Add Service Type"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingServiceType
+                ? "Update the service type details."
+                : "Create a new service type that can be used in estimates and invoices."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="stName">Name *</Label>
+              <Input
+                id="stName"
+                value={serviceTypeForm.name}
+                onChange={(e) => setServiceTypeForm((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Standard Service Call"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="stDescription">Description</Label>
+              <Textarea
+                id="stDescription"
+                value={serviceTypeForm.description}
+                onChange={(e) => setServiceTypeForm((prev) => ({ ...prev, description: e.target.value }))}
+                placeholder="Brief description of this service"
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="stPrice">Default Price *</Label>
+              <Input
+                id="stPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                value={serviceTypeForm.defaultPrice}
+                onChange={(e) => setServiceTypeForm((prev) => ({ ...prev, defaultPrice: e.target.value }))}
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsServiceTypeDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveServiceType} disabled={isSavingServiceType}>
+              {isSavingServiceType ? "Saving..." : editingServiceType ? "Update" : "Create"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Service Type Confirmation Dialog */}
+      <AlertDialog open={isDeleteServiceTypeDialogOpen} onOpenChange={setIsDeleteServiceTypeDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Service Type</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &quot;{deletingServiceType?.name}&quot;? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteServiceType}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Add/Edit Team Member Dialog */}
+      <Dialog open={isTeamMemberDialogOpen} onOpenChange={setIsTeamMemberDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingTeamMember ? "Edit Team Member" : "Add Team Member"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingTeamMember
+                ? "Update the team member details."
+                : "Add a new team member to your organization."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="tmName">Name *</Label>
+              <Input
+                id="tmName"
+                value={teamMemberForm.name}
+                onChange={(e) => setTeamMemberForm((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder="John Smith"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tmEmail">Email *</Label>
+              <Input
+                id="tmEmail"
+                type="email"
+                value={teamMemberForm.email}
+                onChange={(e) => setTeamMemberForm((prev) => ({ ...prev, email: e.target.value }))}
+                placeholder="john@company.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tmPhone">Phone</Label>
+              <Input
+                id="tmPhone"
+                value={teamMemberForm.phone}
+                onChange={(e) => setTeamMemberForm((prev) => ({ ...prev, phone: e.target.value }))}
+                placeholder="(555) 123-4567"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tmRole">Role *</Label>
+              <Select
+                value={teamMemberForm.role}
+                onValueChange={(value: TeamMemberRole) => setTeamMemberForm((prev) => ({ ...prev, role: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roleOptions.map((role) => (
+                    <SelectItem key={role.value} value={role.value}>
+                      {role.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Admin: Full access | Technician: Field work | Office: Administrative tasks
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsTeamMemberDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveTeamMember} disabled={isSavingTeamMember}>
+              {isSavingTeamMember ? "Saving..." : editingTeamMember ? "Update" : "Add"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Team Member Confirmation Dialog */}
+      <AlertDialog open={isDeleteTeamMemberDialogOpen} onOpenChange={setIsDeleteTeamMemberDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Team Member</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &quot;{deletingTeamMember?.name}&quot;? This action cannot be undone.
+              Consider deactivating the team member instead if you want to preserve their history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteTeamMember}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

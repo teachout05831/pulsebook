@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech Portal — Preview</title>
+  <style>
+    /* ─── RESET & BASE ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    /* ─── LAYOUT ─── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 700px;
+    }
+    .page-header h1 {
+      font-size: 2rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ─── SCREEN NAVIGATION ─── */
+    .screen-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .screen-nav button {
+      padding: 10px 20px;
+      border-radius: 24px;
+      border: 2px solid #334155;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .screen-nav button:hover {
+      border-color: #60a5fa;
+      color: #60a5fa;
+    }
+    .screen-nav button.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+
+    /* ─── PHONE FRAME ─── */
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: #f8fafc;
+      border-radius: 44px;
+      overflow: hidden;
+      box-shadow: 0 0 0 12px #0f172a, 0 0 0 14px #334155, 0 25px 80px rgba(0,0,0,0.5);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 34px;
+      background: #0f172a;
+      border-radius: 0 0 20px 20px;
+      z-index: 100;
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      position: relative;
+    }
+    .phone-screen::-webkit-scrollbar { display: none; }
+
+    /* ─── SCREEN PANELS ─── */
+    .screen { display: none; height: 100%; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ═══════════════════════════════════════════
+       SCREEN 1: LOGIN
+       ═══════════════════════════════════════════ */
+    .login-screen {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      justify-content: center;
+      align-items: center;
+      padding: 40px 32px;
+    }
+    .login-logo {
+      width: 80px;
+      height: 80px;
+      background: #2563eb;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 36px;
+    }
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .login-subtitle {
+      color: #64748b;
+      font-size: 0.875rem;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    .login-form {
+      width: 100%;
+    }
+    .login-form label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .login-form input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .login-form input:focus {
+      border-color: #2563eb;
+    }
+    .login-form input::placeholder { color: #475569; }
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .login-btn:hover { background: #1d4ed8; }
+    .login-footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #475569;
+      font-size: 0.8rem;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCREEN 2: SCHEDULE
+       ═══════════════════════════════════════════ */
+    .schedule-screen {
+      background: #f1f5f9;
+    }
+
+    /* Header */
+    .tech-header {
+      background: #fff;
+      padding: 50px 20px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .tech-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tech-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tech-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .tech-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0f172a;
+    }
+    .tech-company {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+    .logout-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #64748b;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    /* Date tabs */
+    .date-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 16px 20px 0;
+    }
+    .date-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border-radius: 10px;
+      border: none;
+      background: #fff;
+      color: #64748b;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid #e2e8f0;
+    }
+    .date-tab.active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+    .date-tab .tab-count {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* Job list */
+    .job-list {
+      padding: 16px 20px;
+      flex: 1;
+    }
+    .date-group-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      margin-top: 8px;
+    }
+    .job-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 10px;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .job-card:hover {
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+    .job-card:active {
+      transform: scale(0.98);
+    }
+    .job-time-block {
+      text-align: center;
+      min-width: 52px;
+    }
+    .job-time {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .job-ampm {
+      font-size: 0.7rem;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+    .job-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .job-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .job-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .status-scheduled { background: #dbeafe; color: #1d4ed8; }
+    .status-in-progress { background: #fef3c7; color: #92400e; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .job-customer {
+      font-size: 0.8rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .job-address {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .job-chevron {
+      color: #cbd5e1;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCREEN 3: JOB DETAIL
+       ═══════════════════════════════════════════ */
+    .detail-screen {
+      background: #f1f5f9;
+    }
+    .detail-header {
+      background: #fff;
+      padding: 50px 20px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .back-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #2563eb;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .detail-body {
+      padding: 16px 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* Detail cards */
+    .detail-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 12px;
+      border: 1px solid #e2e8f0;
+    }
+    .detail-card-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .detail-job-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+    }
+    .detail-row + .detail-row {
+      border-top: 1px solid #f1f5f9;
+    }
+    .detail-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .detail-icon.blue { background: #dbeafe; }
+    .detail-icon.green { background: #d1fae5; }
+    .detail-icon.purple { background: #ede9fe; }
+    .detail-icon.orange { background: #ffedd5; }
+    .detail-icon.pink { background: #fce7f3; }
+    .detail-row-text {
+      flex: 1;
+      min-width: 0;
+    }
+    .detail-label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .detail-value {
+      font-size: 0.9rem;
+      color: #0f172a;
+      font-weight: 500;
+    }
+    .detail-value a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    /* Navigate button */
+    .navigate-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 2px solid #bbf7d0;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+    .navigate-btn:hover { background: #dcfce7; }
+
+    /* Description box */
+    .description-box {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.85rem;
+      color: #334155;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    /* Notes highlight */
+    .notes-box {
+      background: #fffbeb;
+      border-radius: 10px;
+      border: 1px solid #fde68a;
+      padding: 14px;
+      font-size: 0.85rem;
+      color: #92400e;
+      line-height: 1.5;
+    }
+
+    /* Privacy masked */
+    .privacy-masked {
+      color: #cbd5e1;
+      font-style: italic;
+      font-size: 0.8rem;
+    }
+
+    /* Action button area */
+    .detail-actions {
+      padding: 16px 20px 32px;
+      background: #fff;
+      border-top: 1px solid #e2e8f0;
+    }
+    .action-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .action-btn.start {
+      background: #2563eb;
+      color: #fff;
+    }
+    .action-btn.start:hover { background: #1d4ed8; }
+    .action-btn.complete {
+      background: #16a34a;
+      color: #fff;
+    }
+    .action-btn.complete:hover { background: #15803d; }
+
+    /* ═══════════════════════════════════════════
+       SCREEN 4: JOB IN-PROGRESS
+       ═══════════════════════════════════════════ */
+    .progress-timer {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+    .timer-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+    .timer-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-started {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    /* Photo upload area */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .photo-thumb {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      overflow: hidden;
+    }
+    .photo-thumb.filled {
+      background: #dbeafe;
+    }
+    .photo-thumb.add {
+      border: 2px dashed #cbd5e1;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .photo-thumb.add:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    /* Completion notes */
+    .completion-textarea {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      font-size: 0.9rem;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+      color: #0f172a;
+      outline: none;
+    }
+    .completion-textarea:focus {
+      border-color: #2563eb;
+    }
+
+    /* Stops list */
+    .stop-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+    }
+    .stop-item + .stop-item {
+      border-top: 1px solid #f1f5f9;
+    }
+    .stop-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #eff6ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .stop-number.done {
+      background: #d1fae5;
+      color: #16a34a;
+    }
+    .stop-text {
+      flex: 1;
+      font-size: 0.85rem;
+      color: #334155;
+    }
+    .stop-check {
+      font-size: 1rem;
+    }
+    .stop-connector {
+      width: 2px;
+      height: 12px;
+      background: #e2e8f0;
+      margin-left: 13px;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCREEN 5: ADMIN SETTINGS
+       ═══════════════════════════════════════════ */
+    .settings-screen {
+      background: #f1f5f9;
+    }
+    .settings-header {
+      background: #fff;
+      padding: 50px 20px 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .settings-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .settings-subtitle {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .settings-body {
+      padding: 16px 20px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .settings-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .settings-card-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid #f8fafc;
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info {
+      flex: 1;
+    }
+    .toggle-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .toggle-desc {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .toggle-switch {
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: #e2e8f0;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle-switch.on { background: #2563eb; }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .toggle-switch.on::after { transform: translateX(20px); }
+
+    /* Team member list with invite buttons */
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid #f8fafc;
+    }
+    .member-row:last-child { border-bottom: none; }
+    .member-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    .member-info { flex: 1; }
+    .member-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .member-role {
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+    .invite-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid #2563eb;
+      background: transparent;
+      color: #2563eb;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .invite-btn.active-access {
+      background: #d1fae5;
+      border-color: #16a34a;
+      color: #16a34a;
+    }
+    .revoke-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid #ef4444;
+      background: transparent;
+      color: #ef4444;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ═══════════════════════════════════════════
+       INTEGRATION ANNOTATIONS
+       ═══════════════════════════════════════════ */
+    .annotations-panel {
+      max-width: 700px;
+      width: 100%;
+      margin-top: 48px;
+    }
+    .annotations-panel h2 {
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .annotations-panel > p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .integration-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .integration-card:hover {
+      border-color: #475569;
+    }
+    .integration-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .integration-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .integration-icon.built { background: #166534; }
+    .integration-icon.ready { background: #1e40af; }
+    .integration-icon.future { background: #7c2d12; }
+    .integration-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .integration-status {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: auto;
+    }
+    .integration-status.built {
+      background: #166534;
+      color: #4ade80;
+    }
+    .integration-status.ready {
+      background: #1e3a5f;
+      color: #60a5fa;
+    }
+    .integration-status.future {
+      background: #431407;
+      color: #fb923c;
+    }
+    .integration-desc {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .integration-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .int-tag {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: #0f172a;
+      color: #64748b;
+      border: 1px solid #1e293b;
+    }
+
+    /* Architecture diagram */
+    .arch-section {
+      max-width: 700px;
+      width: 100%;
+      margin-top: 48px;
+    }
+    .arch-section h2 {
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .arch-section > p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+    .arch-diagram {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 32px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      line-height: 1.8;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .arch-diagram .highlight { color: #60a5fa; }
+    .arch-diagram .green { color: #4ade80; }
+    .arch-diagram .yellow { color: #fbbf24; }
+    .arch-diagram .pink { color: #f472b6; }
+    .arch-diagram .gray { color: #475569; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── PAGE HEADER ─── -->
+  <div class="page-header">
+    <h1>Tech Portal Preview</h1>
+    <p>Mobile-first technician interface — techs see only their assigned jobs,<br>company owners control privacy settings to protect customer data.</p>
+  </div>
+
+  <!-- ─── SCREEN NAV ─── -->
+  <div class="screen-nav">
+    <button class="active" onclick="showScreen('login')">Login</button>
+    <button onclick="showScreen('schedule')">Schedule</button>
+    <button onclick="showScreen('detail')">Job Detail</button>
+    <button onclick="showScreen('progress')">In Progress</button>
+    <button onclick="showScreen('settings')">Admin Settings</button>
+  </div>
+
+  <!-- ─── PHONE FRAME ─── -->
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="phone-screen">
+
+      <!-- ════════════ SCREEN 1: LOGIN ════════════ -->
+      <div class="screen login-screen active" id="screen-login">
+        <div class="login-logo">🔧</div>
+        <div class="login-title">Acme Services</div>
+        <div class="login-subtitle">Technician Portal</div>
+        <div class="login-form">
+          <label>Email</label>
+          <input type="email" placeholder="mike@acmeservices.com" value="mike@acmeservices.com">
+          <label>Password</label>
+          <input type="password" placeholder="••••••••" value="temporary123">
+          <button class="login-btn" onclick="showScreen('schedule')">Sign In</button>
+        </div>
+        <div class="login-footer">
+          Credentials provided by your company admin
+        </div>
+      </div>
+
+      <!-- ════════════ SCREEN 2: SCHEDULE ════════════ -->
+      <div class="screen schedule-screen" id="screen-schedule">
+        <div class="tech-header">
+          <div class="tech-header-row">
+            <div class="tech-header-left">
+              <div class="tech-avatar">MW</div>
+              <div>
+                <div class="tech-name">Mike Williams</div>
+                <div class="tech-company">Acme Services</div>
+              </div>
+            </div>
+            <button class="logout-btn" onclick="showScreen('login')">Logout</button>
+          </div>
+        </div>
+
+        <div class="date-tabs">
+          <button class="date-tab active">
+            Today
+            <span class="tab-count">4</span>
+          </button>
+          <button class="date-tab">
+            Tomorrow
+            <span class="tab-count">2</span>
+          </button>
+          <button class="date-tab">
+            This Week
+            <span class="tab-count">11</span>
+          </button>
+        </div>
+
+        <div class="job-list">
+          <div class="date-group-label">Friday, Feb 7</div>
+
+          <!-- Job 1 -->
+          <div class="job-card" onclick="showScreen('detail')">
+            <div class="job-time-block">
+              <div class="job-time">8:00</div>
+              <div class="job-ampm">AM</div>
+            </div>
+            <div class="job-info">
+              <div class="job-title-row">
+                <span class="job-title">Pool Cleaning</span>
+                <span class="status-badge status-scheduled">Scheduled</span>
+              </div>
+              <div class="job-customer">👤 Sarah Mitchell</div>
+              <div class="job-address">📍 1234 Oak Drive, Austin TX 78701</div>
+            </div>
+            <div class="job-chevron">›</div>
+          </div>
+
+          <!-- Job 2 -->
+          <div class="job-card" onclick="showScreen('progress')">
+            <div class="job-time-block">
+              <div class="job-time">10:30</div>
+              <div class="job-ampm">AM</div>
+            </div>
+            <div class="job-info">
+              <div class="job-title-row">
+                <span class="job-title">HVAC Maintenance</span>
+                <span class="status-badge status-in-progress">In Progress</span>
+              </div>
+              <div class="job-customer">👤 James Rodriguez</div>
+              <div class="job-address">📍 567 Elm Street, Austin TX 78704</div>
+            </div>
+            <div class="job-chevron">›</div>
+          </div>
+
+          <!-- Job 3 -->
+          <div class="job-card">
+            <div class="job-time-block">
+              <div class="job-time">1:00</div>
+              <div class="job-ampm">PM</div>
+            </div>
+            <div class="job-info">
+              <div class="job-title-row">
+                <span class="job-title">Lawn Treatment</span>
+                <span class="status-badge status-scheduled">Scheduled</span>
+              </div>
+              <div class="job-customer">👤 Karen Chen</div>
+              <div class="job-address">📍 890 Pine Ave, Austin TX 78745</div>
+            </div>
+            <div class="job-chevron">›</div>
+          </div>
+
+          <!-- Job 4 -->
+          <div class="job-card">
+            <div class="job-time-block">
+              <div class="job-time">3:30</div>
+              <div class="job-ampm">PM</div>
+            </div>
+            <div class="job-info">
+              <div class="job-title-row">
+                <span class="job-title">Pest Control</span>
+                <span class="status-badge status-scheduled">Scheduled</span>
+              </div>
+              <div class="job-customer">👤 David Park</div>
+              <div class="job-address">📍 2100 Cedar Ln, Austin TX 78723</div>
+            </div>
+            <div class="job-chevron">›</div>
+          </div>
+
+          <!-- Completed job from earlier -->
+          <div class="job-card" style="opacity: 0.6;">
+            <div class="job-time-block">
+              <div class="job-time">6:30</div>
+              <div class="job-ampm">AM</div>
+            </div>
+            <div class="job-info">
+              <div class="job-title-row">
+                <span class="job-title">Filter Replacement</span>
+                <span class="status-badge status-completed">Completed</span>
+              </div>
+              <div class="job-customer">👤 Amy Foster</div>
+              <div class="job-address">📍 445 Birch Rd, Austin TX 78702</div>
+            </div>
+            <div class="job-chevron">›</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════ SCREEN 3: JOB DETAIL ════════════ -->
+      <div class="screen detail-screen" id="screen-detail">
+        <div class="detail-header">
+          <div class="back-row" onclick="showScreen('schedule')">
+            ← Back to Schedule
+          </div>
+        </div>
+
+        <div class="detail-body">
+          <!-- Job info -->
+          <div class="detail-card">
+            <div class="detail-card-title">Job Information</div>
+            <div class="detail-job-title">
+              Pool Cleaning
+              <span class="status-badge status-scheduled" style="font-size:0.6rem; vertical-align: middle; margin-left: 8px;">Scheduled</span>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon blue">📅</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Scheduled</div>
+                <div class="detail-value">Friday, Feb 7 at 8:00 AM</div>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon purple">⏱️</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Est. Duration</div>
+                <div class="detail-value">90 minutes</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="detail-card">
+            <div class="detail-card-title">Description</div>
+            <div class="description-box">Weekly pool cleaning service.
+- Skim debris from surface
+- Vacuum pool floor
+- Check chemical levels
+- Clean skimmer baskets
+- Backwash filter if needed</div>
+          </div>
+
+          <!-- Notes -->
+          <div class="detail-card">
+            <div class="detail-card-title">Notes</div>
+            <div class="notes-box">⚠️ Gate code is #4521. Dog is friendly but loud. Customer prefers service before noon.</div>
+          </div>
+
+          <!-- Custom fields -->
+          <div class="detail-card">
+            <div class="detail-card-title">Additional Details</div>
+            <div class="detail-row">
+              <div class="detail-icon orange">🏷️</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Equipment Needed</div>
+                <div class="detail-value">Pool vacuum, test kit, chlorine tablets</div>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon blue">🏠</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Pool Type</div>
+                <div class="detail-value">In-ground, 20,000 gallons</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer -->
+          <div class="detail-card">
+            <div class="detail-card-title">Customer</div>
+            <div class="detail-row">
+              <div class="detail-icon blue">👤</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Name</div>
+                <div class="detail-value">Sarah Mitchell</div>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon green">📍</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Address</div>
+                <div class="detail-value"><a href="#">1234 Oak Drive, Austin TX 78701</a></div>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon purple">📞</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Phone</div>
+                <div class="detail-value"><a href="#">(512) 555-0147</a></div>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon orange">✉️</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Email</div>
+                <div class="privacy-masked">Hidden by company settings</div>
+              </div>
+            </div>
+
+            <button class="navigate-btn">
+              🧭 Navigate to Address
+            </button>
+          </div>
+        </div>
+
+        <!-- Action -->
+        <div class="detail-actions">
+          <button class="action-btn start" onclick="showScreen('progress')">
+            ▶ Start Job
+          </button>
+        </div>
+      </div>
+
+      <!-- ════════════ SCREEN 4: IN PROGRESS ════════════ -->
+      <div class="screen detail-screen" id="screen-progress">
+        <div class="detail-header">
+          <div class="back-row" onclick="showScreen('schedule')">
+            ← Back to Schedule
+          </div>
+        </div>
+
+        <div class="detail-body">
+          <!-- Timer -->
+          <div class="progress-timer">
+            <div class="timer-label">Time on Job</div>
+            <div class="timer-value" id="timer-display">01:23:45</div>
+            <div class="timer-started">Started at 10:30 AM</div>
+          </div>
+
+          <!-- Job title -->
+          <div class="detail-card">
+            <div class="detail-job-title">
+              HVAC Maintenance
+              <span class="status-badge status-in-progress" style="font-size:0.6rem; vertical-align: middle; margin-left: 8px;">In Progress</span>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon blue">👤</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Customer</div>
+                <div class="detail-value">James Rodriguez</div>
+              </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-icon green">📍</div>
+              <div class="detail-row-text">
+                <div class="detail-label">Address</div>
+                <div class="detail-value"><a href="#">567 Elm Street, Austin TX 78704</a></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multi-stop route -->
+          <div class="detail-card">
+            <div class="detail-card-title">Route Stops</div>
+            <div class="stop-item">
+              <div class="stop-number done">✓</div>
+              <div class="stop-text"><strong>Stop 1:</strong> Front unit inspection</div>
+              <div class="stop-check" style="color: #16a34a;">✅</div>
+            </div>
+            <div class="stop-item">
+              <div class="stop-number done">✓</div>
+              <div class="stop-text"><strong>Stop 2:</strong> Filter replacement</div>
+              <div class="stop-check" style="color: #16a34a;">✅</div>
+            </div>
+            <div class="stop-item">
+              <div class="stop-number">3</div>
+              <div class="stop-text"><strong>Stop 3:</strong> Thermostat calibration</div>
+              <div class="stop-check" style="color: #cbd5e1;">⬜</div>
+            </div>
+            <div class="stop-item">
+              <div class="stop-number">4</div>
+              <div class="stop-text"><strong>Stop 4:</strong> Ductwork inspection</div>
+              <div class="stop-check" style="color: #cbd5e1;">⬜</div>
+            </div>
+          </div>
+
+          <!-- Job Photos -->
+          <div class="detail-card">
+            <div class="detail-card-title">Job Photos</div>
+            <div class="photo-grid">
+              <div class="photo-thumb filled">🖼️</div>
+              <div class="photo-thumb filled">🖼️</div>
+              <div class="photo-thumb add">
+                <span style="color: #94a3b8; font-size: 1.5rem;">+</span>
+              </div>
+            </div>
+            <div style="margin-top: 8px; font-size: 0.75rem; color: #94a3b8;">
+              2 photos uploaded — tap + to add more
+            </div>
+          </div>
+
+          <!-- Completion Notes -->
+          <div class="detail-card">
+            <div class="detail-card-title">Completion Notes</div>
+            <textarea class="completion-textarea" placeholder="Add notes about the work performed, parts used, issues found...">Replaced air filter (MERV-13). Front unit running at normal pressure. Noticed minor duct leak in attic — flagged for follow-up.</textarea>
+          </div>
+        </div>
+
+        <!-- Complete Action -->
+        <div class="detail-actions">
+          <button class="action-btn complete">
+            ✓ Complete Job
+          </button>
+        </div>
+      </div>
+
+      <!-- ════════════ SCREEN 5: ADMIN SETTINGS ════════════ -->
+      <div class="screen settings-screen" id="screen-settings">
+        <div class="settings-header">
+          <div class="settings-title">📱 Tech Portal Settings</div>
+          <div class="settings-subtitle">Control technician access and customer privacy</div>
+        </div>
+
+        <div class="settings-body">
+          <!-- Main toggle -->
+          <div class="settings-card">
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Enable Tech Portal</div>
+                <div class="toggle-desc">Allow technicians to log in and view assigned jobs</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+
+          <!-- Privacy Controls -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              🔒 Privacy Controls
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Show Customer Email</div>
+                <div class="toggle-desc">Techs can see customer email addresses</div>
+              </div>
+              <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Show Customer Phone</div>
+                <div class="toggle-desc">Techs can call customers directly</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Show Customer Notes</div>
+                <div class="toggle-desc">Internal notes visible to techs</div>
+              </div>
+              <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div style="padding: 12px 18px; background: #f0fdf4; border-top: 1px solid #e2e8f0;">
+              <div style="font-size: 0.75rem; color: #16a34a; font-weight: 600;">
+                📍 Customer address is always visible — techs need it for navigation
+              </div>
+            </div>
+          </div>
+
+          <!-- Team Members with Access -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              👥 Team Member Access
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">MW</div>
+              <div class="member-info">
+                <div class="member-name">Mike Williams</div>
+                <div class="member-role">Technician</div>
+              </div>
+              <button class="invite-btn active-access">✓ Active</button>
+              <button class="revoke-btn">Revoke</button>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">ED</div>
+              <div class="member-info">
+                <div class="member-name">Emily Davis</div>
+                <div class="member-role">Technician</div>
+              </div>
+              <button class="invite-btn active-access">✓ Active</button>
+              <button class="revoke-btn">Revoke</button>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">RB</div>
+              <div class="member-info">
+                <div class="member-name">Robert Brown</div>
+                <div class="member-role">Technician</div>
+              </div>
+              <button class="invite-btn">Enable Access</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /phone-screen -->
+  </div><!-- /phone-frame -->
+
+  <!-- ═══════════════════════════════════════════
+       INTEGRATION ROADMAP
+       ═══════════════════════════════════════════ -->
+  <div class="annotations-panel">
+    <h2>Integration Roadmap</h2>
+    <p>Features that connect to the Tech Portal — what's built, what's ready to plug in, and what's planned.</p>
+
+    <!-- BUILT -->
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon built">🔒</div>
+        <div>
+          <div class="integration-name">Privacy Controls</div>
+        </div>
+        <span class="integration-status built">Built</span>
+      </div>
+      <div class="integration-desc">
+        Company owners control what customer data techs see. Email, phone, and notes can each be toggled independently. Address is always visible for navigation. Privacy filter is enforced server-side in the API route — not just hidden in the UI.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">companies.settings.techPortal</span>
+        <span class="int-tag">API-level enforcement</span>
+        <span class="int-tag">Per-company config</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon built">🎫</div>
+        <div>
+          <div class="integration-name">Invite / Revoke Flow</div>
+        </div>
+        <span class="integration-status built">Built</span>
+      </div>
+      <div class="integration-desc">
+        Admin clicks "Enable Portal Access" on any team member with technician role. Creates a Supabase auth account, links it to the team member record, and shows a one-time temporary password. Revoke removes auth access completely — deletes the auth user.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">Admin client (service role)</span>
+        <span class="int-tag">team_members.user_id</span>
+        <span class="int-tag">One-time password display</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon built">🗓️</div>
+        <div>
+          <div class="integration-name">Job Assignment + Schedule</div>
+        </div>
+        <span class="integration-status built">Built</span>
+      </div>
+      <div class="integration-desc">
+        Jobs are assigned via a team member dropdown (UUID, not free text). The tech schedule fetches jobs WHERE <code>assigned_to = teamMemberId</code>. Techs can update status to "In Progress" or "Completed". Date tabs: today, tomorrow, this week.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">jobs.assigned_to → team_members.id</span>
+        <span class="int-tag">Status: scheduled → in_progress → completed</span>
+        <span class="int-tag">Date range filtering</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon built">🧭</div>
+        <div>
+          <div class="integration-name">Google Maps Navigation</div>
+        </div>
+        <span class="integration-status built">Built</span>
+      </div>
+      <div class="integration-desc">
+        "Navigate to Address" button on job detail opens Google Maps with the job address pre-filled. Works on mobile — opens the Maps app directly for turn-by-turn navigation. Uses the customer address or the job-specific address if different.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">maps.google.com deep link</span>
+        <span class="int-tag">Mobile app handoff</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon built">🛡️</div>
+        <div>
+          <div class="integration-name">Middleware Role Routing</div>
+        </div>
+        <span class="integration-status built">Built</span>
+      </div>
+      <div class="integration-desc">
+        Middleware detects technician role on login and redirects to <code>/tech</code>. Techs are blocked from accessing any dashboard route (<code>/customers</code>, <code>/settings</code>, etc.). Admins can access both portals. This is a hard security boundary, not just UI navigation.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">middleware.ts</span>
+        <span class="int-tag">team_members.role check</span>
+        <span class="int-tag">Auth redirect</span>
+      </div>
+    </div>
+
+    <!-- READY TO INTEGRATE -->
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon ready">📸</div>
+        <div>
+          <div class="integration-name">Job Photos</div>
+        </div>
+        <span class="integration-status ready">Ready to Plug In</span>
+      </div>
+      <div class="integration-desc">
+        The media feature already has <code>MultiImageUploadField</code>, <code>useBunnyUpload</code>, and <code>JobPhotosSection</code> for the admin dashboard. To integrate: add a photo upload section to TechJobDetail so techs can document before/after work on-site. Uploads go to Bunny CDN, same as admin photos.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">features/media/</span>
+        <span class="int-tag">Bunny CDN upload</span>
+        <span class="int-tag">Before/after photos</span>
+        <span class="int-tag">~50 lines to integrate</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon ready">📍</div>
+        <div>
+          <div class="integration-name">Multi-Stop Routes</div>
+        </div>
+        <span class="integration-status ready">Ready to Plug In</span>
+      </div>
+      <div class="integration-desc">
+        The job-stops feature already has <code>StopsEditor</code> and <code>useJobStops</code>. To integrate: show a read-only stop list on TechJobDetail with checkboxes for techs to mark stops complete as they progress through the route. The "Navigate" button could cycle to the next uncompleted stop.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">features/job-stops/</span>
+        <span class="int-tag">Stop progression tracking</span>
+        <span class="int-tag">Next-stop navigation</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon ready">🏷️</div>
+        <div>
+          <div class="integration-name">Custom Fields on Jobs</div>
+        </div>
+        <span class="integration-status ready">Ready to Plug In</span>
+      </div>
+      <div class="integration-desc">
+        The custom-fields feature renders dynamic forms for any entity type. To integrate: show job custom fields (read-only) on TechJobDetail — e.g., "Equipment Needed", "Pool Type", "Access Instructions". Companies define their own fields per their workflow.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">features/custom-fields/</span>
+        <span class="int-tag">CustomFieldsForm component</span>
+        <span class="int-tag">Read-only display for techs</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon ready">🔄</div>
+        <div>
+          <div class="integration-name">Recurring Job Indicator</div>
+        </div>
+        <span class="integration-status ready">Ready to Plug In</span>
+      </div>
+      <div class="integration-desc">
+        Jobs from recurring templates have <code>isRecurringTemplate: true</code> and <code>recurrenceConfig</code>. To integrate: show a subtle "Recurring" badge on the job card and schedule so techs know this is a regular visit. Helps them know the customer and site.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">features/recurring-jobs/</span>
+        <span class="int-tag">Badge on TechJobCard</span>
+        <span class="int-tag">Frequency display</span>
+      </div>
+    </div>
+
+    <!-- FUTURE -->
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon future">⏱️</div>
+        <div>
+          <div class="integration-name">Time Tracking</div>
+        </div>
+        <span class="integration-status future">Future</span>
+      </div>
+      <div class="integration-desc">
+        Timer that starts when tech taps "Start Job" and stops on "Complete Job". Records actual time spent per job. Visible to admins in reports. Could include break tracking and travel time. Needs a new <code>job_time_entries</code> table.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">New DB table</span>
+        <span class="int-tag">Timer UI component</span>
+        <span class="int-tag">Admin reporting</span>
+        <span class="int-tag">Break tracking</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon future">✍️</div>
+        <div>
+          <div class="integration-name">Completion Notes + Signature</div>
+        </div>
+        <span class="integration-status future">Future</span>
+      </div>
+      <div class="integration-desc">
+        Techs add notes when completing a job (what was done, parts used, issues found). Optional customer signature capture on a canvas element. Notes flow back to the admin's job detail view.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">Canvas signature capture</span>
+        <span class="int-tag">Completion form modal</span>
+        <span class="int-tag">Admin visibility</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon future">📊</div>
+        <div>
+          <div class="integration-name">Tech Performance Dashboard</div>
+        </div>
+        <span class="integration-status future">Future</span>
+      </div>
+      <div class="integration-desc">
+        Admin view showing per-technician metrics: jobs completed this week/month, average time per job, on-time rate, customer ratings. Helps owners optimize scheduling and identify training needs.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">Admin reports page</span>
+        <span class="int-tag">Aggregated metrics</span>
+        <span class="int-tag">Charts/graphs</span>
+      </div>
+    </div>
+
+    <div class="integration-card">
+      <div class="integration-header">
+        <div class="integration-icon future">💬</div>
+        <div>
+          <div class="integration-name">In-App Messaging</div>
+        </div>
+        <span class="integration-status future">Future</span>
+      </div>
+      <div class="integration-desc">
+        Simple messaging between admin/office and techs in the field. Could leverage Supabase Realtime for instant delivery. Keeps communication within the app instead of personal text messages.
+      </div>
+      <div class="integration-details">
+        <span class="int-tag">Supabase Realtime</span>
+        <span class="int-tag">Push notifications</span>
+        <span class="int-tag">Message threads</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       ARCHITECTURE DIAGRAM
+       ═══════════════════════════════════════════ -->
+  <div class="arch-section">
+    <h2>Architecture</h2>
+    <p>How data flows through the Tech Portal — from middleware to screen.</p>
+    <div class="arch-diagram"><span class="highlight">┌─────────────────────────────────────────────────────┐</span>
+<span class="highlight">│  MIDDLEWARE (middleware.ts)                          │</span>
+<span class="highlight">│                                                     │</span>
+<span class="highlight">│  Login → check team_members.role                    │</span>
+<span class="highlight">│    ├─ role = 'technician' → redirect /tech          │</span>
+<span class="highlight">│    └─ role = 'admin'      → redirect /dashboard     │</span>
+<span class="highlight">│                                                     │</span>
+<span class="highlight">│  Tech on /dashboard → blocked → redirect /tech      │</span>
+<span class="highlight">│  Admin on /tech → allowed (can access both)         │</span>
+<span class="highlight">└─────────────────────────────────────────────────────┘</span>
+                          │
+                          ▼
+<span class="green">┌─────────────────────────────────────────────────────┐</span>
+<span class="green">│  TECH UI LAYER                                      │</span>
+<span class="green">│                                                     │</span>
+<span class="green">│  (tech)/layout.tsx ─── Mobile-first shell            │</span>
+<span class="green">│    ├─ tech/page.tsx ── TechSchedule component        │</span>
+<span class="green">│    │   └─ TechJobCard ── job list items              │</span>
+<span class="green">│    └─ tech/jobs/[id] ─ TechJobDetail component       │</span>
+<span class="green">│                                                     │</span>
+<span class="green">│  Hooks: useTechJobs (fetch to API routes)            │</span>
+<span class="green">└─────────────────────────────────────────────────────┘</span>
+                          │
+                    fetch('/api/tech/...')
+                          │
+                          ▼
+<span class="yellow">┌─────────────────────────────────────────────────────┐</span>
+<span class="yellow">│  API ROUTES (auth + privacy + snake↔camel)           │</span>
+<span class="yellow">│                                                     │</span>
+<span class="yellow">│  /api/tech/jobs          GET  → job list             │</span>
+<span class="yellow">│  /api/tech/jobs/[id]     GET  → job detail           │</span>
+<span class="yellow">│  /api/tech/jobs/[id]     PATCH→ status update        │</span>
+<span class="yellow">│  /api/tech/profile       GET  → tech name/company   │</span>
+<span class="yellow">│                                                     │</span>
+<span class="yellow">│  ┌─ getTechUser() ── auth check ──────────────────┐  │</span>
+<span class="yellow">│  │  auth.getUser() → team_members.user_id lookup  │  │</span>
+<span class="yellow">│  │  Returns: teamMemberId, companyId, name, role  │  │</span>
+<span class="yellow">│  └────────────────────────────────────────────────┘  │</span>
+<span class="yellow">│                                                     │</span>
+<span class="yellow">│  ┌─ PRIVACY FILTER ──────────────────────────────┐  │</span>
+<span class="yellow">│  │  Read company.settings.techPortal              │  │</span>
+<span class="yellow">│  │  showCustomerEmail: false → strip email         │  │</span>
+<span class="yellow">│  │  showCustomerPhone: true  → include phone       │  │</span>
+<span class="yellow">│  │  showCustomerNotes: false → strip notes         │  │</span>
+<span class="yellow">│  │  address: ALWAYS included                      │  │</span>
+<span class="yellow">│  └────────────────────────────────────────────────┘  │</span>
+<span class="yellow">└─────────────────────────────────────────────────────┘</span>
+                          │
+                          ▼
+<span class="pink">┌─────────────────────────────────────────────────────┐</span>
+<span class="pink">│  QUERIES (Supabase)                                 │</span>
+<span class="pink">│                                                     │</span>
+<span class="pink">│  getTechJobs(supabase, companyId, teamMemberId, {}) │</span>
+<span class="pink">│    → jobs WHERE assigned_to = teamMemberId           │</span>
+<span class="pink">│    → JOIN customers (name, address, email, phone)    │</span>
+<span class="pink">│    → Filter by scheduled_date range                  │</span>
+<span class="pink">│    → .limit(50), specific field selects              │</span>
+<span class="pink">└─────────────────────────────────────────────────────┘</span>
+                          │
+                          ▼
+<span class="gray">┌─────────────────────────────────────────────────────┐</span>
+<span class="gray">│  DATABASE                                           │</span>
+<span class="gray">│                                                     │</span>
+<span class="gray">│  team_members (user_id → auth.uid, indexed)         │</span>
+<span class="gray">│  jobs (assigned_to → team_members.id)                │</span>
+<span class="gray">│  customers (joined for contact info)                 │</span>
+<span class="gray">│  companies.settings.techPortal (privacy config)      │</span>
+<span class="gray">│  user_companies (tech ↔ company linkage)             │</span>
+<span class="gray">└─────────────────────────────────────────────────────┘</span></div>
+  </div>
+
+  <script>
+    function showScreen(name) {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      // Show target
+      document.getElementById('screen-' + name).classList.add('active');
+      // Update nav buttons
+      document.querySelectorAll('.screen-nav button').forEach(b => b.classList.remove('active'));
+      event.target.closest('button')?.classList.add('active');
+      // Reset scroll
+      document.querySelector('.phone-screen').scrollTop = 0;
+    }
+
+    // Animated timer for in-progress screen
+    let timerSeconds = 5025; // 1:23:45
+    setInterval(() => {
+      timerSeconds++;
+      const h = Math.floor(timerSeconds / 3600);
+      const m = Math.floor((timerSeconds % 3600) / 60);
+      const s = timerSeconds % 60;
+      const display = document.getElementById('timer-display');
+      if (display) {
+        display.textContent =
+          String(h).padStart(2, '0') + ':' +
+          String(m).padStart(2, '0') + ':' +
+          String(s).padStart(2, '0');
+      }
+    }, 1000);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1450 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ServicePro API",
+    "description": "REST API for the ServicePro service business management platform. Manage customers, jobs, estimates, invoices, and contracts programmatically.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ServicePro Support"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "ServicePro API v1 (relative)"
+    }
+  ],
+  "security": [
+    { "BearerAuth": [] },
+    { "ApiKeyAuth": [] }
+  ],
+  "tags": [
+    { "name": "Customers", "description": "Manage customer records including leads, contacts, and account details." },
+    { "name": "Jobs", "description": "Manage service jobs, scheduling, and assignments." },
+    { "name": "Estimates", "description": "Create and manage estimates with line items, taxes, and terms." },
+    { "name": "Invoices", "description": "Create and manage invoices, track payments and balances." },
+    { "name": "Contracts", "description": "Generate, send, and track contracts tied to jobs and customers." },
+    { "name": "Me", "description": "Retrieve the authenticated user and company information." }
+  ],
+  "paths": {
+    "/customers": {
+      "get": {
+        "tags": ["Customers"],
+        "operationId": "listCustomers",
+        "summary": "List customers",
+        "description": "Returns a paginated list of customers belonging to the authenticated user's company. Supports search, filtering by status, and sorting.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Field to sort results by.",
+            "schema": { "type": "string", "enum": ["createdAt", "updatedAt"], "default": "createdAt" }
+          },
+          { "$ref": "#/components/parameters/Order" },
+          { "$ref": "#/components/parameters/Search" },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter customers by status.",
+            "schema": { "type": "string", "enum": ["active", "inactive", "lead"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of customers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/PaginatedResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Customer" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Customers"],
+        "operationId": "createCustomer",
+        "summary": "Create a customer",
+        "description": "Creates a new customer record in the authenticated user's company. The name field is required and must be at least 2 characters.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CustomerCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Customer" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/customers/{id}": {
+      "get": {
+        "tags": ["Customers"],
+        "operationId": "getCustomer",
+        "summary": "Get a customer",
+        "description": "Returns a single customer by ID. The customer must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Customer" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Customers"],
+        "operationId": "updateCustomer",
+        "summary": "Update a customer",
+        "description": "Partially updates an existing customer. Only the fields provided in the request body will be changed. The customer must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CustomerUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated customer.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Customer" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Customers"],
+        "operationId": "deleteCustomer",
+        "summary": "Delete a customer",
+        "description": "Permanently deletes a customer record. The customer must belong to the authenticated user's company. This action cannot be undone.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confirmation that the customer was deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string", "format": "uuid", "description": "The ID of the deleted customer." },
+                        "deleted": { "type": "boolean", "description": "Always true on successful deletion.", "example": true }
+                      },
+                      "required": ["id", "deleted"]
+                    }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/jobs": {
+      "get": {
+        "tags": ["Jobs"],
+        "operationId": "listJobs",
+        "summary": "List jobs",
+        "description": "Returns a paginated list of jobs belonging to the authenticated user's company. Supports search, filtering by status or customer, and sorting.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Field to sort results by.",
+            "schema": { "type": "string", "enum": ["createdAt", "updatedAt"], "default": "createdAt" }
+          },
+          { "$ref": "#/components/parameters/Order" },
+          { "$ref": "#/components/parameters/Search" },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter jobs by status.",
+            "schema": { "type": "string", "enum": ["pending", "scheduled", "in_progress", "completed", "cancelled"] }
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "description": "Filter jobs by the associated customer ID.",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of jobs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/PaginatedResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Job" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Jobs"],
+        "operationId": "createJob",
+        "summary": "Create a job",
+        "description": "Creates a new job record. The title field is required and must be at least 2 characters. Optionally associate the job with a customer.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/JobCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created job.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Job" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/jobs/{id}": {
+      "get": {
+        "tags": ["Jobs"],
+        "operationId": "getJob",
+        "summary": "Get a job",
+        "description": "Returns a single job by ID. The job must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested job.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Job" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Jobs"],
+        "operationId": "updateJob",
+        "summary": "Update a job",
+        "description": "Partially updates an existing job. Only the fields provided in the request body will be changed. The job must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/JobUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated job.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Job" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Jobs"],
+        "operationId": "deleteJob",
+        "summary": "Delete a job",
+        "description": "Permanently deletes a job record. The job must belong to the authenticated user's company. This action cannot be undone.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confirmation that the job was deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string", "format": "uuid", "description": "The ID of the deleted job." },
+                        "deleted": { "type": "boolean", "description": "Always true on successful deletion.", "example": true }
+                      },
+                      "required": ["id", "deleted"]
+                    }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/estimates": {
+      "get": {
+        "tags": ["Estimates"],
+        "operationId": "listEstimates",
+        "summary": "List estimates",
+        "description": "Returns a paginated list of estimates belonging to the authenticated user's company. Supports search, filtering by status or customer, and sorting.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "$ref": "#/components/parameters/Search" },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter estimates by status.",
+            "schema": { "type": "string", "enum": ["draft", "sent", "viewed", "approved", "rejected", "expired"] }
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "description": "Filter estimates by the associated customer ID.",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of estimates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/PaginatedResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Estimate" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Estimates"],
+        "operationId": "createEstimate",
+        "summary": "Create an estimate",
+        "description": "Creates a new estimate for a customer. The customerId field is required. An estimate number is automatically generated.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EstimateCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created estimate.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Estimate" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/estimates/{id}": {
+      "get": {
+        "tags": ["Estimates"],
+        "operationId": "getEstimate",
+        "summary": "Get an estimate",
+        "description": "Returns a single estimate by ID, including all line items and calculated totals. The estimate must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested estimate.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Estimate" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Estimates"],
+        "operationId": "updateEstimate",
+        "summary": "Update an estimate",
+        "description": "Partially updates an existing estimate. Only the fields provided in the request body will be changed. The estimate must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EstimateUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated estimate.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Estimate" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Estimates"],
+        "operationId": "deleteEstimate",
+        "summary": "Delete an estimate",
+        "description": "Permanently deletes an estimate record. The estimate must belong to the authenticated user's company. This action cannot be undone.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confirmation that the estimate was deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string", "format": "uuid", "description": "The ID of the deleted estimate." },
+                        "deleted": { "type": "boolean", "description": "Always true on successful deletion.", "example": true }
+                      },
+                      "required": ["id", "deleted"]
+                    }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/invoices": {
+      "get": {
+        "tags": ["Invoices"],
+        "operationId": "listInvoices",
+        "summary": "List invoices",
+        "description": "Returns a paginated list of invoices belonging to the authenticated user's company. Supports search, filtering by status or customer, and sorting.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Limit" },
+          { "$ref": "#/components/parameters/Search" },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter invoices by status.",
+            "schema": { "type": "string", "enum": ["draft", "sent", "viewed", "paid", "partial", "overdue", "cancelled"] }
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "description": "Filter invoices by the associated customer ID.",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of invoices.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/PaginatedResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Invoice" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Invoices"],
+        "operationId": "createInvoice",
+        "summary": "Create an invoice",
+        "description": "Creates a new invoice for a customer. The customerId field is required. An invoice number is automatically generated. Optionally link the invoice to a job or estimate.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InvoiceCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created invoice.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Invoice" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/invoices/{id}": {
+      "get": {
+        "tags": ["Invoices"],
+        "operationId": "getInvoice",
+        "summary": "Get an invoice",
+        "description": "Returns a single invoice by ID, including all line items, calculated totals, and payment history. The invoice must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested invoice.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Invoice" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Invoices"],
+        "operationId": "updateInvoice",
+        "summary": "Update an invoice",
+        "description": "Partially updates an existing invoice. Only the fields provided in the request body will be changed. The invoice must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InvoiceUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated invoice.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Invoice" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Invoices"],
+        "operationId": "deleteInvoice",
+        "summary": "Delete an invoice",
+        "description": "Permanently deletes an invoice record. The invoice must belong to the authenticated user's company. This action cannot be undone.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confirmation that the invoice was deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string", "format": "uuid", "description": "The ID of the deleted invoice." },
+                        "deleted": { "type": "boolean", "description": "Always true on successful deletion.", "example": true }
+                      },
+                      "required": ["id", "deleted"]
+                    }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/contracts": {
+      "get": {
+        "tags": ["Contracts"],
+        "operationId": "listContracts",
+        "summary": "List contracts",
+        "description": "Returns a paginated list of contracts belonging to the authenticated user's company. Supports filtering by status, job, or customer.",
+        "parameters": [
+          { "$ref": "#/components/parameters/Page" },
+          { "$ref": "#/components/parameters/Limit" },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter contracts by status.",
+            "schema": { "type": "string", "enum": ["draft", "sent", "viewed", "signed", "paid", "completed", "cancelled"] }
+          },
+          {
+            "name": "jobId",
+            "in": "query",
+            "description": "Filter contracts by the associated job ID.",
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "description": "Filter contracts by the associated customer ID.",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of contracts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/PaginatedResponse" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Contract" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "tags": ["Contracts"],
+        "operationId": "createContract",
+        "summary": "Create a contract",
+        "description": "Creates a new contract from a template, linked to a specific job and customer. All three IDs (templateId, jobId, customerId) are required.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContractCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created contract.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Contract" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/contracts/{id}": {
+      "get": {
+        "tags": ["Contracts"],
+        "operationId": "getContract",
+        "summary": "Get a contract",
+        "description": "Returns a single contract by ID, including all status timestamps. The contract must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested contract.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Contract" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "patch": {
+        "tags": ["Contracts"],
+        "operationId": "updateContract",
+        "summary": "Update a contract",
+        "description": "Partially updates an existing contract. Typically used to change the contract status. The contract must belong to the authenticated user's company.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContractUpdate" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated contract.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/Contract" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "delete": {
+        "tags": ["Contracts"],
+        "operationId": "deleteContract",
+        "summary": "Delete a contract",
+        "description": "Permanently deletes a contract record. The contract must belong to the authenticated user's company. This action cannot be undone.",
+        "parameters": [
+          { "$ref": "#/components/parameters/ResourceId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confirmation that the contract was deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string", "format": "uuid", "description": "The ID of the deleted contract." },
+                        "deleted": { "type": "boolean", "description": "Always true on successful deletion.", "example": true }
+                      },
+                      "required": ["id", "deleted"]
+                    }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": ["Me"],
+        "operationId": "getMe",
+        "summary": "Get current user and company",
+        "description": "Returns the authenticated user's profile and their active company information. Useful for verifying API key validity and retrieving account context.",
+        "responses": {
+          "200": {
+            "description": "The authenticated user and company details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/MeResponse" }
+                  },
+                  "required": ["data"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Authenticate using a Bearer token in the Authorization header. Tokens start with `sb_live_`."
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Authenticate using an API key passed in the X-API-Key header. Keys start with `sb_live_`."
+      }
+    },
+    "parameters": {
+      "Page": {
+        "name": "page",
+        "in": "query",
+        "description": "Page number for pagination (1-based).",
+        "schema": { "type": "integer", "minimum": 1, "default": 1 }
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "description": "Number of items per page. Maximum is 100.",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+      },
+      "Order": {
+        "name": "order",
+        "in": "query",
+        "description": "Sort order direction.",
+        "schema": { "type": "string", "enum": ["asc", "desc"], "default": "desc" }
+      },
+      "Search": {
+        "name": "q",
+        "in": "query",
+        "description": "Search query string. Searches across relevant text fields for the resource.",
+        "schema": { "type": "string" }
+      },
+      "ResourceId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "The unique identifier (UUID) of the resource.",
+        "schema": { "type": "string", "format": "uuid" }
+      }
+    },
+    "schemas": {
+      "Pagination": {
+        "type": "object",
+        "description": "Pagination metadata included with list responses.",
+        "properties": {
+          "page": { "type": "integer", "description": "The current page number.", "example": 1 },
+          "limit": { "type": "integer", "description": "The number of items per page.", "example": 20 },
+          "total": { "type": "integer", "description": "The total number of items across all pages.", "example": 57 }
+        },
+        "required": ["page", "limit", "total"]
+      },
+      "PaginatedResponse": {
+        "type": "object",
+        "description": "Wrapper for paginated list responses.",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The array of resource items for this page.",
+            "items": {}
+          },
+          "pagination": { "$ref": "#/components/schemas/Pagination" }
+        },
+        "required": ["data", "pagination"]
+      },
+      "Error": {
+        "type": "object",
+        "description": "Standard error response returned when a request fails.",
+        "properties": {
+          "error": { "type": "string", "description": "A human-readable error message describing what went wrong.", "example": "Not authenticated" }
+        },
+        "required": ["error"]
+      },
+      "LineItem": {
+        "type": "object",
+        "description": "A single line item on an estimate or invoice.",
+        "properties": {
+          "description": { "type": "string", "description": "Description of the product or service.", "example": "Lawn mowing - standard lot" },
+          "quantity": { "type": "number", "description": "Quantity of the item.", "minimum": 0, "example": 2 },
+          "unitPrice": { "type": "number", "description": "Price per unit in dollars.", "minimum": 0, "example": 75.00 },
+          "amount": { "type": "number", "description": "Calculated total for this line item (quantity x unitPrice).", "example": 150.00 }
+        },
+        "required": ["description", "quantity", "unitPrice"]
+      },
+      "LineItemInput": {
+        "type": "object",
+        "description": "Input for creating or updating a line item. The amount is calculated server-side.",
+        "properties": {
+          "description": { "type": "string", "description": "Description of the product or service.", "example": "Lawn mowing - standard lot" },
+          "quantity": { "type": "number", "description": "Quantity of the item.", "minimum": 0, "example": 2 },
+          "unitPrice": { "type": "number", "description": "Price per unit in dollars.", "minimum": 0, "example": 75.00 }
+        },
+        "required": ["description", "quantity", "unitPrice"]
+      },
+      "Payment": {
+        "type": "object",
+        "description": "A payment record associated with an invoice.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Unique identifier for the payment." },
+          "amount": { "type": "number", "description": "Payment amount in dollars.", "example": 250.00 },
+          "method": { "type": "string", "description": "Payment method used.", "example": "credit_card" },
+          "paidAt": { "type": "string", "format": "date-time", "description": "Timestamp when the payment was received." }
+        },
+        "required": ["id", "amount", "paidAt"]
+      },
+      "Customer": {
+        "type": "object",
+        "description": "A customer record representing a client or lead in the system.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Unique identifier for the customer." },
+          "name": { "type": "string", "description": "Full name of the customer.", "example": "Jane Smith" },
+          "email": { "type": "string", "format": "email", "description": "Email address of the customer.", "nullable": true, "example": "jane@example.com" },
+          "phone": { "type": "string", "description": "Phone number of the customer.", "nullable": true, "example": "+1-555-0123" },
+          "address": { "type": "string", "description": "Physical address of the customer.", "nullable": true, "example": "123 Main St, Springfield, IL 62704" },
+          "status": { "type": "string", "enum": ["active", "inactive", "lead"], "description": "Current status of the customer.", "example": "active" },
+          "leadStatus": { "type": "string", "description": "Lead pipeline status if the customer is a lead.", "nullable": true, "example": "new" },
+          "source": { "type": "string", "description": "How the customer was acquired.", "nullable": true, "example": "referral" },
+          "estimatedValue": { "type": "number", "description": "Estimated lifetime value of the customer in dollars.", "nullable": true, "example": 5000.00 },
+          "serviceType": { "type": "string", "description": "Primary type of service the customer needs.", "nullable": true, "example": "lawn_care" },
+          "notes": { "type": "string", "description": "Internal notes about the customer.", "nullable": true },
+          "customFields": { "type": "object", "description": "Key-value pairs for custom field data defined by the company.", "additionalProperties": true, "nullable": true },
+          "tags": { "type": "array", "description": "List of tag IDs associated with the customer.", "items": { "type": "string" }, "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the customer was created." },
+          "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp when the customer was last updated." }
+        },
+        "required": ["id", "name", "status", "createdAt", "updatedAt"]
+      },
+      "CustomerCreate": {
+        "type": "object",
+        "description": "Input for creating a new customer. Only the name field is required.",
+        "properties": {
+          "name": { "type": "string", "minLength": 2, "description": "Full name of the customer. Must be at least 2 characters.", "example": "Jane Smith" },
+          "email": { "type": "string", "format": "email", "description": "Email address of the customer.", "example": "jane@example.com" },
+          "phone": { "type": "string", "description": "Phone number of the customer.", "example": "+1-555-0123" },
+          "address": { "type": "string", "description": "Physical address of the customer.", "example": "123 Main St, Springfield, IL 62704" },
+          "notes": { "type": "string", "description": "Internal notes about the customer." },
+          "status": { "type": "string", "enum": ["active", "inactive", "lead"], "description": "Customer status. Defaults to 'active' if not provided.", "default": "active" },
+          "leadStatus": { "type": "string", "description": "Lead pipeline status. Only relevant when status is 'lead'." },
+          "source": { "type": "string", "description": "How the customer was acquired.", "example": "referral" },
+          "estimatedValue": { "type": "number", "description": "Estimated lifetime value of the customer in dollars.", "example": 5000.00 },
+          "serviceType": { "type": "string", "description": "Primary type of service the customer needs.", "example": "lawn_care" },
+          "serviceDate": { "type": "string", "format": "date", "description": "Next scheduled service date.", "example": "2026-03-15" },
+          "lastContactDate": { "type": "string", "format": "date", "description": "Date of last contact with the customer.", "example": "2026-02-01" },
+          "assignedTo": { "type": "string", "description": "Name or ID of the team member assigned to this customer." },
+          "customFields": { "type": "object", "description": "Key-value pairs for custom field data.", "additionalProperties": true },
+          "tags": { "type": "array", "description": "List of tag IDs to associate with the customer.", "items": { "type": "string" } }
+        },
+        "required": ["name"]
+      },
+      "CustomerUpdate": {
+        "type": "object",
+        "description": "Input for partially updating an existing customer. All fields are optional; only provided fields will be changed.",
+        "properties": {
+          "name": { "type": "string", "minLength": 2, "description": "Full name of the customer. Must be at least 2 characters." },
+          "email": { "type": "string", "format": "email", "description": "Email address of the customer." },
+          "phone": { "type": "string", "description": "Phone number of the customer." },
+          "address": { "type": "string", "description": "Physical address of the customer." },
+          "notes": { "type": "string", "description": "Internal notes about the customer." },
+          "status": { "type": "string", "enum": ["active", "inactive", "lead"], "description": "Customer status." },
+          "leadStatus": { "type": "string", "description": "Lead pipeline status." },
+          "source": { "type": "string", "description": "How the customer was acquired." },
+          "estimatedValue": { "type": "number", "description": "Estimated lifetime value in dollars." },
+          "serviceType": { "type": "string", "description": "Primary type of service the customer needs." },
+          "serviceDate": { "type": "string", "format": "date", "description": "Next scheduled service date." },
+          "lastContactDate": { "type": "string", "format": "date", "description": "Date of last contact with the customer." },
+          "assignedTo": { "type": "string", "description": "Name or ID of the assigned team member." },
+          "customFields": { "type": "object", "description": "Key-value pairs for custom field data.", "additionalProperties": true },
+          "tags": { "type": "array", "description": "List of tag IDs to associate with the customer.", "items": { "type": "string" } }
+        }
+      },
+      "Job": {
+        "type": "object",
+        "description": "A job record representing a scheduled or completed service task.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Unique identifier for the job." },
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this job is for.", "nullable": true },
+          "customerName": { "type": "string", "description": "Name of the associated customer (read-only, populated from the customer record).", "nullable": true, "example": "Jane Smith" },
+          "title": { "type": "string", "description": "Short title or summary of the job.", "example": "Spring lawn cleanup" },
+          "description": { "type": "string", "description": "Detailed description of the job scope.", "nullable": true },
+          "status": { "type": "string", "enum": ["pending", "scheduled", "in_progress", "completed", "cancelled"], "description": "Current status of the job.", "example": "scheduled" },
+          "scheduledDate": { "type": "string", "format": "date", "description": "Date the job is scheduled for.", "nullable": true, "example": "2026-03-20" },
+          "scheduledTime": { "type": "string", "description": "Time the job is scheduled for (HH:MM format).", "nullable": true, "example": "09:00" },
+          "estimatedDuration": { "type": "number", "description": "Estimated duration of the job in minutes.", "nullable": true, "example": 120 },
+          "address": { "type": "string", "description": "Service address for the job.", "nullable": true, "example": "123 Main St, Springfield, IL 62704" },
+          "assignedTo": { "type": "string", "description": "Name or ID of the team member assigned to this job.", "nullable": true },
+          "notes": { "type": "string", "description": "Internal notes about the job.", "nullable": true },
+          "customFields": { "type": "object", "description": "Key-value pairs for custom field data defined by the company.", "additionalProperties": true, "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the job was created." },
+          "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp when the job was last updated." }
+        },
+        "required": ["id", "title", "status", "createdAt", "updatedAt"]
+      },
+      "JobCreate": {
+        "type": "object",
+        "description": "Input for creating a new job. Only the title field is required.",
+        "properties": {
+          "title": { "type": "string", "minLength": 2, "description": "Short title or summary of the job. Must be at least 2 characters.", "example": "Spring lawn cleanup" },
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this job is for." },
+          "description": { "type": "string", "description": "Detailed description of the job scope." },
+          "status": { "type": "string", "enum": ["pending", "scheduled", "in_progress", "completed", "cancelled"], "description": "Initial job status. Defaults to 'pending' if not provided.", "default": "pending" },
+          "scheduledDate": { "type": "string", "format": "date", "description": "Date the job is scheduled for.", "example": "2026-03-20" },
+          "scheduledTime": { "type": "string", "description": "Time the job is scheduled for (HH:MM format).", "example": "09:00" },
+          "estimatedDuration": { "type": "number", "description": "Estimated duration of the job in minutes.", "example": 120 },
+          "address": { "type": "string", "description": "Service address for the job.", "example": "123 Main St, Springfield, IL 62704" },
+          "assignedTo": { "type": "string", "description": "Name or ID of the team member assigned to this job." },
+          "notes": { "type": "string", "description": "Internal notes about the job." },
+          "customFields": { "type": "object", "description": "Key-value pairs for custom field data.", "additionalProperties": true }
+        },
+        "required": ["title"]
+      },
+      "JobUpdate": {
+        "type": "object",
+        "description": "Input for partially updating an existing job. All fields are optional; only provided fields will be changed.",
+        "properties": {
+          "title": { "type": "string", "minLength": 2, "description": "Short title or summary of the job. Must be at least 2 characters." },
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this job is for." },
+          "description": { "type": "string", "description": "Detailed description of the job scope." },
+          "status": { "type": "string", "enum": ["pending", "scheduled", "in_progress", "completed", "cancelled"], "description": "Job status." },
+          "scheduledDate": { "type": "string", "format": "date", "description": "Date the job is scheduled for." },
+          "scheduledTime": { "type": "string", "description": "Time the job is scheduled for (HH:MM format)." },
+          "estimatedDuration": { "type": "number", "description": "Estimated duration in minutes." },
+          "address": { "type": "string", "description": "Service address for the job." },
+          "assignedTo": { "type": "string", "description": "Name or ID of the assigned team member." },
+          "notes": { "type": "string", "description": "Internal notes about the job." },
+          "customFields": { "type": "object", "description": "Key-value pairs for custom field data.", "additionalProperties": true }
+        }
+      },
+      "Estimate": {
+        "type": "object",
+        "description": "An estimate record with line items, pricing, and terms sent to a customer for approval.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Unique identifier for the estimate." },
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this estimate is for." },
+          "customerName": { "type": "string", "description": "Name of the associated customer (read-only).", "nullable": true, "example": "Jane Smith" },
+          "estimateNumber": { "type": "string", "description": "Auto-generated estimate reference number.", "example": "EST-0042" },
+          "status": { "type": "string", "enum": ["draft", "sent", "viewed", "approved", "rejected", "expired"], "description": "Current status of the estimate.", "example": "sent" },
+          "issueDate": { "type": "string", "format": "date", "description": "Date the estimate was issued.", "nullable": true, "example": "2026-02-06" },
+          "expiryDate": { "type": "string", "format": "date", "description": "Date the estimate expires.", "nullable": true, "example": "2026-03-06" },
+          "lineItems": { "type": "array", "description": "List of products or services included in the estimate.", "items": { "$ref": "#/components/schemas/LineItem" } },
+          "subtotal": { "type": "number", "description": "Sum of all line item amounts before tax.", "example": 450.00 },
+          "taxRate": { "type": "number", "description": "Tax rate as a percentage (e.g. 8.5 for 8.5%).", "nullable": true, "example": 8.5 },
+          "taxAmount": { "type": "number", "description": "Calculated tax amount in dollars.", "example": 38.25 },
+          "total": { "type": "number", "description": "Grand total including tax.", "example": 488.25 },
+          "notes": { "type": "string", "description": "Notes visible to the customer on the estimate.", "nullable": true },
+          "terms": { "type": "string", "description": "Terms and conditions for the estimate.", "nullable": true },
+          "address": { "type": "string", "description": "Service address for the estimate.", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the estimate was created." },
+          "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp when the estimate was last updated." }
+        },
+        "required": ["id", "customerId", "estimateNumber", "status", "lineItems", "subtotal", "total", "createdAt", "updatedAt"]
+      },
+      "EstimateCreate": {
+        "type": "object",
+        "description": "Input for creating a new estimate. The customerId is required. An estimate number is auto-generated.",
+        "properties": {
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this estimate is for." },
+          "lineItems": { "type": "array", "description": "List of line items for the estimate.", "items": { "$ref": "#/components/schemas/LineItemInput" } },
+          "taxRate": { "type": "number", "description": "Tax rate as a percentage (e.g. 8.5 for 8.5%).", "example": 8.5 },
+          "issueDate": { "type": "string", "format": "date", "description": "Date the estimate is issued. Defaults to today.", "example": "2026-02-06" },
+          "expiryDate": { "type": "string", "format": "date", "description": "Date the estimate expires.", "example": "2026-03-06" },
+          "notes": { "type": "string", "description": "Notes visible to the customer." },
+          "terms": { "type": "string", "description": "Terms and conditions." },
+          "address": { "type": "string", "description": "Service address for the estimate." },
+          "status": { "type": "string", "enum": ["draft", "sent", "viewed", "approved", "rejected", "expired"], "description": "Initial estimate status. Defaults to 'draft'.", "default": "draft" }
+        },
+        "required": ["customerId"]
+      },
+      "EstimateUpdate": {
+        "type": "object",
+        "description": "Input for partially updating an existing estimate. All fields are optional.",
+        "properties": {
+          "lineItems": { "type": "array", "description": "Replacement list of line items (replaces all existing).", "items": { "$ref": "#/components/schemas/LineItemInput" } },
+          "taxRate": { "type": "number", "description": "Tax rate as a percentage." },
+          "issueDate": { "type": "string", "format": "date", "description": "Date the estimate is issued." },
+          "expiryDate": { "type": "string", "format": "date", "description": "Date the estimate expires." },
+          "notes": { "type": "string", "description": "Notes visible to the customer." },
+          "terms": { "type": "string", "description": "Terms and conditions." },
+          "address": { "type": "string", "description": "Service address for the estimate." },
+          "status": { "type": "string", "enum": ["draft", "sent", "viewed", "approved", "rejected", "expired"], "description": "Updated estimate status." }
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "description": "An invoice record with line items, pricing, payment tracking, and terms.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Unique identifier for the invoice." },
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this invoice is for." },
+          "customerName": { "type": "string", "description": "Name of the associated customer (read-only).", "nullable": true, "example": "Jane Smith" },
+          "jobId": { "type": "string", "format": "uuid", "description": "ID of the job this invoice is linked to.", "nullable": true },
+          "estimateId": { "type": "string", "format": "uuid", "description": "ID of the estimate this invoice was created from.", "nullable": true },
+          "invoiceNumber": { "type": "string", "description": "Auto-generated invoice reference number.", "example": "INV-0078" },
+          "status": { "type": "string", "enum": ["draft", "sent", "viewed", "paid", "partial", "overdue", "cancelled"], "description": "Current status of the invoice.", "example": "sent" },
+          "issueDate": { "type": "string", "format": "date", "description": "Date the invoice was issued.", "nullable": true, "example": "2026-02-06" },
+          "dueDate": { "type": "string", "format": "date", "description": "Date the invoice payment is due.", "nullable": true, "example": "2026-03-06" },
+          "lineItems": { "type": "array", "description": "List of products or services billed on the invoice.", "items": { "$ref": "#/components/schemas/LineItem" } },
+          "subtotal": { "type": "number", "description": "Sum of all line item amounts before tax.", "example": 450.00 },
+          "taxRate": { "type": "number", "description": "Tax rate as a percentage.", "nullable": true, "example": 8.5 },
+          "taxAmount": { "type": "number", "description": "Calculated tax amount in dollars.", "example": 38.25 },
+          "total": { "type": "number", "description": "Grand total including tax.", "example": 488.25 },
+          "amountPaid": { "type": "number", "description": "Total amount paid so far.", "example": 200.00 },
+          "amountDue": { "type": "number", "description": "Remaining balance (total minus amountPaid).", "example": 288.25 },
+          "payments": { "type": "array", "description": "List of payment records for this invoice.", "items": { "$ref": "#/components/schemas/Payment" }, "nullable": true },
+          "notes": { "type": "string", "description": "Notes visible to the customer on the invoice.", "nullable": true },
+          "terms": { "type": "string", "description": "Payment terms and conditions.", "nullable": true },
+          "address": { "type": "string", "description": "Billing or service address.", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the invoice was created." },
+          "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp when the invoice was last updated." }
+        },
+        "required": ["id", "customerId", "invoiceNumber", "status", "lineItems", "subtotal", "total", "amountPaid", "amountDue", "createdAt", "updatedAt"]
+      },
+      "InvoiceCreate": {
+        "type": "object",
+        "description": "Input for creating a new invoice. The customerId is required. An invoice number is auto-generated.",
+        "properties": {
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this invoice is for." },
+          "jobId": { "type": "string", "format": "uuid", "description": "ID of the job to link this invoice to." },
+          "estimateId": { "type": "string", "format": "uuid", "description": "ID of the estimate to create this invoice from. Line items may be copied." },
+          "lineItems": { "type": "array", "description": "List of line items for the invoice.", "items": { "$ref": "#/components/schemas/LineItemInput" } },
+          "taxRate": { "type": "number", "description": "Tax rate as a percentage (e.g. 8.5 for 8.5%).", "example": 8.5 },
+          "issueDate": { "type": "string", "format": "date", "description": "Date the invoice is issued. Defaults to today.", "example": "2026-02-06" },
+          "dueDate": { "type": "string", "format": "date", "description": "Date the invoice payment is due.", "example": "2026-03-06" },
+          "notes": { "type": "string", "description": "Notes visible to the customer." },
+          "terms": { "type": "string", "description": "Payment terms and conditions." },
+          "address": { "type": "string", "description": "Billing or service address." },
+          "status": { "type": "string", "enum": ["draft", "sent", "viewed", "paid", "partial", "overdue", "cancelled"], "description": "Initial invoice status. Defaults to 'draft'.", "default": "draft" }
+        },
+        "required": ["customerId"]
+      },
+      "InvoiceUpdate": {
+        "type": "object",
+        "description": "Input for partially updating an existing invoice. All fields are optional.",
+        "properties": {
+          "jobId": { "type": "string", "format": "uuid", "description": "ID of the job to link this invoice to." },
+          "estimateId": { "type": "string", "format": "uuid", "description": "ID of the estimate this invoice was created from." },
+          "lineItems": { "type": "array", "description": "Replacement list of line items (replaces all existing).", "items": { "$ref": "#/components/schemas/LineItemInput" } },
+          "taxRate": { "type": "number", "description": "Tax rate as a percentage." },
+          "issueDate": { "type": "string", "format": "date", "description": "Date the invoice is issued." },
+          "dueDate": { "type": "string", "format": "date", "description": "Date the invoice payment is due." },
+          "notes": { "type": "string", "description": "Notes visible to the customer." },
+          "terms": { "type": "string", "description": "Payment terms and conditions." },
+          "address": { "type": "string", "description": "Billing or service address." },
+          "status": { "type": "string", "enum": ["draft", "sent", "viewed", "paid", "partial", "overdue", "cancelled"], "description": "Updated invoice status." }
+        }
+      },
+      "Contract": {
+        "type": "object",
+        "description": "A contract record linked to a template, job, and customer. Tracks the full signing lifecycle.",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Unique identifier for the contract." },
+          "templateId": { "type": "string", "format": "uuid", "description": "ID of the contract template used." },
+          "jobId": { "type": "string", "format": "uuid", "description": "ID of the job this contract is associated with." },
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this contract is for." },
+          "status": { "type": "string", "enum": ["draft", "sent", "viewed", "signed", "paid", "completed", "cancelled"], "description": "Current status of the contract.", "example": "sent" },
+          "signingToken": { "type": "string", "description": "Unique token used in the signing URL sent to the customer.", "nullable": true },
+          "sentAt": { "type": "string", "format": "date-time", "description": "Timestamp when the contract was sent to the customer.", "nullable": true },
+          "viewedAt": { "type": "string", "format": "date-time", "description": "Timestamp when the customer first viewed the contract.", "nullable": true },
+          "signedAt": { "type": "string", "format": "date-time", "description": "Timestamp when the customer signed the contract.", "nullable": true },
+          "paidAt": { "type": "string", "format": "date-time", "description": "Timestamp when payment associated with the contract was received.", "nullable": true },
+          "completedAt": { "type": "string", "format": "date-time", "description": "Timestamp when the contract was marked as completed.", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the contract was created." },
+          "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp when the contract was last updated." }
+        },
+        "required": ["id", "templateId", "jobId", "customerId", "status", "createdAt", "updatedAt"]
+      },
+      "ContractCreate": {
+        "type": "object",
+        "description": "Input for creating a new contract. All three IDs are required to generate the contract from a template.",
+        "properties": {
+          "templateId": { "type": "string", "format": "uuid", "description": "ID of the contract template to use." },
+          "jobId": { "type": "string", "format": "uuid", "description": "ID of the job this contract is for." },
+          "customerId": { "type": "string", "format": "uuid", "description": "ID of the customer this contract is for." }
+        },
+        "required": ["templateId", "jobId", "customerId"]
+      },
+      "ContractUpdate": {
+        "type": "object",
+        "description": "Input for partially updating an existing contract. Typically used to advance the contract status.",
+        "properties": {
+          "status": { "type": "string", "enum": ["draft", "sent", "viewed", "signed", "paid", "completed", "cancelled"], "description": "Updated contract status." }
+        }
+      },
+      "MeResponse": {
+        "type": "object",
+        "description": "Information about the currently authenticated user and their active company.",
+        "properties": {
+          "user": {
+            "type": "object",
+            "description": "The authenticated user's profile.",
+            "properties": {
+              "id": { "type": "string", "format": "uuid", "description": "Unique identifier for the user." },
+              "email": { "type": "string", "format": "email", "description": "Email address of the user." },
+              "name": { "type": "string", "description": "Display name of the user.", "nullable": true },
+              "role": { "type": "string", "description": "User's role within the company.", "example": "owner" }
+            },
+            "required": ["id", "email"]
+          },
+          "company": {
+            "type": "object",
+            "description": "The user's active company.",
+            "properties": {
+              "id": { "type": "string", "format": "uuid", "description": "Unique identifier for the company." },
+              "name": { "type": "string", "description": "Company name.", "example": "Smith's Lawn Care" },
+              "plan": { "type": "string", "description": "Current subscription plan.", "example": "pro" }
+            },
+            "required": ["id", "name"]
+          }
+        },
+        "required": ["user", "company"]
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "The request was invalid. Check the error message for details on what needs to be corrected.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "Title must be at least 2 characters" }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication failed. Provide a valid Bearer token or X-API-Key header.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "Not authenticated" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The requested resource was not found or does not belong to your company.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "Resource not found" }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "An unexpected server error occurred. If the problem persists, contact support.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "Internal server error" }
+          }
+        }
+      }
+    }
+  }
+}

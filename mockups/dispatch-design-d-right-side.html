@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dispatch - Design D - Both Panels Right Side</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; background: #f3f4f6; display: flex; flex-direction: column; }
+  .banner { position: fixed; top: 50px; left: 50%; transform: translateX(-50%); background: #e0e7ff; color: #3730a3; padding: 5px 16px; border-radius: 0 0 6px 6px; font-size: 11px; font-weight: 600; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.1); white-space: nowrap; }
+
+  /* ── Header ── */
+  .header { height: 44px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; padding: 0 12px; gap: 8px; position: relative; z-index: 30; flex-shrink: 0; }
+  .header h1 { font-size: 14px; font-weight: 700; color: #111827; white-space: nowrap; }
+  .header .sep { width: 1px; height: 20px; background: #e5e7eb; }
+  .date-nav { display: flex; align-items: center; gap: 4px; }
+  .date-nav button { background: none; border: none; cursor: pointer; font-size: 14px; color: #6b7280; padding: 2px 6px; border-radius: 4px; }
+  .date-nav button:hover { background: #f3f4f6; }
+  .date-nav span { font-size: 13px; font-weight: 500; color: #374151; }
+  .date-nav .day-badge { font-size: 11px; background: #e5e7eb; color: #374151; padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+  .stat-dots { display: flex; gap: 4px; align-items: center; }
+  .stat-dot { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #374151; padding: 2px 6px; border-radius: 4px; cursor: pointer; }
+  .stat-dot:hover { background: #f3f4f6; }
+  .stat-dot .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .view-dropdown { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; font-weight: 500; background: #fff; cursor: pointer; color: #374151; }
+  .icon-btn { width: 32px; height: 32px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6b7280; }
+  .icon-btn.active { border-color: #3b82f6; background: #eff6ff; color: #2563eb; }
+  .add-btn { height: 32px; padding: 0 10px; border: none; border-radius: 6px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+  /* ── Timeline ── */
+  .timeline-area { height: 280px; overflow: hidden; background: #fff; flex-shrink: 0; }
+  .tech-row { display: flex; align-items: center; height: 56px; padding: 0 10px; gap: 8px; border-bottom: 1px solid #f3f4f6; }
+  .tech-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .tech-info { flex: 1; min-width: 0; }
+  .tech-name { font-size: 13px; font-weight: 600; color: #111827; }
+  .tech-meta { font-size: 11px; color: #9ca3af; }
+  .time-headers { display: flex; height: 28px; border-bottom: 1px solid #e5e7eb; background: #fafafa; }
+  .time-header { min-width: 80px; font-size: 10px; color: #9ca3af; font-weight: 500; display: flex; align-items: center; padding-left: 6px; border-right: 1px solid #f3f4f6; }
+  .grid-row { height: 56px; border-bottom: 1px solid #f3f4f6; position: relative; }
+  .job-block { height: 40px; border-radius: 6px; padding: 4px 8px; font-size: 11px; color: #fff; font-weight: 500; display: flex; flex-direction: column; justify-content: center; cursor: pointer; position: absolute; top: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .job-block:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+  .job-block.selected { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.25); outline: 2px solid #fff; }
+  .job-block .job-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .job-block .job-sub { font-size: 10px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .unassigned-row { display: flex; height: 40px; background: #fef2f2; border-bottom: 1px solid #fecaca; align-items: center; padding: 0 10px; gap: 6px; }
+  .unassigned-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
+  .unassigned-label { font-size: 12px; font-weight: 600; color: #dc2626; }
+  .unassigned-count { font-size: 11px; color: #f87171; }
+  .unassigned-chip { padding: 4px 10px; background: #fff; border: 1px solid #fecaca; border-radius: 6px; font-size: 11px; font-weight: 500; color: #374151; white-space: nowrap; cursor: pointer; }
+  .unassigned-chip:hover { background: #fef2f2; }
+  .unassigned-chip.selected { background: #fee2e2; border-color: #ef4444; }
+  .status-legend { height: 28px; background: #fafafa; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; padding: 0 14px; gap: 16px; flex-shrink: 0; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #6b7280; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .legend-label { font-size: 10px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── Drawer Handle (draggable) ── */
+  .drawer-handle { height: 28px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: ns-resize; flex-shrink: 0; user-select: none; }
+  .drawer-handle:hover { background: #f0f1f3; }
+  .drawer-handle:active { background: #e5e7eb; }
+  .handle-bar { width: 40px; height: 4px; background: #d1d5db; border-radius: 2px; }
+  .handle-label { font-size: 11px; color: #6b7280; font-weight: 500; }
+
+  /* ── Map Area ── */
+  .map-drawer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .map-content { flex: 1; display: flex; overflow: hidden; position: relative; }
+  .map-canvas { flex: 1; position: relative; }
+  #leafletMap { position: absolute; inset: 0; z-index: 1; }
+
+  /* ── Custom Map Pins (Leaflet DivIcon) ── */
+  .map-pin { cursor: pointer; transition: transform 0.2s ease; z-index: 2 !important; }
+  .map-pin:hover { transform: scale(1.15); z-index: 500 !important; }
+  .map-pin.selected { transform: scale(1.25); z-index: 1000 !important; }
+  .pin-svg { width: 28px; height: 34px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
+  .pin-num { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; color: #fff; }
+  .pin-tip { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+  .map-pin:hover .pin-tip { opacity: 1; }
+  .map-pin.selected .pin-tip { opacity: 0; }
+  .map-pin.selected::after { content: ''; position: absolute; top: -4px; left: -4px; width: 36px; height: 36px; border: 2px solid currentColor; border-radius: 50%; animation: pulse 1.5s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(0.8); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
+
+  /* ── Quick View Popup Card ── */
+  .popup-card { position: absolute; width: 310px; background: #fff; border-radius: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1); z-index: 1100; opacity: 0; transform: translateY(8px) scale(0.96); pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; overflow: hidden; }
+  .popup-card.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+  .popup-arrow { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 9px solid #fff; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.08)); }
+  .popup-arrow.top { bottom: auto; top: -8px; border-top: none; border-bottom: 9px solid #fff; filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.08)); }
+
+  .popup-photo-strip { display: flex; height: 72px; gap: 2px; overflow: hidden; background: #f3f4f6; }
+  .popup-photo-strip img { width: 33.34%; height: 100%; object-fit: cover; transition: opacity 0.15s; }
+  .popup-photo-strip img:hover { opacity: 0.85; }
+
+  .popup-body { padding: 10px 14px 8px; }
+  .popup-title-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .popup-title { font-size: 14px; font-weight: 600; color: #111827; line-height: 1.3; }
+  .popup-priority { font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+  .popup-customer { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .popup-meta { display: flex; gap: 10px; margin-top: 7px; font-size: 11px; color: #4b5563; }
+  .popup-meta-item { display: flex; align-items: center; gap: 4px; }
+  .popup-meta-item svg { width: 12px; height: 12px; color: #9ca3af; flex-shrink: 0; }
+  .popup-tags { display: flex; gap: 5px; margin-top: 7px; }
+  .popup-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+
+  .popup-actions { display: flex; gap: 5px; padding: 8px 14px 10px; border-top: 1px solid #f3f4f6; }
+  .popup-action { flex: 1; padding: 7px 6px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer; border: none; text-align: center; transition: background 0.15s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .popup-action:active { transform: scale(0.97); }
+  .popup-action svg { width: 13px; height: 13px; }
+  .action-details { background: #2563eb; color: #fff; }
+  .action-details:hover { background: #1d4ed8; }
+  .action-nav { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .action-nav:hover { background: #dcfce7; }
+  .action-call { background: #f0f9ff; color: #2563eb; border: 1px solid #bfdbfe; }
+  .action-call:hover { background: #dbeafe; }
+
+  /* ── Right Sidebar (job list) ── */
+  .job-sidebar { width: 240px; background: #fff; border-left: 1px solid #e5e7eb; overflow-y: auto; flex-shrink: 0; }
+  .sidebar-title { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; font-size: 11px; font-weight: 600; color: #374151; display: flex; justify-content: space-between; align-items: center; background: #fff; position: sticky; top: 0; z-index: 2; }
+  .sidebar-title-count { font-size: 10px; color: #9ca3af; font-weight: 500; }
+  .sidebar-group-header { display: flex; align-items: center; gap: 6px; padding: 5px 12px; background: #fafafa; border-bottom: 1px solid #f3f4f6; }
+  .sidebar-color { width: 10px; height: 10px; border-radius: 2px; }
+  .sidebar-group-name { font-size: 11px; font-weight: 600; }
+  .sidebar-group-members { font-size: 10px; color: #9ca3af; }
+  .sidebar-group-count { font-size: 10px; color: #9ca3af; margin-left: auto; }
+  .sidebar-job { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-bottom: 1px solid #f9fafb; cursor: pointer; transition: background 0.1s; }
+  .sidebar-job:hover { background: #f9fafb; }
+  .sidebar-job.active { background: #eff6ff; border-left: 3px solid #2563eb; }
+  .sidebar-job-num { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .sidebar-job-info { flex: 1; min-width: 0; }
+  .sidebar-job-title { font-size: 12px; font-weight: 500; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-job-addr { font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-job-time { font-size: 10px; color: #6b7280; white-space: nowrap; }
+
+  /* ── Right Detail Panel (slides over sidebar) ── */
+  .right-panel { position: absolute; right: 0; top: 0; bottom: 0; width: 380px; background: #fff; border-left: 1px solid #e5e7eb; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1200; display: flex; flex-direction: column; box-shadow: -4px 0 20px rgba(0,0,0,0.1); }
+  .right-panel.open { transform: translateX(0); }
+  .rp-header { padding: 14px 16px 10px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: flex-start; }
+  .rp-header-content { flex: 1; min-width: 0; }
+  .rp-header h3 { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 2px; }
+  .rp-header p { font-size: 12px; color: #6b7280; line-height: 1.4; }
+  .rp-close { background: none; border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; color: #9ca3af; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 8px; }
+  .rp-close:hover { background: #f3f4f6; color: #374151; }
+  .rp-carousel { border-bottom: 1px solid #e5e7eb; background: #f9fafb; padding: 8px 0; overflow: hidden; }
+  .rp-carousel-inner { display: flex; gap: 6px; padding: 0 16px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; }
+  .rp-carousel-inner::-webkit-scrollbar { display: none; }
+  .rp-carousel-thumb { width: 90px; height: 68px; border-radius: 6px; overflow: hidden; cursor: pointer; flex-shrink: 0; position: relative; border: 2px solid transparent; transition: border-color 0.15s, transform 0.15s; }
+  .rp-carousel-thumb:hover { border-color: #2563eb; transform: scale(1.03); }
+  .rp-carousel-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .rp-carousel-thumb .carousel-zoom { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; }
+  .rp-carousel-thumb:hover .carousel-zoom { opacity: 1; }
+  .carousel-zoom svg { width: 18px; height: 18px; color: #fff; }
+  .rp-carousel-label { font-size: 10px; color: #9ca3af; padding: 4px 16px 0; display: flex; align-items: center; gap: 4px; }
+  .rp-body { flex: 1; overflow-y: auto; padding: 14px 16px; }
+  .rp-customer { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .rp-cust-name { font-size: 14px; font-weight: 600; color: #111827; }
+  .rp-cust-phone { font-size: 12px; color: #6b7280; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+  .rp-badge { font-size: 10px; font-weight: 500; padding: 2px 10px; border-radius: 9999px; }
+  .badge-normal { background: #dbeafe; color: #1d4ed8; }
+  .badge-high { background: #fef3c7; color: #92400e; }
+  .badge-urgent { background: #fee2e2; color: #dc2626; }
+  .rp-info { margin-bottom: 12px; }
+  .rp-info-row { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: #4b5563; margin-bottom: 7px; line-height: 1.4; }
+  .rp-info-row.editable { cursor: pointer; padding: 3px 4px; margin-left: -4px; margin-right: -4px; border-radius: 4px; transition: background 0.1s; position: relative; }
+  .rp-info-row.editable:hover { background: #f3f4f6; }
+  .rp-info-row.editable:hover .edit-hint { opacity: 1; }
+  .edit-hint { opacity: 0; transition: opacity 0.15s; color: #9ca3af; font-size: 10px; margin-left: auto; flex-shrink: 0; display: flex; align-items: center; gap: 2px; }
+  .edit-hint svg { width: 10px; height: 10px; }
+  .rp-icon { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; color: #9ca3af; }
+
+  /* ── Inline Edit Mode ── */
+  .rp-inline-input { width: 100%; padding: 5px 8px; font-size: 12px; border: 1px solid #3b82f6; border-radius: 5px; background: #fff; color: #111827; outline: none; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); font-family: inherit; }
+  .rp-inline-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+  textarea.rp-inline-input { resize: vertical; min-height: 60px; line-height: 1.4; }
+  .rp-inline-time-row { display: flex; gap: 6px; align-items: center; width: 100%; }
+  .rp-inline-time-row input { flex: 1; }
+  .rp-inline-time-row .save-btn { padding: 5px 10px; background: #2563eb; color: #fff; border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .rp-inline-time-row .save-btn:hover { background: #1d4ed8; }
+  .rp-inline-time-row .cancel-btn { padding: 5px 8px; background: #f3f4f6; color: #6b7280; border: none; border-radius: 5px; font-size: 11px; cursor: pointer; }
+  .rp-inline-time-row .cancel-btn:hover { background: #e5e7eb; }
+
+  /* ── Priority Badge (clickable) ── */
+  .rp-badge.editable { cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; }
+  .rp-badge.editable:hover { transform: scale(1.05); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+  .rp-badge.editable:active { transform: scale(0.97); }
+
+  /* ── Save confirmation flash ── */
+  @keyframes saveFlash { 0% { background: #dcfce7; } 100% { background: transparent; } }
+  .save-flash { animation: saveFlash 0.8s ease-out; }
+  .rp-divider { border-top: 1px solid #e5e7eb; margin: 12px 0; }
+  .rp-form-group { margin-bottom: 12px; }
+  .rp-label { font-size: 11px; font-weight: 500; color: #374151; margin-bottom: 4px; display: block; }
+  .rp-select { width: 100%; padding: 7px 10px; font-size: 12px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; color: #374151; }
+  .rp-tabs { display: flex; margin-bottom: 5px; border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; }
+  .rp-tab { flex: 1; padding: 5px 10px; font-size: 11px; font-weight: 500; border: none; cursor: pointer; text-align: center; background: #fff; color: #6b7280; }
+  .rp-tab.active { background: #f3f4f6; color: #111827; }
+  .rp-actions { display: flex; gap: 6px; margin-top: 2px; }
+  .rp-action-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 8px; font-size: 11px; font-weight: 500; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; color: #374151; cursor: pointer; }
+  .rp-action-btn svg { width: 14px; height: 14px; }
+  .rp-action-btn.call { color: #16a34a; border-color: #bbf7d0; }
+  .rp-action-btn.call:hover { background: #f0fdf4; }
+  .rp-action-btn.nav { color: #2563eb; border-color: #bfdbfe; }
+  .rp-action-btn.nav:hover { background: #eff6ff; }
+  .rp-action-btn.email { color: #7c3aed; border-color: #ddd6fe; }
+  .rp-action-btn.email:hover { background: #f5f3ff; }
+  .rp-footer { padding: 10px 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; }
+  .rp-btn { padding: 8px 14px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; border: none; }
+  .rp-btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+  .rp-btn-primary { background: #2563eb; color: #fff; flex: 1; text-align: center; }
+
+  /* ── Map Legend Overlay ── */
+  .map-legend-overlay { position: absolute; bottom: 12px; left: 12px; background: #fff; padding: 6px 10px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 10px; z-index: 1050; }
+  .legend-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .legend-row:last-child { margin-bottom: 0; }
+  .legend-color { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ── Lightbox ── */
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: none; align-items: center; justify-content: center; z-index: 2000; }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 85%; max-height: 80vh; border-radius: 8px; }
+  .lb-close { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+  .lb-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); border: none; color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+  .lb-nav.prev { left: 14px; }
+  .lb-nav.next { right: 14px; }
+  .lb-counter { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 13px; }
+
+  /* ── Drag overlay (prevents map stealing mouse during resize) ── */
+  .drag-overlay { position: fixed; inset: 0; z-index: 9999; cursor: ns-resize; display: none; }
+  .drag-overlay.active { display: block; }
+
+  /* ── Drag and Drop (sidebar job reassignment) ── */
+  .sidebar-job[draggable="true"] { cursor: grab; }
+  .sidebar-job[draggable="true"]:active { cursor: grabbing; }
+  .sidebar-job.dragging { opacity: 0.4; background: #e5e7eb; }
+  .sidebar-group-header.drag-over { background: #dbeafe; outline: 2px dashed #3b82f6; outline-offset: -2px; }
+  .sidebar-group-header.drag-over-green { background: #dcfce7; outline: 2px dashed #16a34a; outline-offset: -2px; }
+  .sidebar-group-header.drag-over-gray { background: #f3f4f6; outline: 2px dashed #6b7280; outline-offset: -2px; }
+  .sidebar-job-grip { width: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; flex-shrink: 0; color: #d1d5db; cursor: grab; }
+  .sidebar-job-grip span { display: block; width: 8px; height: 2px; background: #d1d5db; border-radius: 1px; }
+  .sidebar-job:hover .sidebar-job-grip span { background: #9ca3af; }
+  .reassign-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 500; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: none; align-items: center; gap: 8px; }
+  .reassign-toast.show { display: flex; }
+  .reassign-toast .toast-icon { color: #22c55e; }
+
+  /* ── Override Leaflet zoom control position ── */
+  .leaflet-top.leaflet-right { right: 252px; transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+  .leaflet-top.leaflet-right.shifted { right: 392px; }
+
+  /* ── Route Controls ── */
+  .route-toggle { position: relative; }
+  .route-btn { height: 32px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; color: #374151; }
+  .route-btn:hover { background: #f9fafb; }
+  .route-btn.active { border-color: #3b82f6; background: #eff6ff; color: #2563eb; }
+  .route-btn svg { width: 14px; height: 14px; }
+  .route-menu { position: absolute; top: calc(100% + 4px); right: 0; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 50; min-width: 200px; padding: 4px; display: none; }
+  .route-menu.open { display: block; }
+  .route-menu-label { font-size: 10px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 10px 4px; }
+  .route-menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; color: #374151; border: none; background: none; width: 100%; text-align: left; }
+  .route-menu-item:hover { background: #f3f4f6; }
+  .route-menu-item.active { background: #eff6ff; color: #2563eb; }
+  .route-menu-item .rm-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .route-menu-item .rm-info { flex: 1; }
+  .route-menu-item .rm-name { font-weight: 500; }
+  .route-menu-item .rm-meta { font-size: 10px; color: #9ca3af; }
+  .route-menu-divider { border-top: 1px solid #e5e7eb; margin: 4px 0; }
+  .route-menu-item.clear { color: #ef4444; }
+  .route-menu-item.clear:hover { background: #fef2f2; }
+
+  /* ── Drive Time Labels on Map ── */
+  /* ── Route Start Marker ── */
+  .start-marker { width: 24px; height: 24px; background: #fff; border: 3px solid #1e293b; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .start-marker-inner { width: 10px; height: 10px; background: #1e293b; border-radius: 50%; }
+
+  /* ── Route Info Bar (overlay on map) ── */
+  .route-info-bar { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: #fff; padding: 8px 16px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 1050; display: none; align-items: center; gap: 16px; font-size: 12px; }
+  .route-info-bar.open { display: flex; }
+  .route-info-crew { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #111827; }
+  .route-info-crew .ri-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .route-info-stat { display: flex; align-items: center; gap: 4px; color: #6b7280; }
+  .route-info-stat svg { width: 14px; height: 14px; color: #9ca3af; }
+  .route-info-stat strong { color: #111827; font-weight: 600; }
+  .route-info-close { background: none; border: none; cursor: pointer; color: #9ca3af; padding: 2px; border-radius: 4px; font-size: 16px; line-height: 1; }
+  .route-info-close:hover { color: #374151; background: #f3f4f6; }
+  .route-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 1060; font-size: 13px; color: #374151; display: none; align-items: center; gap: 8px; }
+  .route-loading.open { display: flex; }
+  .route-spinner { width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Route Breakdown Panel (left side of map) ── */
+  .nav-panel { position: absolute; top: 12px; left: 12px; width: 320px; background: #fff; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index: 1055; display: none; flex-direction: column; overflow: hidden; }
+  .nav-panel.open { display: flex; }
+  .nav-panel-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #e5e7eb; }
+  .nav-panel-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-panel-icon svg { width: 16px; height: 16px; color: #fff; }
+  .nav-panel-info { flex: 1; min-width: 0; }
+  .nav-panel-title { font-size: 13px; font-weight: 600; color: #111827; }
+  .nav-panel-subtitle { font-size: 11px; color: #6b7280; margin-top: 1px; }
+  .nav-panel-subtitle strong { color: #111827; }
+  .nav-panel-close { width: 28px; height: 28px; border-radius: 6px; border: none; background: none; cursor: pointer; color: #9ca3af; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-panel-close:hover { background: #f3f4f6; color: #374151; }
+
+  /* Leg rows */
+  .nav-legs { max-height: 300px; overflow-y: auto; }
+  .nav-leg { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid #f3f4f6; }
+  .nav-leg:last-child { border-bottom: none; }
+  .nav-leg-num { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .nav-leg-route { flex: 1; min-width: 0; }
+  .nav-leg-from-to { font-size: 12px; color: #111827; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-leg-addrs { font-size: 10px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .nav-leg-time { text-align: right; flex-shrink: 0; }
+  .nav-leg-duration { font-size: 13px; font-weight: 700; color: #111827; }
+  .nav-leg-distance { font-size: 10px; color: #9ca3af; }
+
+  /* Footer */
+  .nav-panel-footer { display: flex; gap: 6px; padding: 8px 14px; border-top: 1px solid #e5e7eb; }
+  .nav-panel-gmaps { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-size: 11px; font-weight: 500; color: #374151; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .nav-panel-gmaps:hover { background: #f9fafb; }
+  .nav-panel-gmaps svg { width: 12px; height: 12px; }
+
+  /* Nav panel toggle + optimize */
+  .nav-panel-options { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid #f3f4f6; background: #fafafa; }
+  .nav-toggle { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; cursor: pointer; flex: 1; }
+  .nav-toggle-switch { width: 32px; height: 18px; border-radius: 9px; background: #d1d5db; position: relative; transition: background 0.2s; flex-shrink: 0; }
+  .nav-toggle-switch.on { background: #2563eb; }
+  .nav-toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .nav-toggle-switch.on::after { transform: translateX(14px); }
+  .nav-optimize-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-size: 11px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .nav-optimize-btn:hover { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+  .nav-optimize-btn svg { width: 12px; height: 12px; }
+  .nav-optimized-badge { font-size: 9px; font-weight: 700; background: #dcfce7; color: #16a34a; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+
+  /* ── Drive Time Labels on Map ── */
+  .drive-time-label { background: #fff; color: #111827; padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.18); border-left: 4px solid; cursor: default; min-width: 110px; text-align: center; }
+  .drive-time-label .dtl-time { font-weight: 700; font-size: 14px; }
+  .drive-time-label .dtl-dist { color: #6b7280; font-weight: 500; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="banner">DESIGN D &mdash; Real map + routing &bull; Click "Routes" to see driving directions &amp; times &bull; Hover pin = preview &bull; Click = detail panel</div>
+
+<!-- Drag overlay for smooth resize -->
+<div class="drag-overlay" id="dragOverlay"></div>
+
+<!-- Header -->
+<div class="header">
+  <h1>Dispatch</h1><div class="sep"></div>
+  <div class="date-nav"><button>&#8249;</button><button>&#8250;</button><span>Monday, February 9, 2026</span><span class="day-badge">Day</span></div>
+  <div class="sep"></div>
+  <div class="stat-dots"><div class="stat-dot"><div class="dot" style="background:#ef4444"></div>2</div><div class="stat-dot"><div class="dot" style="background:#3b82f6"></div>4</div><div class="stat-dot"><div class="dot" style="background:#eab308"></div>1</div><div class="stat-dot"><div class="dot" style="background:#22c55e"></div>1</div></div>
+  <div class="header-right"><span style="font-size:12px;color:#6b7280">View:</span><button class="view-dropdown">Crew + Map &#9662;</button><button class="icon-btn active" title="Map"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></button><button class="icon-btn" title="Refresh"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button><div class="route-toggle"><button class="route-btn" id="routeBtn" onclick="toggleRouteMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M5 8v2a4 4 0 0 0 4 4h6a4 4 0 0 1 4 4v0"/></svg>Routes</button><div class="route-menu" id="routeMenu"><div class="route-menu-label">Show Driving Route</div><button class="route-menu-item" id="rm-truck1" onclick="showCrewRoute('truck1')"><div class="rm-dot" style="background:#2563eb"></div><div class="rm-info"><div class="rm-name">Truck 1 &mdash; Adam R.</div><div class="rm-meta">5 stops &bull; Office &rarr; Jobs</div></div></button><button class="route-menu-item" id="rm-truck2" onclick="showCrewRoute('truck2')"><div class="rm-dot" style="background:#16a34a"></div><div class="rm-info"><div class="rm-name">Truck 2 &mdash; John S., Sammy T.</div><div class="rm-meta">2 stops &bull; Office &rarr; Jobs</div></div></button><div class="route-menu-divider"></div><button class="route-menu-item clear" id="rm-clear" onclick="clearRoutes()" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Clear All Routes</button></div></div><button class="add-btn">+ Job</button></div>
+</div>
+
+<!-- Timeline -->
+<div class="timeline-area" id="timelineArea">
+  <div style="display:flex;height:100%;overflow:hidden">
+    <div style="width:150px;flex-shrink:0;overflow-y:auto;border-right:1px solid #e5e7eb">
+      <div style="height:28px;background:#fafafa;border-bottom:1px solid #e5e7eb"></div>
+      <div class="unassigned-row" style="height:56px;border-bottom:1px solid #fecaca"><div class="unassigned-dot"></div><div style="flex:1"><span class="unassigned-label">Unassigned</span><div class="unassigned-count">2 jobs</div></div></div>
+      <div class="tech-row"><div class="tech-avatar" style="background:#2563eb">T1</div><div class="tech-info"><div class="tech-name">Truck 1</div><div class="tech-meta">Adam R. &mdash; 5 jobs</div></div></div>
+      <div class="tech-row"><div class="tech-avatar" style="background:#16a34a">T2</div><div class="tech-info"><div class="tech-name">Truck 2</div><div class="tech-meta">John S., Sammy T &mdash; 2 jobs</div></div></div>
+    </div>
+    <div style="flex:1;overflow-x:auto;overflow-y:auto">
+      <div class="time-headers"><div class="time-header">6am</div><div class="time-header">7am</div><div class="time-header">8am</div><div class="time-header">9am</div><div class="time-header">10am</div><div class="time-header">11am</div><div class="time-header">12pm</div><div class="time-header">1pm</div><div class="time-header">2pm</div><div class="time-header">3pm</div><div class="time-header">4pm</div><div class="time-header">5pm</div></div>
+      <div style="display:flex;gap:6px;padding:8px;min-width:960px;height:56px;background:#fef2f2;border-bottom:1px solid #fecaca;align-items:center">
+        <div class="unassigned-chip" data-job="hvac" onclick="selectJob('hvac')">HVAC Maintenance</div>
+        <div class="unassigned-chip" data-job="garage" onclick="selectJob('garage')">Garage Door Fix</div>
+      </div>
+      <div class="grid-row" style="min-width:960px">
+        <div class="job-block" data-job="ac" style="background:#2563eb;left:80px;width:120px" onclick="selectJob('ac')"><span class="job-title">AC Unit Repair</span><span class="job-sub">7:00-8:30am</span></div>
+        <div class="job-block" data-job="duct" style="background:#2563eb;left:220px;width:80px" onclick="selectJob('duct')"><span class="job-title">Duct Clean</span><span class="job-sub">8:45-9:45am</span></div>
+        <div class="job-block" data-job="filter" style="background:#eab308;left:340px;width:100px" onclick="selectJob('filter')"><span class="job-title">Filter Replace</span><span class="job-sub">10:15-11:30am</span></div>
+        <div class="job-block" data-job="thermostat" style="background:#2563eb;left:520px;width:90px" onclick="selectJob('thermostat')"><span class="job-title">Thermostat Install</span><span class="job-sub">12:30-1:45pm</span></div>
+        <div class="job-block" data-job="insulation" style="background:#22c55e;left:640px;width:110px" onclick="selectJob('insulation')"><span class="job-title">Insulation Check</span><span class="job-sub">2:00-3:30pm</span></div>
+      </div>
+      <div class="grid-row" style="min-width:960px">
+        <div class="job-block" data-job="electrical" style="background:#16a34a;left:160px;width:100px" onclick="selectJob('electrical')"><span class="job-title">Electrical Insp.</span><span class="job-sub">8:00-9:15am</span></div>
+        <div class="job-block" data-job="window" style="background:#16a34a;left:400px;width:120px" onclick="selectJob('window')"><span class="job-title">Window Repair</span><span class="job-sub">11:00-12:30pm</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Status Legend -->
+<div class="status-legend">
+  <span class="legend-label">Status:</span>
+  <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Unassigned</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Scheduled</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#eab308"></div>In Progress</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Completed</div>
+  <div style="margin-left:auto"></div>
+  <span class="legend-label">Crews:</span>
+  <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Truck 1</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>Truck 2</div>
+</div>
+
+<!-- Draggable Handle -->
+<div class="drawer-handle" id="drawerHandle"><div class="handle-bar"></div><span class="handle-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg> Map View &bull; 9 jobs &bull; drag to resize</span><div class="handle-bar"></div></div>
+
+<!-- Map + Sidebar -->
+<div class="map-drawer"><div class="map-content" id="mapContent">
+  <div class="map-canvas" id="mapCanvas">
+    <div id="leafletMap"></div>
+
+    <!-- Quick View Popup Card (floats above map) -->
+    <div class="popup-card" id="popupCard" onmouseenter="cancelHideCard()" onmouseleave="scheduleHideCard()">
+      <div class="popup-photo-strip" id="popupPhotos"></div>
+      <div class="popup-body">
+        <div class="popup-title-row">
+          <div class="popup-title" id="popupTitle"></div>
+          <span class="popup-priority" id="popupPriority"></span>
+        </div>
+        <div class="popup-customer" id="popupCustomer"></div>
+        <div class="popup-meta">
+          <div class="popup-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="popupTime"></span></div>
+          <div class="popup-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg><span id="popupDur"></span></div>
+          <div class="popup-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span id="popupAddr"></span></div>
+        </div>
+        <div class="popup-tags">
+          <span class="popup-tag" id="popupStatus"></span>
+          <span class="popup-tag" id="popupCrew"></span>
+        </div>
+      </div>
+      <div class="popup-actions">
+        <button class="popup-action action-details" onclick="openPanelFromCard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>View Details</button>
+        <button class="popup-action action-nav" onclick="navigateToJob(cardJobId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Navigate</button>
+        <button class="popup-action action-call" onclick="callJob(cardJobId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</button>
+      </div>
+      <div class="popup-arrow" id="popupArrow"></div>
+    </div>
+
+    <!-- Right Detail Panel -->
+    <div class="right-panel" id="rightPanel">
+      <div class="rp-header"><div class="rp-header-content"><h3 id="rp-title"></h3><p id="rp-desc"></p></div><button class="rp-close" onclick="closePanel()">&#10005;</button></div>
+      <div class="rp-carousel"><div class="rp-carousel-inner" id="carouselInner"></div><div class="rp-carousel-label"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span id="rp-photo-count"></span> &mdash; scroll to see more</div></div>
+      <div class="rp-body">
+        <div class="rp-customer"><div><div class="rp-cust-name" id="rp-customer"></div><div class="rp-cust-phone"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span id="rp-phone"></span></div></div><span class="rp-badge badge-normal editable" id="rp-priority" onclick="cyclePriority()" title="Click to change priority"></span></div>
+        <div class="rp-info">
+          <div class="rp-info-row"><svg class="rp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span id="rp-address"></span></div>
+          <div class="rp-info-row editable" onclick="editTime()" title="Click to change time"><svg class="rp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="rp-date"></span><span class="edit-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>edit</span></div>
+          <div class="rp-info-row editable" onclick="editDuration()" title="Click to change duration"><svg class="rp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="rp-duration"></span><span class="edit-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>edit</span></div>
+          <div class="rp-info-row editable" onclick="editNotes()" title="Click to edit notes"><svg class="rp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span id="rp-notes"></span><span class="edit-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>edit</span></div>
+        </div>
+        <div class="rp-divider"></div>
+        <div class="rp-form-group"><label class="rp-label">Status</label><select class="rp-select" id="rp-status"><option value="scheduled">Scheduled</option><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></div>
+        <div class="rp-form-group"><label class="rp-label">Assigned Technician</label><div class="rp-tabs"><button class="rp-tab active" onclick="switchTab(this,'individual')">Individual</button><button class="rp-tab" onclick="switchTab(this,'crew')">Crew</button></div><select class="rp-select" id="rp-tech-select"><option>Adam R.</option><option>John Smith</option><option>Jimmy G.</option><option>Sammy T.</option></select><select class="rp-select" id="rp-crew-select" style="display:none"><option>Truck 1 &mdash; Adam R.</option><option>Truck 2 &mdash; John S., Sammy T.</option></select></div>
+        <div class="rp-divider"></div>
+        <div class="rp-form-group"><label class="rp-label">Quick Actions</label><div class="rp-actions"><button class="rp-action-btn call" onclick="callJob(cId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call</button><button class="rp-action-btn nav" onclick="navigateToJob(cId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Navigate</button><button class="rp-action-btn email" onclick="emailJob(cId)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email</button></div></div>
+      </div>
+      <div class="rp-footer"><button class="rp-btn rp-btn-outline" onclick="closePanel()">Close</button><button class="rp-btn rp-btn-primary">View Full Job &#8594;</button></div>
+    </div>
+
+    <!-- Navigation Bar (in-app directions) -->
+    <div class="nav-panel" id="navPanel">
+      <div class="nav-panel-header">
+        <div class="nav-panel-icon" id="navIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>
+        <div class="nav-panel-info">
+          <div class="nav-panel-title" id="navTitle"></div>
+          <div class="nav-panel-subtitle"><strong id="navTime">--</strong> total &bull; <strong id="navDist">--</strong> &bull; <span id="navAddr"></span></div>
+        </div>
+        <button class="nav-panel-close" onclick="clearNavigation()" title="Close">&#10005;</button>
+      </div>
+      <div class="nav-panel-options">
+        <label class="nav-toggle" onclick="toggleStartAddress()">
+          <div class="nav-toggle-switch on" id="startToggle"></div>
+          <span id="startToggleLabel">Include start address</span>
+        </label>
+        <button class="nav-optimize-btn" id="optimizeBtn" onclick="optimizeRoute()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Optimize</button>
+      </div>
+      <div class="nav-legs" id="navLegs"></div>
+      <div class="nav-panel-footer">
+        <button class="nav-panel-gmaps" onclick="openInGoogleMaps()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open in Google Maps</button>
+      </div>
+    </div>
+
+    <!-- Route Info Bar -->
+    <div class="route-info-bar" id="routeInfoBar"></div>
+    <!-- Route Loading -->
+    <div class="route-loading" id="routeLoading"><div class="route-spinner"></div>Calculating route&hellip;</div>
+
+    <div class="map-legend-overlay" id="mapLegend"><div class="legend-row"><div class="legend-color" style="background:#2563eb"></div>Truck 1 (5)</div><div class="legend-row"><div class="legend-color" style="background:#16a34a"></div>Truck 2 (2)</div><div class="legend-row"><div class="legend-color" style="background:#6b7280"></div>Unassigned (2)</div></div>
+  </div>
+
+  <!-- Right Sidebar -->
+  <div class="job-sidebar" id="jobSidebar">
+    <div class="sidebar-title">Today's Jobs (9)<span class="sidebar-title-count">Drag jobs to reassign</span></div>
+    <div class="sidebar-group-header" data-crew="truck1" id="group-truck1"><div class="sidebar-color" style="background:#2563eb"></div><span class="sidebar-group-name" style="color:#2563eb">Truck 1</span><span class="sidebar-group-members">Adam R.</span><span class="sidebar-group-count" id="count-truck1">5</span></div>
+    <div class="sidebar-job" data-job="ac" data-crew="truck1" draggable="true" onclick="selectJob('ac')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#2563eb">1</div><div class="sidebar-job-info"><div class="sidebar-job-title">AC Unit Repair</div><div class="sidebar-job-addr">4521 E Cactus Rd, Scottsdale</div></div><div class="sidebar-job-time">7:00</div></div>
+    <div class="sidebar-job" data-job="duct" data-crew="truck1" draggable="true" onclick="selectJob('duct')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#2563eb">2</div><div class="sidebar-job-info"><div class="sidebar-job-title">Duct Clean</div><div class="sidebar-job-addr">1234 N Hayden Rd, Scottsdale</div></div><div class="sidebar-job-time">8:45</div></div>
+    <div class="sidebar-job" data-job="filter" data-crew="truck1" draggable="true" onclick="selectJob('filter')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#eab308">3</div><div class="sidebar-job-info"><div class="sidebar-job-title">Filter Replace</div><div class="sidebar-job-addr">789 E Indian School, Phoenix</div></div><div class="sidebar-job-time">10:15</div></div>
+    <div class="sidebar-job" data-job="thermostat" data-crew="truck1" draggable="true" onclick="selectJob('thermostat')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#2563eb">4</div><div class="sidebar-job-info"><div class="sidebar-job-title">Thermostat Install</div><div class="sidebar-job-addr">2200 E Camelback, Phoenix</div></div><div class="sidebar-job-time">12:30</div></div>
+    <div class="sidebar-job" data-job="insulation" data-crew="truck1" draggable="true" onclick="selectJob('insulation')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#22c55e">5</div><div class="sidebar-job-info"><div class="sidebar-job-title">Insulation Check</div><div class="sidebar-job-addr">550 W McDowell Rd, Phoenix</div></div><div class="sidebar-job-time">2:00</div></div>
+    <div class="sidebar-group-header" data-crew="truck2" id="group-truck2"><div class="sidebar-color" style="background:#16a34a"></div><span class="sidebar-group-name" style="color:#16a34a">Truck 2</span><span class="sidebar-group-members">John S., Sammy T.</span><span class="sidebar-group-count" id="count-truck2">2</span></div>
+    <div class="sidebar-job" data-job="electrical" data-crew="truck2" draggable="true" onclick="selectJob('electrical')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#16a34a">1</div><div class="sidebar-job-info"><div class="sidebar-job-title">Electrical Insp.</div><div class="sidebar-job-addr">555 W Camelback Rd, Phoenix</div></div><div class="sidebar-job-time">8:00</div></div>
+    <div class="sidebar-job" data-job="window" data-crew="truck2" draggable="true" onclick="selectJob('window')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#16a34a">2</div><div class="sidebar-job-info"><div class="sidebar-job-title">Window Repair</div><div class="sidebar-job-addr">321 E Paradise Ln, Scottsdale</div></div><div class="sidebar-job-time">11:00</div></div>
+    <div class="sidebar-group-header" data-crew="unassigned" id="group-unassigned"><div class="sidebar-color" style="background:#6b7280"></div><span class="sidebar-group-name" style="color:#6b7280">Unassigned</span><span class="sidebar-group-members"></span><span class="sidebar-group-count" id="count-unassigned">2</span></div>
+    <div class="sidebar-job" data-job="hvac" data-crew="unassigned" draggable="true" onclick="selectJob('hvac')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#6b7280">?</div><div class="sidebar-job-info"><div class="sidebar-job-title">HVAC Maintenance</div><div class="sidebar-job-addr">999 S Mill Ave, Tempe</div></div><div class="sidebar-job-time">TBD</div></div>
+    <div class="sidebar-job" data-job="garage" data-crew="unassigned" draggable="true" onclick="selectJob('garage')"><div class="sidebar-job-grip"><span></span><span></span><span></span></div><div class="sidebar-job-num" style="background:#6b7280">?</div><div class="sidebar-job-info"><div class="sidebar-job-title">Garage Door Fix</div><div class="sidebar-job-addr">1450 N Scottsdale Rd</div></div><div class="sidebar-job-time">TBD</div></div>
+  </div>
+  <!-- Reassign Toast -->
+  <div class="reassign-toast" id="reassignToast"><span class="toast-icon">&#10003;</span><span id="toastMsg"></span></div>
+</div></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLB()"><button class="lb-close" onclick="closeLB()">&#10005;</button><button class="lb-nav prev" onclick="event.stopPropagation();navLB(-1)">&#8249;</button><img id="lb-img" src="" onclick="event.stopPropagation()"/><button class="lb-nav next" onclick="event.stopPropagation();navLB(1)">&#8250;</button><div class="lb-counter" id="lb-counter"></div></div>
+
+<script>
+/* ══════════════════════════════════════════
+   JOB DATA (with real lat/lng)
+   ══════════════════════════════════════════ */
+var J = {
+  ac:          { t:'AC Unit Repair',       d:'Central AC not cooling properly. Customer reports warm air from all vents.', c:'Adam Richardson',  ph:'(480) 555-1234', pr:'Normal', pc:'badge-normal', prBg:'#dbeafe', prColor:'#1d4ed8', a:'4521 E Cactus Rd, Scottsdale, AZ 85254',     aShort:'Scottsdale', dt:'Mon, Feb 9, 2026 at 7:00 AM',  tm:'7:00 AM',  du:'90 minutes',  duShort:'90 min',  n:'Central AC not cooling. Customer reports warm air from all vents. Check refrigerant levels.',            s:'scheduled',   te:'Adam R.',     cr:'Truck 1',     crBg:'#2563eb', num:'1', color:'#2563eb', lat:33.595,  lng:-111.920, p:['photo-1585771724684-38269d6639fd','photo-1631545806609-3c480a498e26','photo-1504328345606-18bbc8c9d7d1','photo-1621905252507-b35492cc74b4','photo-1558618666-fcd25c85f82e'] },
+  duct:        { t:'Duct Clean',           d:'Full duct cleaning service for residential HVAC system.',                   c:'Sarah Mitchell',  ph:'(480) 555-2345', pr:'Normal', pc:'badge-normal', prBg:'#dbeafe', prColor:'#1d4ed8', a:'1234 N Hayden Rd, Scottsdale, AZ 85257',     aShort:'Scottsdale', dt:'Mon, Feb 9, 2026 at 8:45 AM',  tm:'8:45 AM',  du:'60 minutes',  duShort:'60 min',  n:'Annual duct cleaning. Access through garage. Two-story home, 4 vents upstairs.',                       s:'scheduled',   te:'Adam R.',     cr:'Truck 1',     crBg:'#2563eb', num:'2', color:'#2563eb', lat:33.530,  lng:-111.910, p:['photo-1504328345606-18bbc8c9d7d1','photo-1558618666-fcd25c85f82e','photo-1621905252507-b35492cc74b4'] },
+  filter:      { t:'Filter Replace',       d:'Replace HVAC filters and inspect system performance.',                      c:'David Chen',      ph:'(602) 555-3456', pr:'High',   pc:'badge-high',   prBg:'#fef3c7', prColor:'#92400e', a:'789 E Indian School Rd, Phoenix, AZ 85014',  aShort:'Phoenix',    dt:'Mon, Feb 9, 2026 at 10:15 AM', tm:'10:15 AM', du:'75 minutes',  duShort:'75 min',  n:'Customer requested premium filters. System making unusual noise - investigate.',                        s:'in_progress', te:'Adam R.',     cr:'Truck 1',     crBg:'#eab308', num:'3', color:'#eab308', lat:33.495,  lng:-112.050, p:['photo-1585771724684-38269d6639fd','photo-1631545806609-3c480a498e26'] },
+  thermostat:  { t:'Thermostat Install',   d:'Install new smart thermostat and configure WiFi connection.',               c:'Maria Gonzalez',  ph:'(602) 555-4567', pr:'Normal', pc:'badge-normal', prBg:'#dbeafe', prColor:'#1d4ed8', a:'2200 E Camelback Rd, Phoenix, AZ 85016',     aShort:'Phoenix',    dt:'Mon, Feb 9, 2026 at 12:30 PM', tm:'12:30 PM', du:'75 minutes',  duShort:'75 min',  n:'Ecobee smart thermostat install. Customer has WiFi ready. Old thermostat is Honeywell.',                s:'scheduled',   te:'Adam R.',     cr:'Truck 1',     crBg:'#2563eb', num:'4', color:'#2563eb', lat:33.509,  lng:-111.980, p:['photo-1558618666-fcd25c85f82e','photo-1504328345606-18bbc8c9d7d1','photo-1621905252507-b35492cc74b4','photo-1585771724684-38269d6639fd'] },
+  insulation:  { t:'Insulation Check',     d:'Inspect attic insulation and provide efficiency report.',                   c:'Robert Taylor',   ph:'(602) 555-5678', pr:'Normal', pc:'badge-normal', prBg:'#dbeafe', prColor:'#1d4ed8', a:'550 W McDowell Rd, Phoenix, AZ 85003',       aShort:'Phoenix',    dt:'Mon, Feb 9, 2026 at 2:00 PM',  tm:'2:00 PM',  du:'90 minutes',  duShort:'90 min',  n:'Annual insulation inspection. Customer concerned about energy bills. Check for gaps.',                  s:'completed',   te:'Adam R.',     cr:'Truck 1',     crBg:'#22c55e', num:'5', color:'#22c55e', lat:33.461,  lng:-112.080, p:['photo-1631545806609-3c480a498e26','photo-1585771724684-38269d6639fd'] },
+  electrical:  { t:'Electrical Inspection', d:'Full electrical panel inspection and safety check.',                       c:'David Chen',      ph:'(602) 555-6789', pr:'High',   pc:'badge-high',   prBg:'#fef3c7', prColor:'#92400e', a:'555 W Camelback Rd, Phoenix, AZ 85013',      aShort:'Phoenix',    dt:'Mon, Feb 9, 2026 at 8:00 AM',  tm:'8:00 AM',  du:'75 minutes',  duShort:'75 min',  n:'Panel inspection. Customer reported flickering lights. Check breaker connections.',                     s:'scheduled',   te:'John Smith',  cr:'Truck 2',     crBg:'#16a34a', num:'1', color:'#16a34a', lat:33.509,  lng:-112.075, p:['photo-1504328345606-18bbc8c9d7d1','photo-1621905252507-b35492cc74b4','photo-1558618666-fcd25c85f82e'] },
+  window:      { t:'Window Repair',        d:'Repair broken window seal and replace weather stripping.',                  c:'Lisa Park',       ph:'(480) 555-7890', pr:'Urgent', pc:'badge-urgent', prBg:'#fee2e2', prColor:'#dc2626', a:'321 E Paradise Ln, Scottsdale, AZ 85260',    aShort:'Scottsdale', dt:'Mon, Feb 9, 2026 at 11:00 AM', tm:'11:00 AM', du:'90 minutes',  duShort:'90 min',  n:'Broken seal on master bedroom window. Drafty air. Weather stripping worn.',                             s:'scheduled',   te:'John Smith',  cr:'Truck 2',     crBg:'#16a34a', num:'2', color:'#16a34a', lat:33.620,  lng:-111.895, p:['photo-1585771724684-38269d6639fd','photo-1631545806609-3c480a498e26','photo-1504328345606-18bbc8c9d7d1','photo-1558618666-fcd25c85f82e'] },
+  hvac:        { t:'HVAC Maintenance',     d:'Routine HVAC maintenance and tune-up service.',                             c:'James Thompson',  ph:'(480) 555-8901', pr:'Normal', pc:'badge-normal', prBg:'#dbeafe', prColor:'#1d4ed8', a:'999 S Mill Ave, Tempe, AZ 85281',            aShort:'Tempe',      dt:'Mon, Feb 9, 2026 \u2014 Time TBD', tm:'TBD',  du:'60 minutes',  duShort:'60 min',  n:'Standard maintenance. Returning client. Last service 6 months ago.',                                    s:'scheduled',   te:'Unassigned',  cr:'Unassigned',  crBg:'#6b7280', num:'?', color:'#6b7280', lat:33.415,  lng:-111.940, p:['photo-1621905252507-b35492cc74b4','photo-1585771724684-38269d6639fd'] },
+  garage:      { t:'Garage Door Fix',      d:'Garage door opener malfunction and track alignment.',                       c:'Jennifer Adams',  ph:'(480) 555-9012', pr:'Urgent', pc:'badge-urgent', prBg:'#fee2e2', prColor:'#dc2626', a:'1450 N Scottsdale Rd, Scottsdale, AZ 85257', aShort:'Scottsdale', dt:'Mon, Feb 9, 2026 \u2014 Time TBD', tm:'TBD',  du:'120 minutes', duShort:'120 min', n:'Garage door stuck halfway. Motor running but door not moving. Possible track issue.',                   s:'scheduled',   te:'Unassigned',  cr:'Unassigned',  crBg:'#6b7280', num:'?', color:'#6b7280', lat:33.540,  lng:-111.885, p:['photo-1558618666-fcd25c85f82e'] }
+};
+
+var U = 'https://images.unsplash.com/';
+var cId = null, cPhotos = [], cPhoto = 0;
+var pOpen = false, cardOpen = false, cardJobId = null, hideCardTimer = null;
+var markers = {};  // Leaflet marker references by job id
+
+var statusMap = {
+  scheduled:   { bg: '#dbeafe', color: '#1d4ed8', label: 'Scheduled' },
+  in_progress: { bg: '#fef3c7', color: '#92400e', label: 'In Progress' },
+  completed:   { bg: '#dcfce7', color: '#16a34a', label: 'Completed' },
+  cancelled:   { bg: '#f3f4f6', color: '#6b7280', label: 'Cancelled' }
+};
+
+/* ══════════════════════════════════════════
+   LEAFLET MAP INIT
+   ══════════════════════════════════════════ */
+var map = L.map('leafletMap', {
+  center: [33.51, -111.97],
+  zoom: 12,
+  zoomControl: false
+});
+
+// Add zoom control to top-right
+L.control.zoom({ position: 'topright' }).addTo(map);
+
+// OpenStreetMap tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap',
+  maxZoom: 19
+}).addTo(map);
+
+// Create markers for each job
+Object.keys(J).forEach(function(id) {
+  var j = J[id];
+  var icon = L.divIcon({
+    className: 'map-pin',
+    html: '<svg class="pin-svg" viewBox="0 0 28 34"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="' + j.color + '"/></svg><span class="pin-num">' + j.num + '</span><div class="pin-tip">' + j.t + ' &mdash; ' + j.cr + '</div>',
+    iconSize: [28, 34],
+    iconAnchor: [14, 34],
+    popupAnchor: [0, -34]
+  });
+
+  var marker = L.marker([j.lat, j.lng], { icon: icon }).addTo(map);
+
+  // Store reference
+  markers[id] = marker;
+
+  // Hover: show card
+  marker.on('mouseover', function() { showCard(id); });
+  marker.on('mouseout', function() { scheduleHideCard(); });
+
+  // Click: open panel
+  marker.on('click', function() { selectJob(id); });
+});
+
+/* ══════════════════════════════════════════
+   DRAGGABLE SPLIT HANDLE
+   ══════════════════════════════════════════ */
+var drawerHandle = document.getElementById('drawerHandle');
+var timelineArea = document.getElementById('timelineArea');
+var dragOverlay = document.getElementById('dragOverlay');
+var isDragging = false, dragStartY = 0, dragStartH = 0;
+
+drawerHandle.addEventListener('mousedown', function(e) {
+  isDragging = true;
+  dragStartY = e.clientY;
+  dragStartH = timelineArea.offsetHeight;
+  dragOverlay.classList.add('active');
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', function(e) {
+  if (!isDragging) return;
+  var delta = e.clientY - dragStartY;
+  var newH = Math.max(80, Math.min(dragStartH + delta, window.innerHeight - 200));
+  timelineArea.style.height = newH + 'px';
+  map.invalidateSize();
+});
+
+document.addEventListener('mouseup', function() {
+  if (!isDragging) return;
+  isDragging = false;
+  dragOverlay.classList.remove('active');
+  map.invalidateSize();
+});
+
+/* ══════════════════════════════════════════
+   HIGHLIGHT HELPERS
+   ══════════════════════════════════════════ */
+function clearAllHighlights() {
+  // Clear Leaflet marker highlights
+  Object.keys(markers).forEach(function(id) {
+    var el = markers[id].getElement();
+    if (el) el.classList.remove('selected');
+  });
+  document.querySelectorAll('.sidebar-job').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.job-block').forEach(function(b) { b.classList.remove('selected'); });
+  document.querySelectorAll('.unassigned-chip').forEach(function(c) { c.classList.remove('selected'); });
+}
+
+function highlightJob(id) {
+  var m = markers[id];
+  if (m) {
+    var el = m.getElement();
+    if (el) el.classList.add('selected');
+  }
+  document.querySelectorAll('.sidebar-job[data-job="' + id + '"]').forEach(function(e) { e.classList.add('active'); });
+  document.querySelectorAll('.job-block[data-job="' + id + '"]').forEach(function(e) { e.classList.add('selected'); });
+  document.querySelectorAll('.unassigned-chip[data-job="' + id + '"]').forEach(function(e) { e.classList.add('selected'); });
+}
+
+/* ══════════════════════════════════════════
+   HOVER = Quick View Card
+   ══════════════════════════════════════════ */
+function showCard(id) {
+  cancelHideCard();
+  var j = J[id];
+  if (!j) return;
+  if (cardOpen && cardJobId === id) return;
+
+  cardJobId = id;
+
+  if (pOpen) {
+    clearAllHighlights();
+    highlightJob(cId);
+    if (id !== cId) highlightJob(id);
+  } else {
+    clearAllHighlights();
+    highlightJob(id);
+  }
+
+  // Populate card
+  document.getElementById('popupTitle').textContent = j.t;
+  document.getElementById('popupCustomer').innerHTML = j.c + ' &bull; ' + j.ph;
+  document.getElementById('popupTime').textContent = j.tm;
+  document.getElementById('popupDur').textContent = j.duShort;
+  document.getElementById('popupAddr').textContent = j.aShort;
+
+  var st = statusMap[j.s] || statusMap.scheduled;
+  var se = document.getElementById('popupStatus');
+  se.textContent = st.label; se.style.background = st.bg; se.style.color = st.color;
+
+  var ce = document.getElementById('popupCrew');
+  ce.textContent = j.cr; ce.style.background = j.crBg; ce.style.color = '#fff';
+
+  var pe = document.getElementById('popupPriority');
+  pe.textContent = j.pr; pe.style.background = j.prBg; pe.style.color = j.prColor;
+
+  // Photos
+  var strip = document.getElementById('popupPhotos');
+  strip.innerHTML = '';
+  var photos = j.p.slice(0, 3);
+  if (photos.length === 0) { strip.style.display = 'none'; }
+  else {
+    strip.style.display = 'flex';
+    photos.forEach(function(ph) {
+      var img = document.createElement('img');
+      img.src = U + ph + '?w=200&h=100&fit=crop'; img.alt = '';
+      strip.appendChild(img);
+    });
+  }
+
+  // Position card using Leaflet's latLngToContainerPoint
+  var card = document.getElementById('popupCard');
+  var arrow = document.getElementById('popupArrow');
+  var mapEl = document.getElementById('mapCanvas');
+  var pt = map.latLngToContainerPoint([j.lat, j.lng]);
+
+  var cardWidth = 310;
+  var cardHeight = photos.length > 0 ? 260 : 190;
+  var left = pt.x - (cardWidth / 2);
+  var top = pt.y - cardHeight - 44; // 34 pin height + 10 gap
+
+  var rightBound = pOpen ? mapEl.offsetWidth - 390 : mapEl.offsetWidth - 10;
+  if (left < 10) left = 10;
+  if (left + cardWidth > rightBound) left = rightBound - cardWidth;
+
+  arrow.className = 'popup-arrow';
+  if (top < 10) {
+    top = pt.y + 10;
+    arrow.classList.add('top');
+  }
+
+  card.style.left = left + 'px';
+  card.style.top = top + 'px';
+  card.classList.add('open');
+  cardOpen = true;
+}
+
+function scheduleHideCard() {
+  hideCardTimer = setTimeout(function() {
+    document.getElementById('popupCard').classList.remove('open');
+    if (pOpen) { clearAllHighlights(); highlightJob(cId); }
+    else { clearAllHighlights(); }
+    cardOpen = false;
+    cardJobId = null;
+  }, 300);
+}
+
+function cancelHideCard() {
+  if (hideCardTimer) { clearTimeout(hideCardTimer); hideCardTimer = null; }
+}
+
+function hideCardNow() {
+  cancelHideCard();
+  document.getElementById('popupCard').classList.remove('open');
+  cardOpen = false;
+  cardJobId = null;
+}
+
+/* ══════════════════════════════════════════
+   CLICK = Open Right Detail Panel
+   ══════════════════════════════════════════ */
+function openPanelFromCard() {
+  var id = cardJobId;
+  hideCardNow();
+  if (id) openPanel(id);
+}
+
+function selectJob(id) {
+  hideCardNow();
+  clearAllHighlights();
+  highlightJob(id);
+  openPanel(id);
+}
+
+function openPanel(id) {
+  var j = J[id];
+  if (!j) return;
+  cancelAnyEdit();
+  cId = id;
+  cPhotos = j.p.map(function(x) { return U + x + '?w=900&h=700&fit=crop'; });
+  cPhoto = 0;
+
+  clearAllHighlights();
+  highlightJob(id);
+
+  document.getElementById('rp-title').textContent = j.t;
+  document.getElementById('rp-desc').textContent = j.d;
+  document.getElementById('rp-customer').textContent = j.c;
+  document.getElementById('rp-phone').textContent = j.ph;
+  document.getElementById('rp-address').textContent = j.a;
+  document.getElementById('rp-date').textContent = j.dt;
+  document.getElementById('rp-duration').textContent = j.du;
+  document.getElementById('rp-notes').textContent = j.n;
+  document.getElementById('rp-status').value = j.s;
+  document.getElementById('rp-photo-count').textContent = j.p.length + ' photo' + (j.p.length !== 1 ? 's' : '');
+
+  var b = document.getElementById('rp-priority');
+  b.textContent = j.pr;
+  b.className = 'rp-badge ' + j.pc;
+
+  var ts = document.getElementById('rp-tech-select');
+  for (var i = 0; i < ts.options.length; i++) { if (ts.options[i].text === j.te) { ts.selectedIndex = i; break; } }
+  var cs = document.getElementById('rp-crew-select');
+  for (var i = 0; i < cs.options.length; i++) { if (cs.options[i].text.indexOf(j.cr) === 0) { cs.selectedIndex = i; break; } }
+
+  var ci = document.getElementById('carouselInner');
+  ci.innerHTML = '';
+  j.p.forEach(function(ph, idx) {
+    var d = document.createElement('div');
+    d.className = 'rp-carousel-thumb';
+    d.onclick = function() { openLB(idx); };
+    d.innerHTML = '<img src="' + U + ph + '?w=200&h=150&fit=crop" alt="' + (idx + 1) + '"/><div class="carousel-zoom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>';
+    ci.appendChild(d);
+  });
+
+  document.getElementById('rightPanel').classList.add('open');
+  // Shift Leaflet zoom control
+  var zc = document.querySelector('.leaflet-top.leaflet-right');
+  if (zc) zc.classList.add('shifted');
+  pOpen = true;
+}
+
+function closePanel() {
+  cancelAnyEdit();
+  document.getElementById('rightPanel').classList.remove('open');
+  var zc = document.querySelector('.leaflet-top.leaflet-right');
+  if (zc) zc.classList.remove('shifted');
+  clearAllHighlights();
+  pOpen = false;
+  cId = null;
+}
+
+/* ── Tab switch ── */
+function switchTab(btn, mode) {
+  document.querySelectorAll('.rp-tab').forEach(function(t) { t.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('rp-tech-select').style.display = mode === 'individual' ? '' : 'none';
+  document.getElementById('rp-crew-select').style.display = mode === 'crew' ? '' : 'none';
+}
+
+/* ══════════════════════════════════════════
+   INLINE EDITING (Time, Duration, Priority, Notes)
+   ══════════════════════════════════════════ */
+
+var editingField = null; // Track which field is being edited
+
+// ── Priority: click to cycle Normal → High → Urgent → Normal ──
+function cyclePriority() {
+  if (!cId) return;
+  var j = J[cId];
+  var cycle = ['Normal', 'High', 'Urgent'];
+  var classes = ['badge-normal', 'badge-high', 'badge-urgent'];
+  var bgs = ['#dbeafe', '#fef3c7', '#fee2e2'];
+  var colors = ['#1d4ed8', '#92400e', '#dc2626'];
+
+  var idx = cycle.indexOf(j.pr);
+  var next = (idx + 1) % cycle.length;
+
+  j.pr = cycle[next];
+  j.pc = classes[next];
+  j.prBg = bgs[next];
+  j.prColor = colors[next];
+
+  var el = document.getElementById('rp-priority');
+  el.textContent = j.pr;
+  el.className = 'rp-badge editable ' + j.pc;
+  el.classList.add('save-flash');
+  setTimeout(function() { el.classList.remove('save-flash'); }, 800);
+}
+
+// ── Time: click to show time picker ──
+function editTime() {
+  if (!cId || editingField === 'time') return;
+  cancelAnyEdit();
+  editingField = 'time';
+  var j = J[cId];
+  var row = document.getElementById('rp-date').parentNode;
+  var span = document.getElementById('rp-date');
+  var hint = row.querySelector('.edit-hint');
+
+  // Parse current time for input default (e.g. "7:00 AM" → "07:00")
+  var timeVal = parseTimeTo24(j.tm);
+
+  span.style.display = 'none';
+  if (hint) hint.style.display = 'none';
+  row.onclick = null; // Disable row click while editing
+
+  var editDiv = document.createElement('div');
+  editDiv.className = 'rp-inline-time-row';
+  editDiv.id = 'edit-time-container';
+  editDiv.innerHTML = '<input type="time" class="rp-inline-input" id="edit-time-input" value="' + timeVal + '">' +
+    '<button class="save-btn" onclick="saveTime()">Save</button>' +
+    '<button class="cancel-btn" onclick="cancelAnyEdit()">Cancel</button>';
+  editDiv.onclick = function(e) { e.stopPropagation(); };
+  row.appendChild(editDiv);
+
+  document.getElementById('edit-time-input').focus();
+}
+
+function saveTime() {
+  if (!cId) return;
+  var input = document.getElementById('edit-time-input');
+  if (!input) return;
+  var val = input.value; // "14:30" format
+  if (!val) { cancelAnyEdit(); return; }
+
+  var j = J[cId];
+  var friendly = formatTime12(val);
+  j.tm = friendly;
+
+  // Update the date string too
+  var datePart = j.dt.split(' at ')[0] || j.dt.split(' — ')[0];
+  if (j.dt.indexOf('TBD') !== -1) {
+    j.dt = datePart.replace(' — Time TBD', '') + ' at ' + friendly;
+  } else {
+    j.dt = datePart + ' at ' + friendly;
+  }
+
+  cancelAnyEdit();
+  document.getElementById('rp-date').textContent = j.dt;
+
+  // Flash to confirm save
+  var row = document.getElementById('rp-date').parentNode;
+  row.classList.add('save-flash');
+  setTimeout(function() { row.classList.remove('save-flash'); }, 800);
+
+  // Update sidebar time
+  var sideJob = document.querySelector('.sidebar-job[data-job="' + cId + '"] .sidebar-job-time');
+  if (sideJob) sideJob.textContent = friendly.replace(' AM', '').replace(' PM', '');
+}
+
+// ── Duration: click to edit ──
+function editDuration() {
+  if (!cId || editingField === 'duration') return;
+  cancelAnyEdit();
+  editingField = 'duration';
+  var j = J[cId];
+  var row = document.getElementById('rp-duration').parentNode;
+  var span = document.getElementById('rp-duration');
+  var hint = row.querySelector('.edit-hint');
+
+  // Parse current duration (e.g. "90 minutes" → 90)
+  var mins = parseInt(j.du) || 60;
+
+  span.style.display = 'none';
+  if (hint) hint.style.display = 'none';
+  row.onclick = null;
+
+  var editDiv = document.createElement('div');
+  editDiv.className = 'rp-inline-time-row';
+  editDiv.id = 'edit-duration-container';
+  editDiv.innerHTML = '<input type="number" class="rp-inline-input" id="edit-duration-input" value="' + mins + '" min="15" max="480" step="15" placeholder="Minutes">' +
+    '<span style="font-size:11px;color:#6b7280;white-space:nowrap">min</span>' +
+    '<button class="save-btn" onclick="saveDuration()">Save</button>' +
+    '<button class="cancel-btn" onclick="cancelAnyEdit()">Cancel</button>';
+  editDiv.onclick = function(e) { e.stopPropagation(); };
+  row.appendChild(editDiv);
+
+  document.getElementById('edit-duration-input').focus();
+  document.getElementById('edit-duration-input').select();
+}
+
+function saveDuration() {
+  if (!cId) return;
+  var input = document.getElementById('edit-duration-input');
+  if (!input) return;
+  var mins = parseInt(input.value);
+  if (!mins || mins < 1) { cancelAnyEdit(); return; }
+
+  var j = J[cId];
+  j.du = mins + ' minutes';
+  j.duShort = mins + ' min';
+
+  cancelAnyEdit();
+  document.getElementById('rp-duration').textContent = j.du;
+
+  var row = document.getElementById('rp-duration').parentNode;
+  row.classList.add('save-flash');
+  setTimeout(function() { row.classList.remove('save-flash'); }, 800);
+}
+
+// ── Notes: click to edit as textarea ──
+function editNotes() {
+  if (!cId || editingField === 'notes') return;
+  cancelAnyEdit();
+  editingField = 'notes';
+  var j = J[cId];
+  var row = document.getElementById('rp-notes').parentNode;
+  var span = document.getElementById('rp-notes');
+  var hint = row.querySelector('.edit-hint');
+
+  span.style.display = 'none';
+  if (hint) hint.style.display = 'none';
+  row.onclick = null;
+
+  var editDiv = document.createElement('div');
+  editDiv.style.cssText = 'flex:1;display:flex;flex-direction:column;gap:6px';
+  editDiv.id = 'edit-notes-container';
+  editDiv.innerHTML = '<textarea class="rp-inline-input" id="edit-notes-input" rows="3">' + j.n + '</textarea>' +
+    '<div style="display:flex;gap:6px;justify-content:flex-end">' +
+    '<button class="cancel-btn" onclick="cancelAnyEdit()" style="padding:5px 8px;background:#f3f4f6;color:#6b7280;border:none;border-radius:5px;font-size:11px;cursor:pointer">Cancel</button>' +
+    '<button class="save-btn" onclick="saveNotes()" style="padding:5px 10px;background:#2563eb;color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer">Save</button>' +
+    '</div>';
+  editDiv.onclick = function(e) { e.stopPropagation(); };
+  row.appendChild(editDiv);
+
+  var ta = document.getElementById('edit-notes-input');
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+
+function saveNotes() {
+  if (!cId) return;
+  var input = document.getElementById('edit-notes-input');
+  if (!input) return;
+
+  var j = J[cId];
+  j.n = input.value;
+
+  cancelAnyEdit();
+  document.getElementById('rp-notes').textContent = j.n;
+
+  var row = document.getElementById('rp-notes').parentNode;
+  row.classList.add('save-flash');
+  setTimeout(function() { row.classList.remove('save-flash'); }, 800);
+}
+
+// ── Cancel any open inline edit ──
+function cancelAnyEdit() {
+  ['edit-time-container', 'edit-duration-container', 'edit-notes-container'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.remove();
+  });
+
+  // Restore spans and hints
+  var dateSpan = document.getElementById('rp-date');
+  if (dateSpan) dateSpan.style.display = '';
+  var durSpan = document.getElementById('rp-duration');
+  if (durSpan) durSpan.style.display = '';
+  var notesSpan = document.getElementById('rp-notes');
+  if (notesSpan) notesSpan.style.display = '';
+
+  // Restore hints
+  document.querySelectorAll('.rp-info-row.editable .edit-hint').forEach(function(h) { h.style.display = ''; });
+
+  // Re-attach onclick
+  document.querySelectorAll('.rp-info-row.editable').forEach(function(row) {
+    if (row.querySelector('#rp-date')) row.onclick = function() { editTime(); };
+    if (row.querySelector('#rp-duration')) row.onclick = function() { editDuration(); };
+    if (row.querySelector('#rp-notes')) row.onclick = function() { editNotes(); };
+  });
+
+  editingField = null;
+}
+
+// ── Helper: parse "7:00 AM" → "07:00" ──
+function parseTimeTo24(str) {
+  if (!str || str === 'TBD') return '09:00';
+  var match = str.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (!match) return '09:00';
+  var h = parseInt(match[1]);
+  var m = match[2];
+  var ampm = match[3].toUpperCase();
+  if (ampm === 'PM' && h < 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  return (h < 10 ? '0' : '') + h + ':' + m;
+}
+
+// ── Helper: "14:30" → "2:30 PM" ──
+function formatTime12(str) {
+  var parts = str.split(':');
+  var h = parseInt(parts[0]);
+  var m = parts[1];
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  if (h > 12) h -= 12;
+  if (h === 0) h = 12;
+  return h + ':' + m + ' ' + ampm;
+}
+
+/* ── Lightbox ── */
+function openLB(i) { cPhoto = i; document.getElementById('lb-img').src = cPhotos[i]; document.getElementById('lb-counter').textContent = (i + 1) + ' / ' + cPhotos.length; document.getElementById('lightbox').classList.add('open'); }
+function closeLB() { document.getElementById('lightbox').classList.remove('open'); }
+function navLB(d) { cPhoto = (cPhoto + d + cPhotos.length) % cPhotos.length; document.getElementById('lb-img').src = cPhotos[cPhoto]; document.getElementById('lb-counter').textContent = (cPhoto + 1) + ' / ' + cPhotos.length; }
+
+/* ── Map click dismiss ── */
+map.on('click', function(e) {
+  // Only dismiss the hover preview card, never close the detail panel
+  if (cardOpen) { hideCardNow(); clearAllHighlights(); if (pOpen) highlightJob(cId); }
+});
+
+/* ══════════════════════════════════════════
+   QUICK ACTIONS (Navigate, Call, Email)
+   ══════════════════════════════════════════ */
+
+// Navigation state
+var navRouteLayers = [];
+var navMarkers = [];
+var navJobId = null;
+var navCrewKey = null;
+var navOptimized = false;
+
+async function navigateToJob(id, optimizedOrder) {
+  var j = J[id];
+  if (!j) return;
+
+  // Clear map layers but keep panel state if just recalculating
+  navRouteLayers.forEach(function(l) { map.removeLayer(l); });
+  navRouteLayers = [];
+  navMarkers.forEach(function(m) { map.removeLayer(m); });
+  navMarkers = [];
+
+  // Find which crew this job belongs to
+  var crewKey = null;
+  var crewJobs = [];
+  Object.keys(crewDefs).forEach(function(k) {
+    if (crewDefs[k].jobs.indexOf(id) !== -1) {
+      crewKey = k;
+      crewJobs = optimizedOrder || crewDefs[k].jobs.slice();
+    }
+  });
+
+  if (!crewKey) { crewJobs = [id]; }
+  navCrewKey = crewKey;
+
+  // Build waypoints
+  var waypoints = [];
+
+  // Include start address if toggle is ON and crew has one
+  if (includeStartAddress && crewKey && crewDefs[crewKey].start) {
+    var s = crewDefs[crewKey].start;
+    waypoints.push({ lat: s.lat, lng: s.lng, label: s.label, id: '__start', addr: s.addr, time: '' });
+  }
+
+  crewJobs.forEach(function(jid) {
+    var jj = J[jid];
+    waypoints.push({ lat: jj.lat, lng: jj.lng, label: jj.t, id: jid, addr: jj.aShort, time: jj.tm });
+  });
+
+  // If only 1 waypoint (no start, 1 job), add office
+  if (waypoints.length < 2) {
+    waypoints.unshift({ lat: officeLocation.lat, lng: officeLocation.lng, label: 'Office', id: '__start', addr: 'HQ', time: '' });
+  }
+
+  // Show loading
+  document.getElementById('routeLoading').classList.add('open');
+
+  // Build OSRM URL
+  var coordStr = waypoints.map(function(w) { return w.lng + ',' + w.lat; }).join(';');
+  var url = 'https://router.project-osrm.org/route/v1/driving/' + coordStr + '?overview=full&geometries=geojson&steps=false';
+
+  try {
+    var resp = await fetch(url);
+    var data = await resp.json();
+
+    if (data.code !== 'Ok' || !data.routes || !data.routes.length) {
+      alert('Could not calculate route.');
+      document.getElementById('routeLoading').classList.remove('open');
+      return;
+    }
+
+    var route = data.routes[0];
+    var geojsonCoords = route.geometry.coordinates;
+    var leafletCoords = geojsonCoords.map(function(c) { return [c[1], c[0]]; });
+    var crewColor = crewKey ? crewDefs[crewKey].color : '#2563eb';
+
+    // Draw route
+    var polyGlow = L.polyline(leafletCoords, { color: crewColor, weight: 10, opacity: 0.2, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+    navRouteLayers.push(polyGlow);
+    var polyMain = L.polyline(leafletCoords, { color: crewColor, weight: 5, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+    navRouteLayers.push(polyMain);
+
+    // Start marker if start address included
+    if (includeStartAddress && waypoints[0].id === '__start') {
+      var startIcon = L.divIcon({
+        className: '',
+        html: '<div class="start-marker"><div class="start-marker-inner"></div></div>',
+        iconSize: [24, 24], iconAnchor: [12, 12]
+      });
+      var sm = L.marker([waypoints[0].lat, waypoints[0].lng], { icon: startIcon, zIndexOffset: -100 }).addTo(map);
+      sm.bindTooltip(waypoints[0].label, { direction: 'top', offset: [0, -14] });
+      navMarkers.push(sm);
+    }
+
+    // Drive time labels on map
+    var legs = route.legs;
+    var totalDur = route.duration;
+    var totalDist = route.distance;
+
+    for (var i = 0; i < legs.length; i++) {
+      var leg = legs[i];
+      var durText = formatDuration(leg.duration);
+      var distText = formatDistance(leg.distance);
+      var fromWp = waypoints[i];
+      var toWp = waypoints[i + 1];
+      var midLat = (fromWp.lat + toWp.lat) / 2;
+      var midLng = (fromWp.lng + toWp.lng) / 2;
+
+      var timeIcon = L.divIcon({
+        className: '',
+        html: '<div class="drive-time-label" style="border-left-color:' + crewColor + '"><span class="dtl-time">' + durText + '</span><span class="dtl-dist"> &middot; ' + distText + '</span></div>',
+        iconSize: [0, 0], iconAnchor: [0, 12]
+      });
+      var tm = L.marker([midLat, midLng], { icon: timeIcon, interactive: true, zIndexOffset: 500 }).addTo(map);
+      tm.bindTooltip(fromWp.label + ' \u2192 ' + toWp.label, { direction: 'top', offset: [0, -8] });
+      navMarkers.push(tm);
+    }
+
+    // ── Build leg breakdown in nav panel ──
+    navJobId = id;
+    var crewName = crewKey ? crewDefs[crewKey].name + ' \u2014 ' + crewDefs[crewKey].tech : 'Route';
+
+    document.getElementById('navIcon').style.background = crewColor;
+    document.getElementById('navTitle').innerHTML = crewName + ' Route' + (navOptimized ? '<span class="nav-optimized-badge">OPTIMIZED</span>' : '');
+    document.getElementById('navTime').textContent = formatDuration(totalDur);
+    document.getElementById('navDist').textContent = formatDistance(totalDist);
+    document.getElementById('navAddr').textContent = waypoints.length + ' stops';
+
+    // Update toggle label
+    if (crewKey && crewDefs[crewKey].start) {
+      document.getElementById('startToggleLabel').textContent = includeStartAddress
+        ? crewDefs[crewKey].start.label + ' (start)'
+        : 'Include start address';
+    }
+    document.getElementById('startToggle').className = 'nav-toggle-switch' + (includeStartAddress ? ' on' : '');
+
+    // Build leg rows
+    var legsHtml = '';
+    for (var i = 0; i < legs.length; i++) {
+      var fromWp2 = waypoints[i];
+      var toWp2 = waypoints[i + 1];
+      var legDur = formatDuration(legs[i].duration);
+      var legDist = formatDistance(legs[i].distance);
+      var fromAddr = (fromWp2.id === '__start') ? fromWp2.addr : J[fromWp2.id].a;
+      var toAddr = (toWp2.id === '__start') ? toWp2.addr : J[toWp2.id].a;
+
+      legsHtml += '<div class="nav-leg">';
+      legsHtml += '<div class="nav-leg-num" style="background:' + crewColor + '">' + (i + 1) + '</div>';
+      legsHtml += '<div class="nav-leg-route">';
+      legsHtml += '<div class="nav-leg-from-to">' + fromWp2.label + ' \u2192 ' + toWp2.label + '</div>';
+      legsHtml += '<div class="nav-leg-addrs">' + fromAddr + '</div>';
+      legsHtml += '</div>';
+      legsHtml += '<div class="nav-leg-time"><div class="nav-leg-duration">' + legDur + '</div><div class="nav-leg-distance">' + legDist + '</div></div>';
+      legsHtml += '</div>';
+    }
+
+    document.getElementById('navLegs').innerHTML = legsHtml;
+    document.getElementById('navPanel').classList.add('open');
+    // Don't auto-zoom - keep map where the user has it
+
+  } catch (err) {
+    console.error('Navigation error:', err);
+    alert('Failed to calculate route.');
+  }
+
+  document.getElementById('routeLoading').classList.remove('open');
+}
+
+/* ── Toggle start address on/off ── */
+function toggleStartAddress() {
+  includeStartAddress = !includeStartAddress;
+  document.getElementById('startToggle').className = 'nav-toggle-switch' + (includeStartAddress ? ' on' : '');
+  // Recalculate route with same job
+  if (navJobId) {
+    navOptimized = false;
+    navigateToJob(navJobId);
+  }
+}
+
+/* ── Optimize route order (OSRM /trip endpoint = TSP solver) ── */
+async function optimizeRoute() {
+  if (!navJobId || !navCrewKey) return;
+
+  var crew = crewDefs[navCrewKey];
+  if (!crew || crew.jobs.length < 3) {
+    // Nothing to optimize with less than 3 jobs
+    alert('Need at least 3 stops to optimize.');
+    return;
+  }
+
+  document.getElementById('routeLoading').classList.add('open');
+
+  // Build coords for /trip endpoint
+  var coords = [];
+  // If including start, pin it as first
+  if (includeStartAddress && crew.start) {
+    coords.push(crew.start.lng + ',' + crew.start.lat);
+  }
+  crew.jobs.forEach(function(jid) {
+    var jj = J[jid];
+    coords.push(jj.lng + ',' + jj.lat);
+  });
+
+  var url = 'https://router.project-osrm.org/trip/v1/driving/' + coords.join(';') + '?source=first&roundtrip=false&geometries=geojson';
+
+  try {
+    var resp = await fetch(url);
+    var data = await resp.json();
+
+    if (data.code !== 'Ok' || !data.waypoints) {
+      alert('Could not optimize route.');
+      document.getElementById('routeLoading').classList.remove('open');
+      return;
+    }
+
+    // Get optimized order from waypoint_index
+    var wpIndices = data.waypoints.map(function(wp) { return wp.waypoint_index; });
+
+    // Map indices back to job IDs (skip start address index if included)
+    var startOffset = (includeStartAddress && crew.start) ? 1 : 0;
+    var optimizedJobs = [];
+
+    // Build ordered pairs: [index, jobId]
+    var pairs = [];
+    for (var i = startOffset; i < wpIndices.length; i++) {
+      pairs.push({ idx: wpIndices[i], jobId: crew.jobs[i - startOffset] });
+    }
+    pairs.sort(function(a, b) { return a.idx - b.idx; });
+    optimizedJobs = pairs.map(function(p) { return p.jobId; });
+
+    navOptimized = true;
+    navigateToJob(navJobId, optimizedJobs);
+
+  } catch (err) {
+    console.error('Optimize error:', err);
+    alert('Failed to optimize route.');
+  }
+
+  document.getElementById('routeLoading').classList.remove('open');
+}
+
+function clearNavigation(silent) {
+  navRouteLayers.forEach(function(l) { map.removeLayer(l); });
+  navRouteLayers = [];
+  navMarkers.forEach(function(m) { map.removeLayer(m); });
+  navMarkers = [];
+  document.getElementById('navPanel').classList.remove('open');
+  navJobId = null;
+  navCrewKey = null;
+  navOptimized = false;
+}
+
+function openInGoogleMaps() {
+  if (!navJobId) return;
+  // Build Google Maps directions URL with all stops for this crew
+  var j = J[navJobId];
+  if (!j) return;
+  var crewKey = null;
+  Object.keys(crewDefs).forEach(function(k) {
+    if (crewDefs[k].jobs.indexOf(navJobId) !== -1) crewKey = k;
+  });
+  if (crewKey) {
+    var jobs = crewDefs[crewKey].jobs;
+    var dest = J[jobs[jobs.length - 1]];
+    var gmUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + dest.lat + ',' + dest.lng;
+    if (jobs.length > 1) {
+      var wps = jobs.slice(0, -1).map(function(jid) { var jj = J[jid]; return jj.lat + ',' + jj.lng; }).join('|');
+      gmUrl += '&waypoints=' + wps;
+    }
+    window.open(gmUrl, '_blank');
+  } else {
+    window.open('https://www.google.com/maps/dir/?api=1&destination=' + j.lat + ',' + j.lng, '_blank');
+  }
+}
+
+function callJob(id) {
+  var j = J[id];
+  if (!j) return;
+  // Extract digits for tel: link
+  var digits = j.ph.replace(/\D/g, '');
+  window.open('tel:' + digits);
+}
+
+function emailJob(id) {
+  var j = J[id];
+  if (!j) return;
+  window.open('mailto:?subject=' + encodeURIComponent('Re: ' + j.t) + '&body=' + encodeURIComponent('Regarding job: ' + j.t + '\nAddress: ' + j.a + '\nScheduled: ' + j.dt));
+}
+
+/* ══════════════════════════════════════════
+   ROUTE / DIRECTIONS FEATURE
+   ══════════════════════════════════════════ */
+
+// Company office (starting point for all crews)
+var officeLocation = { lat: 33.480, lng: -111.950, label: 'Office — ServicePro HQ' };
+
+// Crew route definitions (job order = scheduled time order)
+var crewDefs = {
+  truck1: {
+    name: 'Truck 1',
+    tech: 'Adam R.',
+    color: '#2563eb',
+    jobs: ['ac', 'duct', 'filter', 'thermostat', 'insulation'],
+    start: { lat: 33.452, lng: -111.945, label: 'Adam\u2019s Home', addr: '1820 E Apache Blvd, Tempe, AZ 85281' }
+  },
+  truck2: {
+    name: 'Truck 2',
+    tech: 'John S., Sammy T.',
+    color: '#16a34a',
+    jobs: ['electrical', 'window'],
+    start: { lat: 33.480, lng: -111.950, label: 'ServicePro Office', addr: '950 S Mill Ave, Tempe, AZ 85281' }
+  }
+};
+
+// Start address toggle state
+var includeStartAddress = true;
+
+// Route state
+var activeRouteLayers = [];    // Leaflet polylines
+var activeTimeMarkers = [];    // Leaflet drive-time label markers
+var activeStartMarkers = [];   // Office start markers
+var activeCrewRoutes = {};     // { truck1: true, truck2: true }
+var routeMenuOpen = false;
+
+function toggleRouteMenu() {
+  routeMenuOpen = !routeMenuOpen;
+  document.getElementById('routeMenu').classList.toggle('open', routeMenuOpen);
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  if (routeMenuOpen && !e.target.closest('.route-toggle')) {
+    routeMenuOpen = false;
+    document.getElementById('routeMenu').classList.remove('open');
+  }
+});
+
+function formatDuration(secs) {
+  var mins = Math.round(secs / 60);
+  if (mins < 60) return mins + ' min';
+  var h = Math.floor(mins / 60);
+  var m = mins % 60;
+  return h + 'h ' + (m > 0 ? m + 'm' : '');
+}
+
+function formatDistance(meters) {
+  var miles = meters / 1609.34;
+  return miles.toFixed(1) + ' mi';
+}
+
+function getMidpoint(coords, fraction) {
+  var idx = Math.floor(coords.length * fraction);
+  idx = Math.min(idx, coords.length - 1);
+  return coords[idx];
+}
+
+async function showCrewRoute(crewKey) {
+  var crew = crewDefs[crewKey];
+  if (!crew) return;
+
+  // If already showing this route, remove it
+  if (activeCrewRoutes[crewKey]) {
+    removeCrewRoute(crewKey);
+    return;
+  }
+
+  // Close menu
+  routeMenuOpen = false;
+  document.getElementById('routeMenu').classList.remove('open');
+
+  // Show loading
+  document.getElementById('routeLoading').classList.add('open');
+
+  // Build waypoints: Office -> Job1 -> Job2 -> ...
+  var waypoints = [officeLocation];
+  crew.jobs.forEach(function(jid) {
+    var j = J[jid];
+    waypoints.push({ lat: j.lat, lng: j.lng, label: j.t });
+  });
+
+  // Build OSRM URL (lng,lat format)
+  var coords = waypoints.map(function(w) { return w.lng + ',' + w.lat; }).join(';');
+  var url = 'https://router.project-osrm.org/route/v1/driving/' + coords + '?overview=full&geometries=geojson&steps=false';
+
+  try {
+    var resp = await fetch(url);
+    var data = await resp.json();
+
+    if (data.code !== 'Ok' || !data.routes || !data.routes.length) {
+      alert('Could not calculate route. Try again.');
+      document.getElementById('routeLoading').classList.remove('open');
+      return;
+    }
+
+    var route = data.routes[0];
+    var geojsonCoords = route.geometry.coordinates; // [lng, lat] pairs
+    var leafletCoords = geojsonCoords.map(function(c) { return [c[1], c[0]]; });
+
+    // Draw the route polyline
+    var polyline = L.polyline(leafletCoords, {
+      color: crew.color,
+      weight: 4,
+      opacity: 0.8,
+      dashArray: null,
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(map);
+
+    // Draw a wider transparent line for easier hovering
+    var polylineBg = L.polyline(leafletCoords, {
+      color: crew.color,
+      weight: 12,
+      opacity: 0.15,
+      lineCap: 'round',
+      lineJoin: 'round'
+    }).addTo(map);
+
+    // Store layers
+    if (!activeRouteLayers[crewKey]) activeRouteLayers[crewKey] = [];
+    activeRouteLayers[crewKey] = [polyline, polylineBg];
+
+    // Add start marker (office location)
+    var startIcon = L.divIcon({
+      className: '',
+      html: '<div class="start-marker"><div class="start-marker-inner"></div></div>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+    var startMarker = L.marker([officeLocation.lat, officeLocation.lng], { icon: startIcon, zIndexOffset: -100 }).addTo(map);
+    startMarker.bindTooltip('Office — Start', { direction: 'top', offset: [0, -14] });
+    if (!activeStartMarkers[crewKey]) activeStartMarkers[crewKey] = [];
+    activeStartMarkers[crewKey].push(startMarker);
+
+    // Add drive time labels between each leg
+    if (!activeTimeMarkers[crewKey]) activeTimeMarkers[crewKey] = [];
+    var legs = route.legs;
+    var cumCoordIdx = 0;
+
+    for (var i = 0; i < legs.length; i++) {
+      var leg = legs[i];
+      var durationText = formatDuration(leg.duration);
+      var distText = formatDistance(leg.distance);
+
+      // Find midpoint of this leg by estimating position
+      // Get the start/end waypoint and find the midpoint between them
+      var fromWp = waypoints[i];
+      var toWp = waypoints[i + 1];
+      var midLat = (fromWp.lat + toWp.lat) / 2;
+      var midLng = (fromWp.lng + toWp.lng) / 2;
+
+      var timeIcon = L.divIcon({
+        className: '',
+        html: '<div class="drive-time-label" style="border-left-color:' + crew.color + '"><span class="dtl-time">' + durationText + '</span><span class="dtl-dist"> &middot; ' + distText + '</span></div>',
+        iconSize: [0, 0],
+        iconAnchor: [0, 12]
+      });
+
+      var timeMarker = L.marker([midLat, midLng], { icon: timeIcon, interactive: true, zIndexOffset: 500 }).addTo(map);
+
+      // Tooltip showing from -> to
+      var fromLabel = i === 0 ? 'Office' : waypoints[i].label;
+      var toLabel = waypoints[i + 1].label;
+      timeMarker.bindTooltip(fromLabel + ' → ' + toLabel, { direction: 'top', offset: [0, -8] });
+
+      activeTimeMarkers[crewKey].push(timeMarker);
+    }
+
+    // Mark crew as active
+    activeCrewRoutes[crewKey] = true;
+
+    // Update UI
+    document.getElementById('rm-' + crewKey).classList.add('active');
+    document.getElementById('rm-clear').style.display = '';
+    document.getElementById('routeBtn').classList.add('active');
+
+    // Build and show route info bar
+    updateRouteInfoBar();
+
+    // Fit map to show the full route
+    // Don't auto-zoom - keep map where the user has it
+
+  } catch (err) {
+    console.error('Route error:', err);
+    alert('Failed to fetch route. Check your internet connection.');
+  }
+
+  document.getElementById('routeLoading').classList.remove('open');
+}
+
+function removeCrewRoute(crewKey) {
+  // Remove polylines
+  if (activeRouteLayers[crewKey]) {
+    activeRouteLayers[crewKey].forEach(function(layer) { map.removeLayer(layer); });
+    delete activeRouteLayers[crewKey];
+  }
+  // Remove time markers
+  if (activeTimeMarkers[crewKey]) {
+    activeTimeMarkers[crewKey].forEach(function(m) { map.removeLayer(m); });
+    delete activeTimeMarkers[crewKey];
+  }
+  // Remove start markers
+  if (activeStartMarkers[crewKey]) {
+    activeStartMarkers[crewKey].forEach(function(m) { map.removeLayer(m); });
+    delete activeStartMarkers[crewKey];
+  }
+  delete activeCrewRoutes[crewKey];
+
+  // Update UI
+  document.getElementById('rm-' + crewKey).classList.remove('active');
+
+  var anyActive = Object.keys(activeCrewRoutes).length > 0;
+  document.getElementById('rm-clear').style.display = anyActive ? '' : 'none';
+  document.getElementById('routeBtn').classList.toggle('active', anyActive);
+
+  updateRouteInfoBar();
+}
+
+function clearRoutes() {
+  Object.keys(activeCrewRoutes).forEach(function(k) { removeCrewRoute(k); });
+  routeMenuOpen = false;
+  document.getElementById('routeMenu').classList.remove('open');
+}
+
+function updateRouteInfoBar() {
+  var bar = document.getElementById('routeInfoBar');
+  var keys = Object.keys(activeCrewRoutes);
+  if (keys.length === 0) {
+    bar.classList.remove('open');
+    return;
+  }
+
+  var html = '';
+  keys.forEach(function(k) {
+    var crew = crewDefs[k];
+    var totalDuration = 0, totalDistance = 0;
+    // Sum up from the time markers (we can recalculate or store)
+    // For simplicity, just show crew info with stop count
+    html += '<div class="route-info-crew"><div class="ri-dot" style="background:' + crew.color + '"></div>' + crew.name + '</div>';
+    html += '<div class="route-info-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><strong>' + crew.jobs.length + '</strong> stops</div>';
+  });
+  html += '<button class="route-info-close" onclick="clearRoutes()" title="Clear routes">&#10005;</button>';
+
+  bar.innerHTML = html;
+  bar.classList.add('open');
+}
+
+/* ══════════════════════════════════════════
+   DRAG & DROP — Sidebar Job Reassignment
+   ══════════════════════════════════════════ */
+
+var draggedJobId = null;
+var draggedFromCrew = null;
+
+// ── Attach drag events to all sidebar jobs ──
+document.querySelectorAll('.sidebar-job[draggable="true"]').forEach(function(el) {
+  el.addEventListener('dragstart', handleDragStart);
+  el.addEventListener('dragend', handleDragEnd);
+  // Jobs are also drop targets (so you can drop anywhere in a crew section)
+  el.addEventListener('dragover', handleDragOver);
+  el.addEventListener('dragenter', handleJobDragEnter);
+  el.addEventListener('dragleave', handleJobDragLeave);
+  el.addEventListener('drop', handleJobDrop);
+});
+
+// ── Attach drop-zone events to all crew group headers ──
+document.querySelectorAll('.sidebar-group-header[data-crew]').forEach(function(el) {
+  el.addEventListener('dragover', handleDragOver);
+  el.addEventListener('dragenter', handleDragEnter);
+  el.addEventListener('dragleave', handleDragLeave);
+  el.addEventListener('drop', handleDrop);
+});
+
+function handleDragStart(e) {
+  draggedJobId = this.getAttribute('data-job');
+  draggedFromCrew = this.getAttribute('data-crew');
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', draggedJobId);
+}
+
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  // Clean up all drag-over highlights
+  document.querySelectorAll('.sidebar-group-header').forEach(function(h) {
+    h.classList.remove('drag-over', 'drag-over-green', 'drag-over-gray');
+  });
+  draggedJobId = null;
+  draggedFromCrew = null;
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragEnter(e) {
+  e.preventDefault();
+  var targetCrew = this.getAttribute('data-crew');
+  // Don't highlight if dropping on same crew
+  if (targetCrew === draggedFromCrew) return;
+  // Pick highlight color based on crew
+  var cls = 'drag-over';
+  if (targetCrew === 'unassigned') cls = 'drag-over-gray';
+  else if (targetCrew === 'truck2') cls = 'drag-over-green';
+  this.classList.add(cls);
+}
+
+function handleDragLeave(e) {
+  this.classList.remove('drag-over', 'drag-over-green', 'drag-over-gray');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over', 'drag-over-green', 'drag-over-gray');
+  var targetCrew = this.getAttribute('data-crew');
+  var jobId = e.dataTransfer.getData('text/plain');
+  if (!jobId || targetCrew === draggedFromCrew) return;
+  reassignJob(jobId, draggedFromCrew, targetCrew);
+}
+
+// ── Job-level drop handlers (drop on any job in a crew section) ──
+function handleJobDragEnter(e) {
+  e.preventDefault();
+  var targetCrew = this.getAttribute('data-crew');
+  if (targetCrew === draggedFromCrew) return;
+  // Highlight the crew header so user sees which crew they're dropping into
+  var header = document.getElementById('group-' + targetCrew);
+  if (header) {
+    var cls = 'drag-over';
+    if (targetCrew === 'unassigned') cls = 'drag-over-gray';
+    else if (targetCrew === 'truck2') cls = 'drag-over-green';
+    header.classList.add(cls);
+  }
+  this.style.background = '#f0f9ff';
+}
+
+function handleJobDragLeave(e) {
+  this.style.background = '';
+  // Only remove header highlight if we're truly leaving the crew zone
+  var targetCrew = this.getAttribute('data-crew');
+  var related = e.relatedTarget;
+  // Check if we're moving to another element in the same crew
+  if (related && related.closest && related.closest('[data-crew="' + targetCrew + '"]')) return;
+  var header = document.getElementById('group-' + targetCrew);
+  if (header) header.classList.remove('drag-over', 'drag-over-green', 'drag-over-gray');
+}
+
+function handleJobDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  this.style.background = '';
+  var targetCrew = this.getAttribute('data-crew');
+  var header = document.getElementById('group-' + targetCrew);
+  if (header) header.classList.remove('drag-over', 'drag-over-green', 'drag-over-gray');
+  var jobId = e.dataTransfer.getData('text/plain');
+  if (!jobId || targetCrew === draggedFromCrew) return;
+  reassignJob(jobId, draggedFromCrew, targetCrew);
+}
+
+function reassignJob(jobId, fromCrew, toCrew) {
+  var job = J[jobId];
+  if (!job) return;
+
+  // ── 1. Update crewDefs arrays ──
+  if (fromCrew !== 'unassigned' && crewDefs[fromCrew]) {
+    var idx = crewDefs[fromCrew].jobs.indexOf(jobId);
+    if (idx !== -1) crewDefs[fromCrew].jobs.splice(idx, 1);
+  }
+  if (toCrew !== 'unassigned' && crewDefs[toCrew]) {
+    crewDefs[toCrew].jobs.push(jobId);
+  }
+
+  // ── 2. Update job data ──
+  if (toCrew === 'unassigned') {
+    job.cr = 'Unassigned';
+    job.crBg = '#6b7280';
+    job.te = 'Unassigned';
+  } else {
+    var crew = crewDefs[toCrew];
+    job.cr = crew.name;
+    job.crBg = crew.color;
+    job.te = crew.tech;
+  }
+
+  // ── 3. Move sidebar DOM element ──
+  var jobEl = document.querySelector('.sidebar-job[data-job="' + jobId + '"]');
+  if (jobEl) {
+    jobEl.setAttribute('data-crew', toCrew);
+    // Find the last job in the target crew group, or the header if empty
+    var targetHeader = document.getElementById('group-' + toCrew);
+    if (targetHeader) {
+      // Find next sibling that isn't a job of this crew (insert before it)
+      var insertBefore = targetHeader.nextElementSibling;
+      while (insertBefore && insertBefore.classList.contains('sidebar-job') && insertBefore.getAttribute('data-crew') === toCrew) {
+        insertBefore = insertBefore.nextElementSibling;
+      }
+      jobEl.parentNode.insertBefore(jobEl, insertBefore);
+    }
+  }
+
+  // ── 4. Re-number jobs in both affected crews ──
+  renumberCrewJobs(fromCrew);
+  renumberCrewJobs(toCrew);
+
+  // ── 5. Update crew job counts in sidebar ──
+  updateCrewCount(fromCrew);
+  updateCrewCount(toCrew);
+
+  // ── 6. Update map pin ──
+  updateMapPin(jobId);
+
+  // ── 7. Update timeline block color ──
+  var block = document.querySelector('.job-block[data-job="' + jobId + '"]');
+  if (block) {
+    var newColor = toCrew === 'unassigned' ? '#6b7280' : crewDefs[toCrew].color;
+    block.style.background = newColor;
+  }
+
+  // ── 8. Update map legend ──
+  updateMapLegend();
+
+  // ── 9. Show toast notification ──
+  var toastMsg = job.t + ' → ' + (toCrew === 'unassigned' ? 'Unassigned' : crewDefs[toCrew].name);
+  showReassignToast(toastMsg);
+}
+
+function renumberCrewJobs(crewKey) {
+  var header = document.getElementById('group-' + crewKey);
+  if (!header) return;
+  var sibling = header.nextElementSibling;
+  var num = 1;
+  var crewColor = crewKey === 'unassigned' ? '#6b7280' : (crewDefs[crewKey] ? crewDefs[crewKey].color : '#6b7280');
+  while (sibling && sibling.classList.contains('sidebar-job') && sibling.getAttribute('data-crew') === crewKey) {
+    var numEl = sibling.querySelector('.sidebar-job-num');
+    if (numEl) {
+      numEl.textContent = crewKey === 'unassigned' ? '?' : num;
+      numEl.style.background = crewColor;
+    }
+    num++;
+    sibling = sibling.nextElementSibling;
+  }
+}
+
+function updateCrewCount(crewKey) {
+  var countEl = document.getElementById('count-' + crewKey);
+  if (!countEl) return;
+  if (crewKey === 'unassigned') {
+    var count = document.querySelectorAll('.sidebar-job[data-crew="unassigned"]').length;
+    countEl.textContent = count;
+  } else if (crewDefs[crewKey]) {
+    countEl.textContent = crewDefs[crewKey].jobs.length;
+  }
+}
+
+function updateMapPin(jobId) {
+  var job = J[jobId];
+  var oldMarker = markers[jobId];
+  if (!oldMarker) return;
+
+  // Remove old marker
+  map.removeLayer(oldMarker);
+
+  // Determine pin color — use status color for special statuses, otherwise crew color
+  var pinColor = job.crBg;
+
+  // Create new icon with updated color
+  var icon = L.divIcon({
+    className: 'map-pin',
+    html: '<svg class="pin-svg" viewBox="0 0 28 34"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="' + pinColor + '"/></svg><span class="pin-num">' + job.num + '</span><div class="pin-tip">' + job.t + ' — ' + job.cr + '</div>',
+    iconSize: [28, 34],
+    iconAnchor: [14, 34],
+    popupAnchor: [0, -34]
+  });
+
+  var newMarker = L.marker([job.lat, job.lng], { icon: icon }).addTo(map);
+  newMarker.on('mouseover', function() { showCard(jobId); });
+  newMarker.on('mouseout', function() { scheduleHideCard(); });
+  newMarker.on('click', function() { selectJob(jobId); });
+  markers[jobId] = newMarker;
+}
+
+function updateMapLegend() {
+  var truck1Count = crewDefs.truck1 ? crewDefs.truck1.jobs.length : 0;
+  var truck2Count = crewDefs.truck2 ? crewDefs.truck2.jobs.length : 0;
+  var unassignedCount = document.querySelectorAll('.sidebar-job[data-crew="unassigned"]').length;
+  var legend = document.getElementById('mapLegend');
+  legend.innerHTML = '<div class="legend-row"><div class="legend-color" style="background:#2563eb"></div>Truck 1 (' + truck1Count + ')</div>' +
+    '<div class="legend-row"><div class="legend-color" style="background:#16a34a"></div>Truck 2 (' + truck2Count + ')</div>' +
+    '<div class="legend-row"><div class="legend-color" style="background:#6b7280"></div>Unassigned (' + unassignedCount + ')</div>';
+}
+
+function showReassignToast(msg) {
+  var toast = document.getElementById('reassignToast');
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 2500);
+}
+
+/* ── Keyboard shortcuts ── */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('lightbox').classList.contains('open')) { closeLB(); return; }
+    if (routeMenuOpen) { routeMenuOpen = false; document.getElementById('routeMenu').classList.remove('open'); return; }
+    if (cardOpen) { hideCardNow(); clearAllHighlights(); return; }
+    if (pOpen) { closePanel(); return; }
+  }
+  if (document.getElementById('lightbox').classList.contains('open')) {
+    if (e.key === 'ArrowLeft') navLB(-1);
+    if (e.key === 'ArrowRight') navLB(1);
+  }
+});
+</script>
+</body>
+</html>

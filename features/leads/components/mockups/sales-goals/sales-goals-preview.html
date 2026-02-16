@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Goals Mockups Preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #1e293b;
+      padding: 16px 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 100;
+      overflow-x: auto;
+    }
+    .nav a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      background: #334155;
+      white-space: nowrap;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .nav a:hover { background: #475569; }
+    .nav a.active { background: #3b82f6; }
+
+    /* Layout */
+    .container { max-width: 1400px; margin: 0 auto; padding: 80px 24px 24px; }
+    .mockup {
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 48px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .mockup-header {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      padding: 24px;
+    }
+    .mockup-header h2 { font-size: 24px; margin-bottom: 4px; }
+    .mockup-header p { opacity: 0.9; font-size: 14px; }
+    .mockup-content { padding: 24px; }
+
+    /* Cards */
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .card-header {
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    /* Grid */
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* KPI Cards */
+    .kpi-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .kpi-card .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+    .kpi-card .value { font-size: 28px; font-weight: 700; }
+    .kpi-card .label { font-size: 14px; color: #64748b; }
+    .kpi-card .progress-bar {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    .kpi-card .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+
+    /* Colors */
+    .bg-blue { background: #dbeafe; }
+    .bg-green { background: #dcfce7; }
+    .bg-amber { background: #fef3c7; }
+    .bg-red { background: #fee2e2; }
+    .bg-purple { background: #f3e8ff; }
+    .text-blue { color: #2563eb; }
+    .text-green { color: #16a34a; }
+    .text-amber { color: #d97706; }
+    .text-red { color: #dc2626; }
+
+    /* Flex */
+    .flex { display: flex; }
+    .flex-between { justify-content: space-between; }
+    .flex-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .gap-4 { gap: 16px; }
+
+    /* Button */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-outline { background: white; border: 1px solid #e2e8f0; color: #374151; }
+    .btn-outline:hover { background: #f8fafc; }
+
+    /* Funnel */
+    .funnel-stage {
+      text-align: center;
+      padding: 12px;
+      margin: 4px auto;
+      border-radius: 4px;
+      color: white;
+      font-weight: 500;
+    }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; }
+
+    /* Leaderboard */
+    .leaderboard-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .leaderboard-row:nth-child(1) { background: linear-gradient(90deg, #fef3c7 0%, transparent 100%); }
+    .leaderboard-row:nth-child(2) { background: #f8fafc; }
+    .leaderboard-row:nth-child(3) { background: #f8fafc; }
+    .rank-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+    .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: white; }
+    .rank-3 { background: linear-gradient(135deg, #d97706, #b45309); color: white; }
+
+    /* Avatar */
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+    }
+    .avatar-lg {
+      width: 56px;
+      height: 56px;
+      font-size: 18px;
+    }
+
+    /* Chart bars */
+    .chart-container { display: flex; align-items: flex-end; gap: 12px; height: 200px; padding: 16px 0; }
+    .chart-bar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+    }
+    .chart-bar .bar {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+    }
+    .chart-bar .bar-fill {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      transition: height 0.5s ease;
+    }
+    .chart-bar .label { font-size: 12px; color: #64748b; margin-top: 8px; }
+    .chart-bar .value { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+
+    /* Circular progress */
+    .circular-progress {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+    .circular-progress svg {
+      transform: rotate(-90deg);
+    }
+    .circular-progress .center-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .circular-progress .percent { font-size: 28px; font-weight: 700; }
+    .circular-progress .sublabel { font-size: 12px; color: #64748b; }
+
+    /* Daily calendar */
+    .daily-grid { display: flex; gap: 4px; flex-wrap: wrap; }
+    .daily-cell {
+      width: 24px;
+      height: 32px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .daily-cell:hover { opacity: 0.8; }
+
+    /* Action items grid */
+    .action-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .action-item:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .action-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+    }
+
+    /* Setup cards */
+    .setup-option {
+      flex: 1;
+      padding: 20px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .setup-option:hover { border-color: #3b82f6; }
+    .setup-option.active { border-color: #3b82f6; background: #eff6ff; }
+    .setup-option .icon { font-size: 24px; margin-bottom: 8px; }
+    .setup-option .title { font-weight: 600; margin-bottom: 4px; }
+    .setup-option .desc { font-size: 13px; color: #64748b; }
+
+    /* Input */
+    .input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+    /* Salesperson list */
+    .person-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .person-item:hover { background: #f8fafc; }
+    .person-item.active { border-color: #3b82f6; background: #eff6ff; }
+
+    /* Trend indicator */
+    .trend { display: flex; align-items: center; gap: 4px; font-size: 14px; }
+    .trend-up { color: #16a34a; }
+    .trend-down { color: #dc2626; }
+
+    /* Insights */
+    .insight-card {
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid;
+    }
+    .insight-card.green { background: #f0fdf4; border-color: #bbf7d0; }
+    .insight-card.amber { background: #fffbeb; border-color: #fde68a; }
+    .insight-card.blue { background: #eff6ff; border-color: #bfdbfe; }
+    .insight-card .title { font-weight: 600; margin-bottom: 4px; }
+    .insight-card p { font-size: 13px; }
+
+    /* Section spacing */
+    .section { margin-bottom: 24px; }
+    .section-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+
+    /* Utilities */
+    .text-sm { font-size: 14px; }
+    .text-xs { font-size: 12px; }
+    .text-muted { color: #64748b; }
+    .font-bold { font-weight: 700; }
+    .font-semibold { font-weight: 600; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-4 { margin-bottom: 16px; }
+    .mt-4 { margin-top: 16px; }
+    .p-4 { padding: 16px; }
+    .rounded { border-radius: 8px; }
+    .border { border: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="#dashboard" class="active">1. Dashboard</a>
+    <a href="#setup">2. Setup Goals</a>
+    <a href="#salesperson">3. Salesperson View</a>
+    <a href="#leaderboard">4. Leaderboard</a>
+    <a href="#trends">5. Trends</a>
+  </nav>
+
+  <div class="container">
+
+    <!-- ========================================== -->
+    <!-- MOCKUP 1: SALES GOALS DASHBOARD -->
+    <!-- ========================================== -->
+    <div id="dashboard" class="mockup">
+      <div class="mockup-header">
+        <h2>1. Sales Goals Dashboard</h2>
+        <p>Main view for managers - KPIs, action items, funnel, daily progress</p>
+      </div>
+      <div class="mockup-content">
+
+        <!-- Header -->
+        <div class="flex flex-between flex-center mb-4">
+          <div>
+            <h3 style="font-size: 24px; font-weight: 700;">Sales Goals Dashboard</h3>
+            <p class="text-muted">February 2026 &bull; 26 days remaining</p>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-outline">📅 February 2026</button>
+            <button class="btn btn-outline">⬇️ Export</button>
+            <button class="btn btn-primary">🎯 Setup Goals</button>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-4 section">
+          <div class="kpi-card">
+            <div class="flex flex-between flex-center">
+              <div class="icon bg-green">💵</div>
+              <span class="badge badge-red">Behind</span>
+            </div>
+            <div class="value text-red">$28,500</div>
+            <div class="label">/ $100,000 Booked Revenue</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 28.5%; background: #ef4444;"></div>
+            </div>
+            <div class="text-xs text-muted mt-4" style="text-align: right;">29% of goal</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="flex flex-between flex-center">
+              <div class="icon bg-blue">🎯</div>
+              <span class="badge badge-green">On Track</span>
+            </div>
+            <div class="value text-green">42%</div>
+            <div class="label">/ 35% Booking Rate</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 100%; background: #22c55e;"></div>
+            </div>
+            <div class="text-xs text-muted mt-4" style="text-align: right;">120% of goal</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="flex flex-between flex-center">
+              <div class="icon bg-purple">📄</div>
+              <span class="badge badge-amber">Close</span>
+            </div>
+            <div class="value text-amber">75%</div>
+            <div class="label">/ 80% Sent Estimate Rate</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 94%; background: #f59e0b;"></div>
+            </div>
+            <div class="text-xs text-muted mt-4" style="text-align: right;">94% of goal</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="flex flex-between flex-center">
+              <div class="icon bg-amber">📈</div>
+              <span class="badge badge-amber">Close</span>
+            </div>
+            <div class="value text-amber">22%</div>
+            <div class="label">/ 25% Closed Rate</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 88%; background: #f59e0b;"></div>
+            </div>
+            <div class="text-xs text-muted mt-4" style="text-align: right;">88% of goal</div>
+          </div>
+        </div>
+
+        <!-- Action Items & Funnel -->
+        <div class="grid grid-2 section">
+          <div class="card">
+            <div class="card-header">Action Items</div>
+            <div class="grid grid-2">
+              <div class="action-item">
+                <div class="action-icon" style="background: #3b82f6;">👥</div>
+                <div>
+                  <div style="font-size: 24px; font-weight: 700;">12</div>
+                  <div class="text-muted text-sm">New Leads</div>
+                </div>
+              </div>
+              <div class="action-item">
+                <div class="action-icon" style="background: #f59e0b;">⏰</div>
+                <div>
+                  <div style="font-size: 24px; font-weight: 700;">8</div>
+                  <div class="text-muted text-sm">Follow-ups Due</div>
+                </div>
+              </div>
+              <div class="action-item">
+                <div class="action-icon" style="background: #ef4444;">⚠️</div>
+                <div>
+                  <div style="font-size: 24px; font-weight: 700;">3</div>
+                  <div class="text-muted text-sm">Stale Opportunities</div>
+                </div>
+              </div>
+              <div class="action-item">
+                <div class="action-icon" style="background: #22c55e;">✓</div>
+                <div>
+                  <div style="font-size: 24px; font-weight: 700;">5</div>
+                  <div class="text-muted text-sm">Estimates Accepted</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Sales Funnel</div>
+            <div style="padding: 12px 0;">
+              <div class="funnel-stage" style="width: 100%; background: #94a3b8;">Total Leads: 145</div>
+              <div class="funnel-stage" style="width: 70%; background: #3b82f6;">Qualified: 98</div>
+              <div class="funnel-stage" style="width: 50%; background: #8b5cf6;">Estimate Sent: 72</div>
+              <div class="funnel-stage" style="width: 30%; background: #22c55e;">Booked: 38</div>
+            </div>
+            <div class="flex flex-between mt-4 p-4" style="background: #f8fafc; border-radius: 8px;">
+              <span class="text-muted">Overall Conversion</span>
+              <span class="font-bold text-green">26%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily Progress -->
+        <div class="card">
+          <div class="card-header flex flex-between flex-center">
+            <span>Daily Progress</span>
+            <span class="badge badge-blue">Daily Target: $3,226</span>
+          </div>
+          <p class="text-muted text-sm mb-4">Revenue needed per day to hit monthly goal</p>
+          <div class="daily-grid">
+            <div class="daily-cell" style="background: #22c55e;" title="Day 1 - Hit"></div>
+            <div class="daily-cell" style="background: #ef4444;" title="Day 2 - Missed"></div>
+            <div class="daily-cell" style="background: #3b82f6; box-shadow: 0 0 0 2px #93c5fd;" title="Today"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+            <div class="daily-cell" style="background: #e2e8f0;"></div>
+          </div>
+          <div class="flex gap-4 mt-4 text-sm">
+            <div class="flex flex-center gap-2"><div style="width:12px;height:12px;background:#22c55e;border-radius:2px;"></div> Hit Target</div>
+            <div class="flex flex-center gap-2"><div style="width:12px;height:12px;background:#ef4444;border-radius:2px;"></div> Missed Target</div>
+            <div class="flex flex-center gap-2"><div style="width:12px;height:12px;background:#3b82f6;border-radius:2px;"></div> Today</div>
+            <div class="flex flex-center gap-2"><div style="width:12px;height:12px;background:#e2e8f0;border-radius:2px;"></div> Upcoming</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MOCKUP 2: SETUP GOALS -->
+    <!-- ========================================== -->
+    <div id="setup" class="mockup">
+      <div class="mockup-header">
+        <h2>2. Setup Sales Goals</h2>
+        <p>Where managers configure monthly/annual goals for salespeople</p>
+      </div>
+      <div class="mockup-content">
+
+        <!-- Header -->
+        <div class="flex flex-between flex-center mb-4">
+          <div>
+            <h3 style="font-size: 24px; font-weight: 700;">Setup Sales Goals</h3>
+            <p class="text-muted">Configure revenue and rate targets for your sales team</p>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-outline">📜 View History</button>
+            <button class="btn btn-primary">💾 Save Goals</button>
+          </div>
+        </div>
+
+        <!-- Assignment Type -->
+        <div class="card section">
+          <div class="card-header">Goal Assignment</div>
+          <div class="flex gap-4">
+            <div class="setup-option">
+              <div class="icon">👥</div>
+              <div class="title">All Salespeople</div>
+              <div class="desc">Same goals for everyone</div>
+            </div>
+            <div class="setup-option active">
+              <div class="icon">👤</div>
+              <div class="title">Individual</div>
+              <div class="desc">Custom goals per person</div>
+            </div>
+            <div class="setup-option">
+              <div class="icon">🎯</div>
+              <div class="title">By Team/Branch</div>
+              <div class="desc">Goals by team or branch</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main config area -->
+        <div class="grid" style="grid-template-columns: 280px 1fr; gap: 24px;">
+          <!-- Salesperson list -->
+          <div class="card">
+            <div class="card-header">Select Salesperson</div>
+            <div class="person-item active">
+              <div class="avatar">DM</div>
+              <div style="flex: 1;">
+                <div class="font-semibold">Daniela Martinez</div>
+                <div class="text-xs text-muted">Last year avg: $85,000/mo</div>
+              </div>
+              <span style="color: #3b82f6;">✓</span>
+            </div>
+            <div class="person-item">
+              <div class="avatar">JS</div>
+              <div style="flex: 1;">
+                <div class="font-semibold">John Smith</div>
+                <div class="text-xs text-muted">Last year avg: $72,000/mo</div>
+              </div>
+            </div>
+            <div class="person-item">
+              <div class="avatar">SJ</div>
+              <div style="flex: 1;">
+                <div class="font-semibold">Sarah Johnson</div>
+                <div class="text-xs text-muted">Last year avg: $95,000/mo</div>
+              </div>
+            </div>
+            <div class="person-item">
+              <div class="avatar">MC</div>
+              <div style="flex: 1;">
+                <div class="font-semibold">Mike Chen</div>
+                <div class="text-xs text-muted">Last year avg: $68,000/mo</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Goal configuration -->
+          <div class="card">
+            <div class="card-header flex flex-between flex-center">
+              <span>2026 Goals - Daniela Martinez</span>
+              <button class="btn btn-outline">📅 2026 ▼</button>
+            </div>
+
+            <!-- Annual targets -->
+            <div class="grid grid-4 mb-4">
+              <div>
+                <label class="text-sm font-semibold" style="display: block; margin-bottom: 8px;">Annual Revenue Target</label>
+                <input type="text" class="input" value="$1,000,000" />
+                <div class="text-xs text-muted mt-4">~$83,333/month</div>
+              </div>
+              <div>
+                <label class="text-sm font-semibold" style="display: block; margin-bottom: 8px;">Booking Rate Target</label>
+                <input type="text" class="input" value="35%" />
+                <div class="text-xs text-muted mt-4">Booked / Total Leads</div>
+              </div>
+              <div>
+                <label class="text-sm font-semibold" style="display: block; margin-bottom: 8px;">Sent Estimate Rate</label>
+                <input type="text" class="input" value="80%" />
+                <div class="text-xs text-muted mt-4">Estimates / Total Leads</div>
+              </div>
+              <div>
+                <label class="text-sm font-semibold" style="display: block; margin-bottom: 8px;">Closed Rate Target</label>
+                <input type="text" class="input" value="25%" />
+                <div class="text-xs text-muted mt-4">Closed / Estimates Sent</div>
+              </div>
+            </div>
+
+            <!-- Monthly breakdown -->
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
+              <div class="flex flex-between flex-center mb-4">
+                <h4 class="font-semibold">Monthly Revenue Breakdown</h4>
+                <button class="btn btn-outline" style="font-size: 13px;">📋 Distribute Evenly</button>
+              </div>
+              <div class="grid" style="grid-template-columns: repeat(6, 1fr); gap: 12px;">
+                <div><label class="text-xs text-muted">Jan</label><input class="input" value="$88,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Feb</label><input class="input" value="$80,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Mar</label><input class="input" value="$88,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Apr</label><input class="input" value="$80,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">May</label><input class="input" value="$88,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Jun</label><input class="input" value="$80,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Jul</label><input class="input" value="$88,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Aug</label><input class="input" value="$80,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Sep</label><input class="input" value="$88,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Oct</label><input class="input" value="$80,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Nov</label><input class="input" value="$88,333" style="margin-top: 4px;" /></div>
+                <div><label class="text-xs text-muted">Dec</label><input class="input" value="$80,333" style="margin-top: 4px;" /></div>
+              </div>
+            </div>
+
+            <!-- Historical reference -->
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 20px;">
+              <h4 class="font-semibold mb-4">Historical Reference</h4>
+              <div class="grid grid-3">
+                <div class="p-4 rounded" style="background: #f8fafc;">
+                  <div class="text-sm text-muted">Last Year Total</div>
+                  <div style="font-size: 24px; font-weight: 700;">$892,000</div>
+                  <div class="text-xs text-green">+12% proposed increase</div>
+                </div>
+                <div class="p-4 rounded" style="background: #f8fafc;">
+                  <div class="text-sm text-muted">Avg Monthly</div>
+                  <div style="font-size: 24px; font-weight: 700;">$74,333</div>
+                  <div class="text-xs text-muted">Based on 2025 data</div>
+                </div>
+                <div class="p-4 rounded" style="background: #f8fafc;">
+                  <div class="text-sm text-muted">Best Month</div>
+                  <div style="font-size: 24px; font-weight: 700;">$112,000</div>
+                  <div class="text-xs text-muted">June 2025</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex flex-between flex-center p-4 rounded mt-4" style="background: #f8fafc;">
+          <span class="text-sm text-muted">Goals will be distributed daily. Feb 2026 = $83,333 / 28 days = $2,976.19 per day</span>
+          <div class="flex gap-2">
+            <button class="btn btn-outline">Cancel</button>
+            <button class="btn btn-primary">💾 Save & Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MOCKUP 3: SALESPERSON VIEW -->
+    <!-- ========================================== -->
+    <div id="salesperson" class="mockup">
+      <div class="mockup-header">
+        <h2>3. Salesperson View</h2>
+        <p>What an individual salesperson sees - their personal goals and progress</p>
+      </div>
+      <div class="mockup-content">
+
+        <!-- Header with greeting -->
+        <div class="flex flex-between flex-center mb-4">
+          <div class="flex flex-center gap-4">
+            <div class="avatar avatar-lg" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white;">DM</div>
+            <div>
+              <h3 style="font-size: 24px; font-weight: 700;">Hey Daniela!</h3>
+              <p class="text-muted">February 2026 &bull; 26 days to hit your goals</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <span class="badge" style="background: #fff7ed; color: #c2410c;">🔥 5 day streak</span>
+            <span class="badge badge-blue">🏆 #2 of 8</span>
+          </div>
+        </div>
+
+        <!-- Main cards -->
+        <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 24px;">
+          <!-- Revenue Progress -->
+          <div class="card">
+            <div class="card-header flex flex-center gap-2">💵 Monthly Revenue</div>
+            <div class="flex flex-center gap-4" style="padding: 24px 0;">
+              <!-- Circular progress -->
+              <div class="circular-progress">
+                <svg width="140" height="140">
+                  <circle cx="70" cy="70" r="60" fill="none" stroke="#e2e8f0" stroke-width="12"/>
+                  <circle cx="70" cy="70" r="60" fill="none" stroke="#22c55e" stroke-width="12"
+                    stroke-dasharray="377" stroke-dashoffset="283" stroke-linecap="round"/>
+                </svg>
+                <div class="center-text">
+                  <span class="percent">25%</span>
+                  <span class="sublabel">of goal</span>
+                </div>
+              </div>
+
+              <!-- Stats -->
+              <div style="flex: 1;">
+                <div class="flex flex-between mb-2">
+                  <div>
+                    <div class="text-sm text-muted">Achieved</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #22c55e;">$28,500</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div class="text-sm text-muted">Target</div>
+                    <div style="font-size: 20px; font-weight: 600;">$83,333</div>
+                  </div>
+                </div>
+
+                <div class="progress-bar" style="height: 12px; margin: 16px 0;">
+                  <div class="progress-fill" style="width: 34%; background: #22c55e;"></div>
+                </div>
+
+                <div class="flex flex-between text-xs text-muted">
+                  <span>Day 2 of 28</span>
+                  <span>$54,833 to go</span>
+                </div>
+
+                <div class="flex flex-center gap-2 p-4 rounded mt-4" style="background: #f0fdf4;">
+                  <span style="color: #16a34a;">📈</span>
+                  <span class="font-semibold" style="color: #166534;">On track!</span>
+                  <span class="text-sm" style="color: #15803d;">You're averaging $4,250/day</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Today's Stats -->
+          <div class="card">
+            <div class="card-header flex flex-center gap-2">⚡ Today's Progress</div>
+
+            <div class="p-4 rounded mb-4" style="background: #f8fafc;">
+              <div class="flex flex-between flex-center">
+                <span class="text-sm text-muted">Revenue Today</span>
+                <span class="badge badge-amber">71%</span>
+              </div>
+              <div class="flex flex-center gap-2 mt-4">
+                <span style="font-size: 24px; font-weight: 700;">$2,100</span>
+                <span class="text-muted">/ $2,976</span>
+              </div>
+            </div>
+
+            <div class="grid grid-3" style="gap: 8px;">
+              <div class="p-4 rounded text-center" style="background: #dbeafe;">
+                <div style="font-size: 20px;">📞</div>
+                <div style="font-size: 20px; font-weight: 700;">12</div>
+                <div class="text-xs text-muted">Calls</div>
+              </div>
+              <div class="p-4 rounded text-center" style="background: #f3e8ff;">
+                <div style="font-size: 20px;">📄</div>
+                <div style="font-size: 20px; font-weight: 700;">3</div>
+                <div class="text-xs text-muted">Estimates</div>
+              </div>
+              <div class="p-4 rounded text-center" style="background: #dcfce7;">
+                <div style="font-size: 20px;">🎯</div>
+                <div style="font-size: 20px; font-weight: 700;">1</div>
+                <div class="text-xs text-muted">Bookings</div>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid #e2e8f0; margin-top: 16px; padding-top: 16px;">
+              <h4 class="text-sm font-semibold mb-2">Recent Wins</h4>
+              <div class="flex flex-between text-sm mb-2">
+                <span class="text-muted">Johnson Family</span>
+                <span class="badge badge-green">+$4,200</span>
+              </div>
+              <div class="flex flex-between text-sm mb-2">
+                <span class="text-muted">Smith Relocation</span>
+                <span class="badge badge-green">+$3,100</span>
+              </div>
+              <div class="flex flex-between text-sm">
+                <span class="text-muted">Garcia Move</span>
+                <span class="badge badge-green">+$1,200</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rate KPIs -->
+        <div class="grid grid-3 mt-4">
+          <div class="card">
+            <div class="flex flex-between flex-center mb-2">
+              <span class="text-sm text-muted">Booking Rate</span>
+              <span class="badge badge-green">+7%</span>
+            </div>
+            <div class="flex flex-center gap-2">
+              <span style="font-size: 28px; font-weight: 700; color: #22c55e;">42%</span>
+              <span class="text-muted">/ 35%</span>
+            </div>
+            <div class="progress-bar mt-4">
+              <div class="progress-fill" style="width: 100%; background: #22c55e;"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex flex-between flex-center mb-2">
+              <span class="text-sm text-muted">Sent Estimate Rate</span>
+              <span class="badge badge-amber">-2%</span>
+            </div>
+            <div class="flex flex-center gap-2">
+              <span style="font-size: 28px; font-weight: 700; color: #f59e0b;">78%</span>
+              <span class="text-muted">/ 80%</span>
+            </div>
+            <div class="progress-bar mt-4">
+              <div class="progress-fill" style="width: 97%; background: #f59e0b;"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex flex-between flex-center mb-2">
+              <span class="text-sm text-muted">Closed Rate</span>
+              <span class="badge badge-green">+3%</span>
+            </div>
+            <div class="flex flex-center gap-2">
+              <span style="font-size: 28px; font-weight: 700; color: #22c55e;">28%</span>
+              <span class="text-muted">/ 25%</span>
+            </div>
+            <div class="progress-bar mt-4">
+              <div class="progress-fill" style="width: 100%; background: #22c55e;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick action -->
+        <div class="card mt-4">
+          <div class="flex flex-between flex-center">
+            <span class="text-muted">You have <strong>8 follow-ups</strong> due today</span>
+            <button class="btn btn-primary">View My Leads →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MOCKUP 4: LEADERBOARD -->
+    <!-- ========================================== -->
+    <div id="leaderboard" class="mockup">
+      <div class="mockup-header">
+        <h2>4. Sales Leaderboard</h2>
+        <p>Team comparison and competitive rankings</p>
+      </div>
+      <div class="mockup-content">
+
+        <!-- Header -->
+        <div class="flex flex-between flex-center mb-4">
+          <div>
+            <h3 style="font-size: 24px; font-weight: 700;">🏆 Sales Leaderboard</h3>
+            <p class="text-muted">February 2026 &bull; Updated live</p>
+          </div>
+          <button class="btn btn-outline">📅 This Month ▼</button>
+        </div>
+
+        <!-- Team summary -->
+        <div class="grid grid-4 section">
+          <div class="kpi-card">
+            <div class="flex flex-center gap-4">
+              <div class="icon bg-green">💵</div>
+              <div>
+                <div style="font-size: 24px; font-weight: 700;">$131,500</div>
+                <div class="text-sm text-muted">Team Revenue</div>
+              </div>
+            </div>
+            <div class="text-xs text-muted mt-4">30% of $441,666 goal</div>
+          </div>
+          <div class="kpi-card">
+            <div class="flex flex-center gap-4">
+              <div class="icon bg-blue">🎯</div>
+              <div>
+                <div style="font-size: 24px; font-weight: 700;">37%</div>
+                <div class="text-sm text-muted">Avg Booking Rate</div>
+              </div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="flex flex-center gap-4">
+              <div class="icon bg-purple">📈</div>
+              <div>
+                <div style="font-size: 24px; font-weight: 700;">24%</div>
+                <div class="text-sm text-muted">Avg Closed Rate</div>
+              </div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="flex flex-center gap-4">
+              <div class="icon bg-amber">👥</div>
+              <div>
+                <div style="font-size: 24px; font-weight: 700;">190</div>
+                <div class="text-sm text-muted">Total Leads</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard table -->
+        <div class="card">
+          <div class="card-header flex flex-between flex-center">
+            <span>Rankings</span>
+            <div class="flex gap-2">
+              <button class="btn btn-primary" style="font-size: 13px;">Revenue</button>
+              <button class="btn btn-outline" style="font-size: 13px;">Booking %</button>
+              <button class="btn btn-outline" style="font-size: 13px;">Closed %</button>
+              <button class="btn btn-outline" style="font-size: 13px;">Leads</button>
+            </div>
+          </div>
+
+          <div class="leaderboard-row" style="border: 2px solid #fbbf24;">
+            <div class="rank-badge rank-1">👑</div>
+            <div class="flex flex-center gap-4" style="min-width: 180px;">
+              <div class="avatar" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white;">SJ</div>
+              <div>
+                <div class="font-semibold">Sarah Johnson</div>
+                <div class="text-xs" style="color: #c2410c;">🔥 8 day streak</div>
+              </div>
+            </div>
+            <div style="flex: 1;">
+              <div class="flex flex-between mb-2">
+                <span class="font-semibold">$32,500</span>
+                <span class="text-xs text-muted">39% of goal</span>
+              </div>
+              <div class="progress-bar" style="height: 8px;">
+                <div class="progress-fill" style="width: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
+              </div>
+            </div>
+            <div class="flex gap-4 text-center">
+              <div><div class="font-semibold">48%</div><div class="text-xs text-muted">Booking</div></div>
+              <div><div class="font-semibold">32%</div><div class="text-xs text-muted">Closed</div></div>
+              <div><div class="font-semibold">42</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+            <span class="trend trend-up">↗</span>
+          </div>
+
+          <div class="leaderboard-row">
+            <div class="rank-badge rank-2">🥈</div>
+            <div class="flex flex-center gap-4" style="min-width: 180px;">
+              <div class="avatar">DM</div>
+              <div>
+                <div class="font-semibold">Daniela Martinez</div>
+                <div class="text-xs" style="color: #c2410c;">🔥 5 day streak</div>
+              </div>
+            </div>
+            <div style="flex: 1;">
+              <div class="flex flex-between mb-2">
+                <span class="font-semibold">$28,500</span>
+                <span class="text-xs text-muted">34% of goal</span>
+              </div>
+              <div class="progress-bar" style="height: 8px;">
+                <div class="progress-fill" style="width: 88%; background: linear-gradient(90deg, #94a3b8, #64748b);"></div>
+              </div>
+            </div>
+            <div class="flex gap-4 text-center">
+              <div><div class="font-semibold">42%</div><div class="text-xs text-muted">Booking</div></div>
+              <div><div class="font-semibold">28%</div><div class="text-xs text-muted">Closed</div></div>
+              <div><div class="font-semibold">38</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+            <span class="trend trend-up">↗</span>
+          </div>
+
+          <div class="leaderboard-row">
+            <div class="rank-badge rank-3">🥉</div>
+            <div class="flex flex-center gap-4" style="min-width: 180px;">
+              <div class="avatar">JS</div>
+              <div>
+                <div class="font-semibold">John Smith</div>
+              </div>
+            </div>
+            <div style="flex: 1;">
+              <div class="flex flex-between mb-2">
+                <span class="font-semibold">$24,000</span>
+                <span class="text-xs text-muted">32% of goal</span>
+              </div>
+              <div class="progress-bar" style="height: 8px;">
+                <div class="progress-fill" style="width: 74%; background: linear-gradient(90deg, #d97706, #b45309);"></div>
+              </div>
+            </div>
+            <div class="flex gap-4 text-center">
+              <div><div class="font-semibold">38%</div><div class="text-xs text-muted">Booking</div></div>
+              <div><div class="font-semibold">25%</div><div class="text-xs text-muted">Closed</div></div>
+              <div><div class="font-semibold">35</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+            <span style="color: #94a3b8;">—</span>
+          </div>
+
+          <div class="leaderboard-row" style="background: #f8fafc;">
+            <div class="rank-badge" style="background: #f1f5f9;">4</div>
+            <div class="flex flex-center gap-4" style="min-width: 180px;">
+              <div class="avatar">MC</div>
+              <div><div class="font-semibold">Mike Chen</div></div>
+            </div>
+            <div style="flex: 1;">
+              <div class="flex flex-between mb-2">
+                <span class="font-semibold">$18,500</span>
+                <span class="text-xs text-muted">26% of goal</span>
+              </div>
+              <div class="progress-bar" style="height: 8px;">
+                <div class="progress-fill" style="width: 57%; background: #3b82f6;"></div>
+              </div>
+            </div>
+            <div class="flex gap-4 text-center">
+              <div><div class="font-semibold">35%</div><div class="text-xs text-muted">Booking</div></div>
+              <div><div class="font-semibold">22%</div><div class="text-xs text-muted">Closed</div></div>
+              <div><div class="font-semibold">28</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+            <span class="trend trend-down">↘</span>
+          </div>
+
+          <div class="leaderboard-row" style="background: #f8fafc;">
+            <div class="rank-badge" style="background: #f1f5f9;">5</div>
+            <div class="flex flex-center gap-4" style="min-width: 180px;">
+              <div class="avatar">ED</div>
+              <div><div class="font-semibold">Emily Davis</div></div>
+            </div>
+            <div style="flex: 1;">
+              <div class="flex flex-between mb-2">
+                <span class="font-semibold">$15,200</span>
+                <span class="text-xs text-muted">23% of goal</span>
+              </div>
+              <div class="progress-bar" style="height: 8px;">
+                <div class="progress-fill" style="width: 47%; background: #3b82f6;"></div>
+              </div>
+            </div>
+            <div class="flex gap-4 text-center">
+              <div><div class="font-semibold">32%</div><div class="text-xs text-muted">Booking</div></div>
+              <div><div class="font-semibold">20%</div><div class="text-xs text-muted">Closed</div></div>
+              <div><div class="font-semibold">25</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+            <span class="trend trend-up">↗</span>
+          </div>
+
+          <div class="leaderboard-row" style="background: #f8fafc;">
+            <div class="rank-badge" style="background: #f1f5f9;">6</div>
+            <div class="flex flex-center gap-4" style="min-width: 180px;">
+              <div class="avatar">AT</div>
+              <div><div class="font-semibold">Alex Thompson</div></div>
+            </div>
+            <div style="flex: 1;">
+              <div class="flex flex-between mb-2">
+                <span class="font-semibold">$12,800</span>
+                <span class="text-xs text-muted">20% of goal</span>
+              </div>
+              <div class="progress-bar" style="height: 8px;">
+                <div class="progress-fill" style="width: 39%; background: #3b82f6;"></div>
+              </div>
+            </div>
+            <div class="flex gap-4 text-center">
+              <div><div class="font-semibold">28%</div><div class="text-xs text-muted">Booking</div></div>
+              <div><div class="font-semibold">18%</div><div class="text-xs text-muted">Closed</div></div>
+              <div><div class="font-semibold">22</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+            <span class="trend trend-down">↘</span>
+          </div>
+        </div>
+
+        <!-- Top 3 highlight -->
+        <div class="grid grid-3 mt-4">
+          <div class="card" style="border: 2px solid #fbbf24; position: relative;">
+            <div style="position: absolute; top: 0; right: 0; background: #fbbf24; color: #78350f; font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 0 0 0 8px;">TOP PERFORMER</div>
+            <div class="flex flex-center gap-4 mb-4" style="padding-top: 8px;">
+              <div class="avatar avatar-lg" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white;">SJ</div>
+              <div>
+                <div class="font-semibold">Sarah Johnson</div>
+                <div style="font-size: 24px; font-weight: 700;">$32,500</div>
+              </div>
+            </div>
+            <div class="grid grid-3 text-center">
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">48%</div><div class="text-xs text-muted">Booking</div></div>
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">32%</div><div class="text-xs text-muted">Closed</div></div>
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">42</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex flex-center gap-4 mb-4">
+              <div class="avatar avatar-lg" style="background: linear-gradient(135deg, #94a3b8, #64748b); color: white;">DM</div>
+              <div>
+                <div class="font-semibold">Daniela Martinez</div>
+                <div style="font-size: 24px; font-weight: 700;">$28,500</div>
+              </div>
+            </div>
+            <div class="grid grid-3 text-center">
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">42%</div><div class="text-xs text-muted">Booking</div></div>
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">28%</div><div class="text-xs text-muted">Closed</div></div>
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">38</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex flex-center gap-4 mb-4">
+              <div class="avatar avatar-lg" style="background: linear-gradient(135deg, #d97706, #b45309); color: white;">JS</div>
+              <div>
+                <div class="font-semibold">John Smith</div>
+                <div style="font-size: 24px; font-weight: 700;">$24,000</div>
+              </div>
+            </div>
+            <div class="grid grid-3 text-center">
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">38%</div><div class="text-xs text-muted">Booking</div></div>
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">25%</div><div class="text-xs text-muted">Closed</div></div>
+              <div class="p-4 rounded" style="background: #f8fafc;"><div class="font-semibold">35</div><div class="text-xs text-muted">Leads</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MOCKUP 5: TRENDS -->
+    <!-- ========================================== -->
+    <div id="trends" class="mockup">
+      <div class="mockup-header">
+        <h2>5. Trends & Analytics</h2>
+        <p>Historical data and performance patterns</p>
+      </div>
+      <div class="mockup-content">
+
+        <!-- Header -->
+        <div class="flex flex-between flex-center mb-4">
+          <div>
+            <h3 style="font-size: 24px; font-weight: 700;">📊 Sales Trends & Analytics</h3>
+            <p class="text-muted">Track performance trends and patterns over time</p>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-outline">📅 Last 6 Months ▼</button>
+            <button class="btn btn-outline">⬇️ Export</button>
+          </div>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="grid grid-4 section">
+          <div class="kpi-card">
+            <div class="text-sm text-muted">Avg Monthly Revenue</div>
+            <div style="font-size: 24px; font-weight: 700;">$83,000</div>
+            <div class="trend trend-up">↗ +4.3%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="text-sm text-muted">Avg Monthly Leads</div>
+            <div style="font-size: 24px; font-weight: 700;">133</div>
+            <div class="trend trend-down">↘ -2.8%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="text-sm text-muted">Goals Hit</div>
+            <div style="font-size: 24px; font-weight: 700;">3/5</div>
+            <div class="text-sm text-green">60% attainment rate</div>
+          </div>
+          <div class="kpi-card">
+            <div class="text-sm text-muted">YoY Growth</div>
+            <div style="font-size: 24px; font-weight: 700; color: #22c55e;">+11.4%</div>
+            <div class="text-sm text-muted">vs same period last year</div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card section">
+          <div class="card-header flex flex-between flex-center">
+            <span>Performance Trends</span>
+            <div class="flex gap-2">
+              <button class="btn btn-primary" style="font-size: 13px;">Revenue</button>
+              <button class="btn btn-outline" style="font-size: 13px;">Leads</button>
+              <button class="btn btn-outline" style="font-size: 13px;">Rates</button>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-bar">
+              <div class="value">$72k</div>
+              <div class="bar">
+                <div class="bar-fill" style="height: 78%; background: #f59e0b;"></div>
+              </div>
+              <div class="label">Sep</div>
+            </div>
+            <div class="chart-bar">
+              <div class="value">$85k</div>
+              <div class="bar">
+                <div class="bar-fill" style="height: 92%; background: #22c55e;"></div>
+              </div>
+              <div class="label">Oct</div>
+            </div>
+            <div class="chart-bar">
+              <div class="value">$78k</div>
+              <div class="bar">
+                <div class="bar-fill" style="height: 85%; background: #f59e0b;"></div>
+              </div>
+              <div class="label">Nov</div>
+            </div>
+            <div class="chart-bar">
+              <div class="value">$92k</div>
+              <div class="bar">
+                <div class="bar-fill" style="height: 100%; background: #22c55e;"></div>
+              </div>
+              <div class="label">Dec</div>
+            </div>
+            <div class="chart-bar">
+              <div class="value">$88k</div>
+              <div class="bar">
+                <div class="bar-fill" style="height: 96%; background: #f59e0b;"></div>
+              </div>
+              <div class="label">Jan</div>
+            </div>
+            <div class="chart-bar">
+              <div class="value">$29k</div>
+              <div class="bar">
+                <div class="bar-fill" style="height: 31%; background: #93c5fd;"></div>
+              </div>
+              <div class="label">Feb</div>
+            </div>
+          </div>
+
+          <div class="flex gap-4 text-sm" style="justify-content: center;">
+            <div class="flex flex-center gap-2"><div style="width:12px;height:12px;background:#22c55e;border-radius:2px;"></div> Hit Goal</div>
+            <div class="flex flex-center gap-2"><div style="width:12px;height:12px;background:#f59e0b;border-radius:2px;"></div> Missed Goal</div>
+            <div class="flex flex-center gap-2"><div style="width:12px;height:12px;background:#93c5fd;border-radius:2px;"></div> Current Month</div>
+            <div class="flex flex-center gap-2"><div style="width:24px;height:2px;border-top:2px dashed #94a3b8;"></div> Goal Line</div>
+          </div>
+        </div>
+
+        <!-- Comparison -->
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">Year over Year Comparison</div>
+            <div class="p-4 rounded mb-4" style="background: #f8fafc;">
+              <div class="flex flex-between flex-center">
+                <div>
+                  <div class="text-sm text-muted">Total Revenue (YTD)</div>
+                  <div style="font-size: 20px; font-weight: 700;">$443,500</div>
+                </div>
+                <div style="text-align: right;">
+                  <div class="text-sm text-muted">Last Year</div>
+                  <div style="font-size: 18px;">$398,000</div>
+                </div>
+                <span class="badge badge-green">+11.4%</span>
+              </div>
+            </div>
+            <div class="p-4 rounded mb-4" style="background: #f8fafc;">
+              <div class="flex flex-between flex-center">
+                <div>
+                  <div class="text-sm text-muted">Total Leads (YTD)</div>
+                  <div style="font-size: 20px; font-weight: 700;">711</div>
+                </div>
+                <div style="text-align: right;">
+                  <div class="text-sm text-muted">Last Year</div>
+                  <div style="font-size: 18px;">652</div>
+                </div>
+                <span class="badge badge-green">+9.0%</span>
+              </div>
+            </div>
+            <div class="p-4 rounded" style="background: #f8fafc;">
+              <div class="flex flex-between flex-center">
+                <div>
+                  <div class="text-sm text-muted">Avg Booking Rate</div>
+                  <div style="font-size: 20px; font-weight: 700;">36%</div>
+                </div>
+                <div style="text-align: right;">
+                  <div class="text-sm text-muted">Last Year</div>
+                  <div style="font-size: 18px;">32%</div>
+                </div>
+                <span class="badge badge-green">+4pts</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Monthly Breakdown</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th style="text-align: right;">Revenue</th>
+                  <th style="text-align: right;">Goal</th>
+                  <th style="text-align: right;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sep</td>
+                  <td style="text-align: right; font-weight: 600;">$72,000</td>
+                  <td style="text-align: right;" class="text-muted">$80,000</td>
+                  <td style="text-align: right;"><span class="badge badge-red">90%</span></td>
+                </tr>
+                <tr>
+                  <td>Oct</td>
+                  <td style="text-align: right; font-weight: 600;">$85,000</td>
+                  <td style="text-align: right;" class="text-muted">$80,000</td>
+                  <td style="text-align: right;"><span class="badge badge-green">106%</span></td>
+                </tr>
+                <tr>
+                  <td>Nov</td>
+                  <td style="text-align: right; font-weight: 600;">$78,000</td>
+                  <td style="text-align: right;" class="text-muted">$85,000</td>
+                  <td style="text-align: right;"><span class="badge badge-red">92%</span></td>
+                </tr>
+                <tr>
+                  <td>Dec</td>
+                  <td style="text-align: right; font-weight: 600;">$92,000</td>
+                  <td style="text-align: right;" class="text-muted">$85,000</td>
+                  <td style="text-align: right;"><span class="badge badge-green">108%</span></td>
+                </tr>
+                <tr>
+                  <td>Jan</td>
+                  <td style="text-align: right; font-weight: 600;">$88,000</td>
+                  <td style="text-align: right;" class="text-muted">$90,000</td>
+                  <td style="text-align: right;"><span class="badge badge-red">98%</span></td>
+                </tr>
+                <tr>
+                  <td>Feb <span class="badge badge-blue" style="font-size: 10px;">Current</span></td>
+                  <td style="text-align: right; font-weight: 600;">$28,500</td>
+                  <td style="text-align: right;" class="text-muted">$90,000</td>
+                  <td style="text-align: right;"><span class="badge badge-blue">32%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Insights -->
+        <div class="card mt-4">
+          <div class="card-header">Key Insights</div>
+          <div class="grid grid-3">
+            <div class="insight-card green">
+              <div class="title flex flex-center gap-2" style="color: #166534;">📈 Strong Performance</div>
+              <p style="color: #15803d;">December was your best month with $92,000 in revenue - 8% above goal.</p>
+            </div>
+            <div class="insight-card amber">
+              <div class="title flex flex-center gap-2" style="color: #92400e;">📉 Watch Area</div>
+              <p style="color: #a16207;">November saw a dip in lead quality - qualified rate dropped to 72%.</p>
+            </div>
+            <div class="insight-card blue">
+              <div class="title flex flex-center gap-2" style="color: #1e40af;">📊 Trending Up</div>
+              <p style="color: #1d4ed8;">Booking rate has improved 4 percentage points year over year.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Simple navigation highlighting
+    document.querySelectorAll('.nav a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

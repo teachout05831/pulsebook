@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServicePro Dashboard - Design 1: Activity Feed</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar for activity feed */
+    .feed-scroll::-webkit-scrollbar { width: 6px; }
+    .feed-scroll::-webkit-scrollbar-track { background: transparent; }
+    .feed-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .feed-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Fade-in animation for cards */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .feed-card { animation: fadeInUp 0.3s ease-out forwards; }
+    .feed-card:nth-child(2) { animation-delay: 0.05s; }
+    .feed-card:nth-child(3) { animation-delay: 0.1s; }
+    .feed-card:nth-child(4) { animation-delay: 0.15s; }
+    .feed-card:nth-child(5) { animation-delay: 0.2s; }
+    .feed-card:nth-child(6) { animation-delay: 0.25s; }
+    .feed-card:nth-child(7) { animation-delay: 0.3s; }
+    .feed-card:nth-child(8) { animation-delay: 0.35s; }
+    .feed-card:nth-child(9) { animation-delay: 0.4s; }
+    .feed-card:nth-child(10) { animation-delay: 0.45s; }
+
+    /* Modal backdrop blur */
+    .modal-backdrop {
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Revenue chart bars animation */
+    .chart-bar {
+      transition: height 0.6s ease-out;
+    }
+
+    /* Pipeline dots pulse */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .pipeline-active { animation: pulse-dot 2s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <!-- ===== TOP NAVIGATION BAR ===== -->
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-14">
+        <!-- Logo / Brand -->
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <span class="text-lg font-bold text-slate-800">ServicePro</span>
+        </div>
+        <!-- Nav Actions -->
+        <div class="flex items-center gap-3">
+          <button class="relative p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+          <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+            MC
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== TOP STATS STRIP ===== -->
+  <div class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
+        <!-- Jobs This Month -->
+        <div class="flex items-center gap-3 p-2 sm:p-0">
+          <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Jobs This Month</p>
+            <p class="text-lg font-bold text-slate-800">30 <span class="text-sm font-normal text-slate-400">/ $26,079</span></p>
+          </div>
+        </div>
+        <!-- Jobs Today -->
+        <div class="flex items-center gap-3 p-2 sm:p-0">
+          <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Jobs Today</p>
+            <p class="text-lg font-bold text-slate-800">5</p>
+          </div>
+        </div>
+        <!-- Avg Job Value -->
+        <div class="flex items-center gap-3 p-2 sm:p-0">
+          <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Avg Job Value</p>
+            <p class="text-lg font-bold text-slate-800">$964</p>
+          </div>
+        </div>
+        <!-- Revenue This Month -->
+        <div class="flex items-center gap-3 p-2 sm:p-0">
+          <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Revenue This Month</p>
+            <p class="text-lg font-bold text-emerald-600">$26,079</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN DASHBOARD CONTENT ===== -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- ===== LEFT SIDEBAR (Desktop) / Top sections (Mobile) ===== -->
+      <div class="lg:col-span-3 order-2 lg:order-1 space-y-6">
+
+        <!-- SALES LEADERS -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              Sales Leaders
+            </h3>
+            <span class="text-xs text-slate-400">This Month</span>
+          </div>
+          <div class="p-4 space-y-4">
+            <!-- Leader 1 -->
+            <div class="cursor-pointer hover:bg-slate-50 -mx-2 px-2 py-1 rounded-lg transition-colors" onclick="openSalesLeaderPopup('Monica Copo')">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-medium text-amber-600">1</span>
+                  <div class="w-7 h-7 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center text-xs font-bold">MC</div>
+                  <div>
+                    <p class="text-sm font-medium text-slate-800">Monica Copo</p>
+                    <p class="text-xs text-slate-400">7 jobs</p>
+                  </div>
+                </div>
+                <span class="text-sm font-bold text-slate-700">$8,096</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-green-500 h-1.5 rounded-full" style="width: 100%"></div>
+              </div>
+            </div>
+            <!-- Leader 2 -->
+            <div class="cursor-pointer hover:bg-slate-50 -mx-2 px-2 py-1 rounded-lg transition-colors" onclick="openSalesLeaderPopup('Daniela')">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-medium text-slate-400">2</span>
+                  <div class="w-7 h-7 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">DA</div>
+                  <div>
+                    <p class="text-sm font-medium text-slate-800">Daniela</p>
+                    <p class="text-xs text-slate-400">8 jobs</p>
+                  </div>
+                </div>
+                <span class="text-sm font-bold text-slate-700">$3,692</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-green-500 h-1.5 rounded-full" style="width: 46%"></div>
+              </div>
+            </div>
+            <!-- Leader 3 -->
+            <div class="cursor-pointer hover:bg-slate-50 -mx-2 px-2 py-1 rounded-lg transition-colors" onclick="openSalesLeaderPopup('Raquel')">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-medium text-slate-400">3</span>
+                  <div class="w-7 h-7 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-xs font-bold">RA</div>
+                  <div>
+                    <p class="text-sm font-medium text-slate-800">Raquel</p>
+                    <p class="text-xs text-slate-400">3 jobs</p>
+                  </div>
+                </div>
+                <span class="text-sm font-bold text-slate-700">$3,164</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-green-500 h-1.5 rounded-full" style="width: 39%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP REFERRAL SOURCES -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-100">
+            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+              </svg>
+              Top Referral Sources
+            </h3>
+          </div>
+          <div class="p-4 space-y-3">
+            <!-- Source 1 -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-medium text-slate-700">Equate Media</span>
+                <span class="text-xs text-slate-500">14 leads / <span class="font-semibold text-slate-700">$11,241</span></span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-blue-500 h-1.5 rounded-full" style="width: 100%"></div>
+              </div>
+            </div>
+            <!-- Source 2 -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-medium text-slate-700">Your Website</span>
+                <span class="text-xs text-slate-500">1 lead / <span class="font-semibold text-slate-700">$2,139</span></span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-blue-500 h-1.5 rounded-full" style="width: 19%"></div>
+              </div>
+            </div>
+            <!-- Source 3 -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-medium text-slate-700">Return Customer</span>
+                <span class="text-xs text-slate-500">2 leads / <span class="font-semibold text-slate-700">$798</span></span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-blue-500 h-1.5 rounded-full" style="width: 7%"></div>
+              </div>
+            </div>
+            <!-- Source 4 -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-medium text-slate-700">Word of Mouth</span>
+                <span class="text-xs text-slate-500">1 lead / <span class="font-semibold text-slate-700">$774</span></span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-1.5">
+                <div class="bg-blue-500 h-1.5 rounded-full" style="width: 7%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LEAD PIPELINE MINI -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-100">
+            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+              Lead Pipeline
+            </h3>
+          </div>
+          <div class="p-4">
+            <!-- Pipeline Flow -->
+            <div class="flex items-center justify-between">
+              <!-- New -->
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold pipeline-active">4</div>
+                <span class="text-[10px] text-slate-500 mt-1 font-medium">New</span>
+              </div>
+              <!-- Arrow -->
+              <svg class="w-4 h-4 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+              <!-- Contacted -->
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center text-sm font-bold">3</div>
+                <span class="text-[10px] text-slate-500 mt-1 font-medium">Contacted</span>
+              </div>
+              <!-- Arrow -->
+              <svg class="w-4 h-4 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+              <!-- Qualified -->
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold">2</div>
+                <span class="text-[10px] text-slate-500 mt-1 font-medium">Qualified</span>
+              </div>
+              <!-- Arrow -->
+              <svg class="w-4 h-4 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+              <!-- Proposal -->
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-sm font-bold">1</div>
+                <span class="text-[10px] text-slate-500 mt-1 font-medium">Proposal</span>
+              </div>
+              <!-- Arrow -->
+              <svg class="w-4 h-4 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+              <!-- Won -->
+              <div class="flex flex-col items-center">
+                <div class="w-10 h-10 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-sm font-bold">1</div>
+                <span class="text-[10px] text-slate-500 mt-1 font-medium">Won</span>
+              </div>
+            </div>
+            <!-- Pipeline progress bar -->
+            <div class="mt-3 flex rounded-full overflow-hidden h-2 bg-slate-100">
+              <div class="bg-blue-400" style="width: 36%"></div>
+              <div class="bg-cyan-400" style="width: 27%"></div>
+              <div class="bg-amber-400" style="width: 18%"></div>
+              <div class="bg-purple-400" style="width: 10%"></div>
+              <div class="bg-green-500" style="width: 9%"></div>
+            </div>
+            <p class="text-xs text-slate-400 mt-2 text-center">11 total leads in pipeline</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ACTIVITY FEED (Center) ===== -->
+      <div class="lg:col-span-6 order-1 lg:order-2">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Activity Feed
+          </h2>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="text-xs text-slate-400">Live</span>
+          </div>
+        </div>
+
+        <!-- Feed Cards -->
+        <div class="space-y-3 feed-scroll" style="max-height: calc(100vh - 240px); overflow-y: auto; padding-right: 4px;">
+
+          <!-- CARD 1: Booked Job (Green) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-green-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">JR</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">James Rodriguez</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Booked
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">2 hours ago</p>
+                  </div>
+                </div>
+                <span class="text-base font-bold text-green-600">$1,250</span>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Local Move (3BR)
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Feb 8, 2026
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Tech: Monica Copo
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('booked', 'James Rodriguez')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2: New Lead (Blue) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-blue-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">SM</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">Sarah Martinez</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                        New Lead
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">3 hours ago</p>
+                  </div>
+                </div>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                    Source: Google Ads
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    Stage: New
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Deep Clean Service
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('lead', 'Sarah Martinez')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3: Booked Job (Green) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-green-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">TW</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">Tom Williams</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Booked
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Today at 9:30 AM</p>
+                  </div>
+                </div>
+                <span class="text-base font-bold text-green-600">$475</span>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Pool Cleaning (Monthly)
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Feb 10, 2026
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Tech: Raquel
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('booked', 'Tom Williams')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 4: Quote Sent (Purple) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-purple-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">LP</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">Linda Patel</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Quote Sent
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Today at 10:15 AM</p>
+                  </div>
+                </div>
+                <span class="text-base font-bold text-purple-600">$2,800</span>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Long Distance Move (4BR)
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Emailed to customer
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('quote', 'Linda Patel')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 5: Cancelled (Red) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-red-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-red-100 text-red-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">DK</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">David Kim</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-100 text-red-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Cancelled
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Today at 8:45 AM</p>
+                  </div>
+                </div>
+                <span class="text-base font-bold text-red-500 line-through">$650</span>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Office Cleaning (Bi-Weekly)
+                  </span>
+                  <span class="flex items-center gap-1 text-red-500">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Reason: Found cheaper provider
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('cancelled', 'David Kim')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 6: New Lead (Blue) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-blue-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">AC</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">Amanda Chen</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                        New Lead
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Yesterday at 4:20 PM</p>
+                  </div>
+                </div>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                    Source: Referral (Mike Thompson)
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    Stage: Contacted
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Pool Resurfacing
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('lead', 'Amanda Chen')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 7: Booked Job (Green) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-green-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">RH</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">Rachel Howard</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Booked
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Yesterday at 2:10 PM</p>
+                  </div>
+                </div>
+                <span class="text-base font-bold text-green-600">$320</span>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Move-Out Cleaning
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Feb 12, 2026
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Tech: Daniela
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('booked', 'Rachel Howard')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 8: Quote Sent (Purple) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-purple-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">BG</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">Brian Garcia</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Quote Sent
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">Yesterday at 11:00 AM</p>
+                  </div>
+                </div>
+                <span class="text-base font-bold text-purple-600">$1,950</span>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Pool Equipment Install + Cleaning
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Emailed to customer
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('quote', 'Brian Garcia')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 9: Booked Job (Green) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-green-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">NT</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">Nancy Turner</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Booked
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">2 days ago</p>
+                  </div>
+                </div>
+                <span class="text-base font-bold text-green-600">$890</span>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Studio Apartment Move
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    Feb 14, 2026
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Tech: Monica Copo
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('booked', 'Nancy Turner')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 10: New Lead (Blue) -->
+          <div class="feed-card bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+            <div class="border-l-4 border-blue-500 p-4">
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">MJ</div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-semibold text-slate-800">Marcus Johnson</h4>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700">
+                        <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                        New Lead
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500">2 days ago</p>
+                  </div>
+                </div>
+              </div>
+              <div class="ml-[52px]">
+                <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                    Source: Website Form
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    Stage: Qualified
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Commercial Cleaning (Weekly)
+                  </span>
+                </div>
+                <button onclick="openDetailPopup('lead', 'Marcus Johnson')" class="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                  View Details &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Load More -->
+          <div class="text-center py-4">
+            <button class="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors">
+              Load more activity...
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== RIGHT SIDEBAR ===== -->
+      <div class="lg:col-span-3 order-3 space-y-6">
+
+        <!-- REVENUE CHART -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+              Revenue (6 Months)
+            </h3>
+          </div>
+          <div class="p-4">
+            <!-- CSS Bar Chart -->
+            <div class="flex items-end justify-between gap-2 h-32">
+              <!-- Sep -->
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full bg-blue-500 rounded-t chart-bar opacity-80 hover:opacity-100 transition-opacity cursor-pointer relative group" style="height: 55%">
+                  <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap hidden group-hover:block">$18,200</div>
+                </div>
+                <span class="text-[10px] text-slate-400 mt-1">Sep</span>
+              </div>
+              <!-- Oct -->
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full bg-blue-500 rounded-t chart-bar opacity-80 hover:opacity-100 transition-opacity cursor-pointer relative group" style="height: 72%">
+                  <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap hidden group-hover:block">$23,850</div>
+                </div>
+                <span class="text-[10px] text-slate-400 mt-1">Oct</span>
+              </div>
+              <!-- Nov -->
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full bg-blue-500 rounded-t chart-bar opacity-80 hover:opacity-100 transition-opacity cursor-pointer relative group" style="height: 60%">
+                  <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap hidden group-hover:block">$19,700</div>
+                </div>
+                <span class="text-[10px] text-slate-400 mt-1">Nov</span>
+              </div>
+              <!-- Dec -->
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full bg-blue-500 rounded-t chart-bar opacity-80 hover:opacity-100 transition-opacity cursor-pointer relative group" style="height: 45%">
+                  <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap hidden group-hover:block">$14,900</div>
+                </div>
+                <span class="text-[10px] text-slate-400 mt-1">Dec</span>
+              </div>
+              <!-- Jan -->
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full bg-blue-500 rounded-t chart-bar opacity-80 hover:opacity-100 transition-opacity cursor-pointer relative group" style="height: 82%">
+                  <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap hidden group-hover:block">$27,100</div>
+                </div>
+                <span class="text-[10px] text-slate-400 mt-1">Jan</span>
+              </div>
+              <!-- Feb (current) -->
+              <div class="flex-1 flex flex-col items-center">
+                <div class="w-full bg-emerald-500 rounded-t chart-bar hover:opacity-90 transition-opacity cursor-pointer relative group" style="height: 78%">
+                  <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap hidden group-hover:block">$26,079</div>
+                </div>
+                <span class="text-[10px] text-emerald-600 mt-1 font-semibold">Feb</span>
+              </div>
+            </div>
+            <!-- Chart footer -->
+            <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+              <span class="text-xs text-slate-400">6-month avg: $21,638</span>
+              <span class="text-xs font-medium text-emerald-600 flex items-center gap-0.5">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                +20.5%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-100">
+            <h3 class="text-sm font-semibold text-slate-800">Quick Actions</h3>
+          </div>
+          <div class="p-3 grid grid-cols-2 gap-2">
+            <button class="flex items-center gap-2 px-3 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-medium transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              New Job
+            </button>
+            <button class="flex items-center gap-2 px-3 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg text-xs font-medium transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              New Estimate
+            </button>
+            <button class="flex items-center gap-2 px-3 py-2.5 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg text-xs font-medium transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+              Add Customer
+            </button>
+            <button class="flex items-center gap-2 px-3 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-xs font-medium transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              Reports
+            </button>
+          </div>
+        </div>
+
+        <!-- TODAY'S SCHEDULE MINI -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+              <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Today's Schedule
+            </h3>
+            <span class="text-xs text-slate-400">5 jobs</span>
+          </div>
+          <div class="divide-y divide-slate-50">
+            <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50 transition-colors cursor-pointer">
+              <span class="text-xs font-mono text-slate-400 w-12">8:00a</span>
+              <div class="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-slate-700 truncate">James Rodriguez - Local Move</p>
+                <p class="text-[10px] text-slate-400">Monica Copo</p>
+              </div>
+            </div>
+            <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50 transition-colors cursor-pointer">
+              <span class="text-xs font-mono text-slate-400 w-12">9:30a</span>
+              <div class="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-slate-700 truncate">Tom Williams - Pool Cleaning</p>
+                <p class="text-[10px] text-slate-400">Raquel</p>
+              </div>
+            </div>
+            <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50 transition-colors cursor-pointer">
+              <span class="text-xs font-mono text-slate-400 w-12">11:00a</span>
+              <div class="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-slate-700 truncate">Karen L. - Deep Clean</p>
+                <p class="text-[10px] text-slate-400">Daniela</p>
+              </div>
+            </div>
+            <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50 transition-colors cursor-pointer">
+              <span class="text-xs font-mono text-slate-400 w-12">1:30p</span>
+              <div class="w-1.5 h-1.5 bg-green-500 rounded-full flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-slate-700 truncate">Pete F. - Pool Maintenance</p>
+                <p class="text-[10px] text-slate-400">Raquel</p>
+              </div>
+            </div>
+            <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-slate-50 transition-colors cursor-pointer">
+              <span class="text-xs font-mono text-slate-400 w-12">3:00p</span>
+              <div class="w-1.5 h-1.5 bg-amber-500 rounded-full flex-shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-slate-700 truncate">Office Building - Weekly Clean</p>
+                <p class="text-[10px] text-slate-400">Monica Copo + Daniela</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== DETAIL POPUP / MODAL ===== -->
+  <div id="detailModal" class="fixed inset-0 z-50 hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40 modal-backdrop" onclick="closeDetailPopup()"></div>
+    <!-- Modal Content -->
+    <div class="absolute inset-x-4 top-[10%] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] overflow-y-auto">
+      <!-- Modal Header -->
+      <div id="modalHeader" class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="modalAvatar" class="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold"></div>
+          <div>
+            <h3 id="modalName" class="text-lg font-bold text-slate-800"></h3>
+            <span id="modalBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"></span>
+          </div>
+        </div>
+        <button onclick="closeDetailPopup()" class="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <!-- Modal Body -->
+      <div id="modalBody" class="px-6 py-5">
+        <!-- Content injected by JS -->
+      </div>
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+        <button onclick="closeDetailPopup()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">
+          Close
+        </button>
+        <div class="flex items-center gap-2">
+          <button class="px-4 py-2 text-sm font-medium bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
+            Edit
+          </button>
+          <button class="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            View Full Record
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SALES LEADER POPUP / MODAL ===== -->
+  <div id="salesLeaderModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/40 modal-backdrop" onclick="closeSalesLeaderPopup()"></div>
+    <div class="absolute inset-x-4 top-[10%] sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="slAvatar" class="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold"></div>
+          <div>
+            <h3 id="slName" class="text-lg font-bold text-slate-800"></h3>
+            <span class="text-xs text-slate-400">Sales Performance - This Month</span>
+          </div>
+        </div>
+        <button onclick="closeSalesLeaderPopup()" class="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="slBody" class="px-6 py-5">
+        <!-- Content injected by JS -->
+      </div>
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <button onclick="closeSalesLeaderPopup()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // Mock Data for Detail Popups
+    // ==========================================
+    const mockData = {
+      'booked': {
+        'James Rodriguez': {
+          phone: '(305) 555-0142',
+          email: 'james.rodriguez@email.com',
+          address: '1842 Maple Dr, Miami, FL 33125',
+          service: 'Local Move (3BR House)',
+          date: 'Feb 8, 2026 at 8:00 AM',
+          price: '$1,250',
+          tech: 'Monica Copo',
+          status: 'Confirmed',
+          notes: 'Customer needs piano moved carefully. 2nd floor walk-up at destination. Estimated 5 hours.'
+        },
+        'Tom Williams': {
+          phone: '(305) 555-0298',
+          email: 'tom.w@email.com',
+          address: '4521 Ocean Blvd, Fort Lauderdale, FL 33301',
+          service: 'Pool Cleaning (Monthly)',
+          date: 'Feb 10, 2026 at 9:30 AM',
+          price: '$475',
+          tech: 'Raquel',
+          status: 'Confirmed',
+          notes: 'Recurring monthly service. Includes chemical balancing, filter cleaning, and tile scrubbing.'
+        },
+        'Rachel Howard': {
+          phone: '(786) 555-0177',
+          email: 'rachel.h@email.com',
+          address: '982 SW 3rd St, Apt 4B, Miami, FL 33130',
+          service: 'Move-Out Cleaning',
+          date: 'Feb 12, 2026 at 10:00 AM',
+          price: '$320',
+          tech: 'Daniela',
+          status: 'Confirmed',
+          notes: 'Full deep clean for lease return. Includes oven, fridge interior, baseboards, and window tracks.'
+        },
+        'Nancy Turner': {
+          phone: '(954) 555-0311',
+          email: 'nancy.turner@email.com',
+          address: '2100 Brickell Ave, Unit 708, Miami, FL 33129',
+          service: 'Studio Apartment Move',
+          date: 'Feb 14, 2026 at 9:00 AM',
+          price: '$890',
+          tech: 'Monica Copo',
+          status: 'Confirmed',
+          notes: 'Moving from 7th floor condo. Building requires elevator reservation. Destination is 15 min drive.'
+        }
+      },
+      'lead': {
+        'Sarah Martinez': {
+          phone: '(305) 555-0423',
+          email: 'sarah.m@email.com',
+          address: '3200 Coral Way, Miami, FL 33145',
+          source: 'Google Ads',
+          stage: 'New',
+          service: 'Deep Clean Service',
+          estimatedValue: '$350-$500',
+          notes: 'Interested in one-time deep clean for 4BR house. Asked about recurring options. Follow up Friday.'
+        },
+        'Amanda Chen': {
+          phone: '(786) 555-0588',
+          email: 'amanda.chen@email.com',
+          address: '1500 Bay Rd, Miami Beach, FL 33139',
+          source: 'Referral (Mike Thompson)',
+          stage: 'Contacted',
+          service: 'Pool Resurfacing',
+          estimatedValue: '$3,200-$4,500',
+          notes: 'Pool is 15 years old, plaster is deteriorating. Wants estimate for full resurface. Appointment scheduled for site visit Feb 9.'
+        },
+        'Marcus Johnson': {
+          phone: '(954) 555-0621',
+          email: 'marcus.j@email.com',
+          address: '8800 NW 36th St, Doral, FL 33178',
+          source: 'Website Form',
+          stage: 'Qualified',
+          service: 'Commercial Cleaning (Weekly)',
+          estimatedValue: '$1,200/month',
+          notes: 'Office building, 5,000 sq ft. Needs weekly cleaning M/W/F after hours. Sent proposal, awaiting response.'
+        }
+      },
+      'quote': {
+        'Linda Patel': {
+          phone: '(305) 555-0745',
+          email: 'linda.patel@email.com',
+          address: '6700 Red Rd, Coral Gables, FL 33143',
+          service: 'Long Distance Move (4BR House)',
+          amount: '$2,800',
+          sentDate: 'Feb 6, 2026',
+          validUntil: 'Feb 20, 2026',
+          notes: 'Moving from Miami to Orlando. Full pack and load. Includes 2 fragile items (artwork). Quote includes insurance.'
+        },
+        'Brian Garcia': {
+          phone: '(786) 555-0812',
+          email: 'brian.garcia@email.com',
+          address: '4100 Pine Tree Dr, Miami Beach, FL 33140',
+          service: 'Pool Equipment Install + Cleaning',
+          amount: '$1,950',
+          sentDate: 'Feb 5, 2026',
+          validUntil: 'Feb 19, 2026',
+          notes: 'New Pentair VS pump installation, sand filter replacement, and full chemical service. Equipment cost included.'
+        }
+      },
+      'cancelled': {
+        'David Kim': {
+          phone: '(305) 555-0999',
+          email: 'david.kim@email.com',
+          address: '2250 NW 2nd Ave, Suite 300, Miami, FL 33127',
+          service: 'Office Cleaning (Bi-Weekly)',
+          originalPrice: '$650/month',
+          cancelDate: 'Feb 6, 2026',
+          reason: 'Found cheaper provider',
+          notes: 'Customer had been with us 4 months. Competitor offered $450/month. Did not accept counter-offer of $550.'
+        }
+      }
+    };
+
+    const salesLeaderData = {
+      'Monica Copo': {
+        initials: 'MC',
+        color: 'amber',
+        jobs: 7,
+        revenue: '$8,096',
+        leads: 12,
+        conversionRate: '58%',
+        recentJobs: [
+          { customer: 'James Rodriguez', service: 'Local Move (3BR)', price: '$1,250', date: 'Feb 8' },
+          { customer: 'Nancy Turner', service: 'Studio Apt Move', price: '$890', date: 'Feb 14' },
+          { customer: 'Office Building', service: 'Weekly Clean', price: '$1,500', date: 'Feb 6' },
+          { customer: 'Elena Voss', service: 'Pool Service', price: '$425', date: 'Feb 4' },
+        ],
+        recentLeads: [
+          { customer: 'Sarah Martinez', status: 'New', source: 'Google' },
+          { customer: 'Kevin Park', status: 'Contacted', source: 'Referral' },
+          { customer: 'Lisa Wong', status: 'Proposal', source: 'Website' },
+        ]
+      },
+      'Daniela': {
+        initials: 'DA',
+        color: 'blue',
+        jobs: 8,
+        revenue: '$3,692',
+        leads: 9,
+        conversionRate: '44%',
+        recentJobs: [
+          { customer: 'Rachel Howard', service: 'Move-Out Cleaning', price: '$320', date: 'Feb 12' },
+          { customer: 'Karen L.', service: 'Deep Clean', price: '$280', date: 'Feb 6' },
+          { customer: 'Amy Torres', service: 'Recurring Clean', price: '$180', date: 'Feb 5' },
+          { customer: 'Office Building', service: 'Weekly Clean', price: '$1,500', date: 'Feb 6' },
+        ],
+        recentLeads: [
+          { customer: 'Greg Miller', status: 'Contacted', source: 'Google' },
+          { customer: 'Priya Sharma', status: 'New', source: 'Referral' },
+        ]
+      },
+      'Raquel': {
+        initials: 'RA',
+        color: 'purple',
+        jobs: 3,
+        revenue: '$3,164',
+        leads: 5,
+        conversionRate: '60%',
+        recentJobs: [
+          { customer: 'Tom Williams', service: 'Pool Cleaning', price: '$475', date: 'Feb 10' },
+          { customer: 'Pete F.', service: 'Pool Maintenance', price: '$350', date: 'Feb 6' },
+          { customer: 'Brian Garcia', service: 'Pool Equipment', price: '$1,950', date: 'Pending' },
+        ],
+        recentLeads: [
+          { customer: 'Amanda Chen', status: 'Contacted', source: 'Referral' },
+          { customer: 'Jake Foster', status: 'New', source: 'Website' },
+        ]
+      }
+    };
+
+    // ==========================================
+    // Detail Popup Functions
+    // ==========================================
+    function openDetailPopup(type, name) {
+      const modal = document.getElementById('detailModal');
+      const avatar = document.getElementById('modalAvatar');
+      const nameEl = document.getElementById('modalName');
+      const badge = document.getElementById('modalBadge');
+      const body = document.getElementById('modalBody');
+
+      const data = mockData[type]?.[name];
+      if (!data) return;
+
+      // Set name
+      nameEl.textContent = name;
+
+      // Set avatar initials
+      const initials = name.split(' ').map(n => n[0]).join('');
+
+      // Set colors and badge based on type
+      const typeConfig = {
+        booked: { bg: 'bg-green-100', text: 'text-green-700', badgeBg: 'bg-green-100', badgeText: 'text-green-700', label: 'Booked Job' },
+        lead: { bg: 'bg-blue-100', text: 'text-blue-700', badgeBg: 'bg-blue-100', badgeText: 'text-blue-700', label: 'New Lead' },
+        quote: { bg: 'bg-purple-100', text: 'text-purple-700', badgeBg: 'bg-purple-100', badgeText: 'text-purple-700', label: 'Quote Sent' },
+        cancelled: { bg: 'bg-red-100', text: 'text-red-700', badgeBg: 'bg-red-100', badgeText: 'text-red-700', label: 'Cancelled' }
+      };
+
+      const config = typeConfig[type];
+      avatar.className = `w-12 h-12 rounded-full flex items-center justify-center text-base font-bold ${config.bg} ${config.text}`;
+      avatar.textContent = initials;
+      badge.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${config.badgeBg} ${config.badgeText}`;
+      badge.textContent = config.label;
+
+      // Build body content based on type
+      let html = '';
+
+      if (type === 'booked') {
+        html = `
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Phone</p>
+                <p class="text-sm font-medium text-slate-700">${data.phone}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Email</p>
+                <p class="text-sm font-medium text-slate-700">${data.email}</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Address</p>
+              <p class="text-sm font-medium text-slate-700">${data.address}</p>
+            </div>
+            <hr class="border-slate-100">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Service</p>
+                <p class="text-sm font-medium text-slate-700">${data.service}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Scheduled Date</p>
+                <p class="text-sm font-medium text-slate-700">${data.date}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Price</p>
+                <p class="text-sm font-bold text-green-600">${data.price}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Assigned Tech</p>
+                <p class="text-sm font-medium text-slate-700">${data.tech}</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Status</p>
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">${data.status}</span>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Notes</p>
+              <p class="text-sm text-slate-600 bg-slate-50 rounded-lg p-3">${data.notes}</p>
+            </div>
+          </div>
+        `;
+      } else if (type === 'lead') {
+        html = `
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Phone</p>
+                <p class="text-sm font-medium text-slate-700">${data.phone}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Email</p>
+                <p class="text-sm font-medium text-slate-700">${data.email}</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Address</p>
+              <p class="text-sm font-medium text-slate-700">${data.address}</p>
+            </div>
+            <hr class="border-slate-100">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Lead Source</p>
+                <p class="text-sm font-medium text-slate-700">${data.source}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Pipeline Stage</p>
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">${data.stage}</span>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Service Interest</p>
+                <p class="text-sm font-medium text-slate-700">${data.service}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Estimated Value</p>
+                <p class="text-sm font-bold text-blue-600">${data.estimatedValue}</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Notes</p>
+              <p class="text-sm text-slate-600 bg-slate-50 rounded-lg p-3">${data.notes}</p>
+            </div>
+          </div>
+        `;
+      } else if (type === 'quote') {
+        html = `
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Phone</p>
+                <p class="text-sm font-medium text-slate-700">${data.phone}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Email</p>
+                <p class="text-sm font-medium text-slate-700">${data.email}</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Address</p>
+              <p class="text-sm font-medium text-slate-700">${data.address}</p>
+            </div>
+            <hr class="border-slate-100">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Service</p>
+                <p class="text-sm font-medium text-slate-700">${data.service}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Quote Amount</p>
+                <p class="text-sm font-bold text-purple-600">${data.amount}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Sent Date</p>
+                <p class="text-sm font-medium text-slate-700">${data.sentDate}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Valid Until</p>
+                <p class="text-sm font-medium text-slate-700">${data.validUntil}</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Status</p>
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Awaiting Response</span>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Notes</p>
+              <p class="text-sm text-slate-600 bg-slate-50 rounded-lg p-3">${data.notes}</p>
+            </div>
+          </div>
+        `;
+      } else if (type === 'cancelled') {
+        html = `
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Phone</p>
+                <p class="text-sm font-medium text-slate-700">${data.phone}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Email</p>
+                <p class="text-sm font-medium text-slate-700">${data.email}</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Address</p>
+              <p class="text-sm font-medium text-slate-700">${data.address}</p>
+            </div>
+            <hr class="border-slate-100">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Service</p>
+                <p class="text-sm font-medium text-slate-700">${data.service}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Original Price</p>
+                <p class="text-sm font-bold text-red-500 line-through">${data.originalPrice}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Cancellation Date</p>
+                <p class="text-sm font-medium text-slate-700">${data.cancelDate}</p>
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 mb-1">Reason</p>
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">${data.reason}</span>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 mb-1">Notes</p>
+              <p class="text-sm text-slate-600 bg-slate-50 rounded-lg p-3">${data.notes}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      body.innerHTML = html;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetailPopup() {
+      document.getElementById('detailModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // ==========================================
+    // Sales Leader Popup Functions
+    // ==========================================
+    function openSalesLeaderPopup(name) {
+      const modal = document.getElementById('salesLeaderModal');
+      const avatar = document.getElementById('slAvatar');
+      const nameEl = document.getElementById('slName');
+      const body = document.getElementById('slBody');
+
+      const data = salesLeaderData[name];
+      if (!data) return;
+
+      nameEl.textContent = name;
+      avatar.className = `w-12 h-12 rounded-full flex items-center justify-center text-base font-bold bg-${data.color}-100 text-${data.color}-700`;
+      avatar.textContent = data.initials;
+
+      let jobRows = data.recentJobs.map(j => `
+        <tr class="border-b border-slate-50 last:border-0">
+          <td class="py-2 pr-3 text-sm text-slate-700">${j.customer}</td>
+          <td class="py-2 pr-3 text-sm text-slate-500">${j.service}</td>
+          <td class="py-2 pr-3 text-sm font-medium text-green-600">${j.price}</td>
+          <td class="py-2 text-sm text-slate-400">${j.date}</td>
+        </tr>
+      `).join('');
+
+      let leadRows = data.recentLeads.map(l => {
+        const statusColors = {
+          'New': 'bg-blue-100 text-blue-700',
+          'Contacted': 'bg-cyan-100 text-cyan-700',
+          'Qualified': 'bg-amber-100 text-amber-700',
+          'Proposal': 'bg-purple-100 text-purple-700'
+        };
+        return `
+          <tr class="border-b border-slate-50 last:border-0">
+            <td class="py-2 pr-3 text-sm text-slate-700">${l.customer}</td>
+            <td class="py-2 pr-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusColors[l.status] || 'bg-slate-100 text-slate-700'}">${l.status}</span></td>
+            <td class="py-2 text-sm text-slate-400">${l.source}</td>
+          </tr>
+        `;
+      }).join('');
+
+      body.innerHTML = `
+        <div class="space-y-5">
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-4 gap-3">
+            <div class="bg-slate-50 rounded-lg p-3 text-center">
+              <p class="text-lg font-bold text-slate-800">${data.jobs}</p>
+              <p class="text-[10px] text-slate-400">Jobs</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3 text-center">
+              <p class="text-lg font-bold text-green-600">${data.revenue}</p>
+              <p class="text-[10px] text-slate-400">Revenue</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3 text-center">
+              <p class="text-lg font-bold text-slate-800">${data.leads}</p>
+              <p class="text-[10px] text-slate-400">Leads</p>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-3 text-center">
+              <p class="text-lg font-bold text-blue-600">${data.conversionRate}</p>
+              <p class="text-[10px] text-slate-400">Conversion</p>
+            </div>
+          </div>
+
+          <!-- Recent Jobs -->
+          <div>
+            <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Recent Jobs</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-slate-100">
+                    <th class="py-1.5 pr-3 text-left text-[10px] text-slate-400 font-medium">Customer</th>
+                    <th class="py-1.5 pr-3 text-left text-[10px] text-slate-400 font-medium">Service</th>
+                    <th class="py-1.5 pr-3 text-left text-[10px] text-slate-400 font-medium">Price</th>
+                    <th class="py-1.5 text-left text-[10px] text-slate-400 font-medium">Date</th>
+                  </tr>
+                </thead>
+                <tbody>${jobRows}</tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Recent Leads -->
+          <div>
+            <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Active Leads</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="border-b border-slate-100">
+                    <th class="py-1.5 pr-3 text-left text-[10px] text-slate-400 font-medium">Customer</th>
+                    <th class="py-1.5 pr-3 text-left text-[10px] text-slate-400 font-medium">Stage</th>
+                    <th class="py-1.5 text-left text-[10px] text-slate-400 font-medium">Source</th>
+                  </tr>
+                </thead>
+                <tbody>${leadRows}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSalesLeaderPopup() {
+      document.getElementById('salesLeaderModal').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    // ==========================================
+    // Close modals on Escape key
+    // ==========================================
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeDetailPopup();
+        closeSalesLeaderPopup();
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New HTML Blocks Preview - Service Business Edition</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 3rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #1a1a1a;
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 3rem;
+      font-size: 1.1rem;
+    }
+    .block-section {
+      margin-bottom: 5rem;
+    }
+    .block-header {
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+    .block-header h2 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .block-header p {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+    .block-demo {
+      background: #fafafa;
+      padding: 3rem 2rem;
+      border-radius: 8px;
+      border: 2px dashed #e0e0e0;
+      margin-bottom: 3rem;
+    }
+    .block-name {
+      background: #2563eb;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Block Styles */
+    .emergency-banner {
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      color: white;
+      padding: 2.5rem 2rem;
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .emergency-banner::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: repeating-linear-gradient(
+        45deg,
+        #fbbf24,
+        #fbbf24 10px,
+        #f59e0b 10px,
+        #f59e0b 20px
+      );
+      animation: slide 1s linear infinite;
+    }
+    @keyframes slide {
+      0% { background-position: 0 0; }
+      100% { background-position: 20px 0; }
+    }
+    .emergency-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .emergency-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .emergency-phone {
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin: 1rem 0;
+      color: #fbbf24;
+    }
+    .emergency-subtext {
+      font-size: 1.125rem;
+      opacity: 0.95;
+    }
+
+    .same-day-badge {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 16px;
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+      position: relative;
+    }
+    .same-day-badge::after {
+      content: "✓";
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      width: 60px;
+      height: 60px;
+      background: #fbbf24;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.5);
+    }
+    .badge-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .badge-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .badge-text {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    .limited-alert {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+    }
+    .alert-icon {
+      font-size: 3rem;
+      flex-shrink: 0;
+      animation: shake 0.5s infinite;
+    }
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
+    }
+    .alert-content {
+      flex: 1;
+    }
+    .alert-heading {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+    }
+    .alert-text {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    .cert-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      padding: 2rem 0;
+    }
+    .cert-card {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+    .cert-card:hover {
+      border-color: #2563eb;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+      transform: translateY(-4px);
+    }
+    .cert-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+    }
+    .cert-name {
+      font-weight: 700;
+      color: #111827;
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+    }
+    .cert-desc {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .years-highlight {
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      color: white;
+      padding: 4rem 2rem;
+      border-radius: 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .years-highlight::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .years-number {
+      font-size: 6rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 1rem;
+      color: #fbbf24;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .years-label {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .years-text {
+      font-size: 1.125rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .insurance-badge {
+      background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+      color: white;
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+      box-shadow: 0 8px 24px rgba(6, 95, 70, 0.3);
+    }
+    .insurance-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .insurance-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .insurance-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .insurance-list {
+      list-style: none;
+      padding: 0;
+    }
+    .insurance-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      font-size: 1.125rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .insurance-list li:last-child {
+      border-bottom: none;
+    }
+    .insurance-list li::before {
+      content: "✓";
+      width: 24px;
+      height: 24px;
+      background: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .ba-column {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .ba-label {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      z-index: 1;
+    }
+    .ba-image {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: white;
+    }
+    .ba-column:first-child .ba-label {
+      background: #dc2626;
+    }
+    .ba-column:last-child .ba-label {
+      background: #10b981;
+    }
+
+    .service-areas {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      border: 2px solid #e5e7eb;
+    }
+    .sa-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .sa-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 0.5rem;
+    }
+    .sa-subtitle {
+      color: #6b7280;
+    }
+    .sa-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .sa-item {
+      padding: 1rem;
+      background: #f9fafb;
+      border-radius: 8px;
+      border-left: 4px solid #2563eb;
+      font-weight: 600;
+      color: #111827;
+      transition: all 0.3s;
+    }
+    .sa-item:hover {
+      background: #eff6ff;
+      transform: translateX(4px);
+    }
+
+    .location-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .location-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s;
+    }
+    .location-card:hover {
+      border-color: #2563eb;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+    }
+    .loc-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      color: white;
+      margin-bottom: 1.5rem;
+    }
+    .loc-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 1rem;
+    }
+    .loc-address {
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+    .loc-phone {
+      color: #2563eb;
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+
+    .coupon-card {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 3px dashed #f59e0b;
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      text-align: center;
+    }
+    .coupon-stamp {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 80px;
+      height: 80px;
+      border: 3px solid #dc2626;
+      border-radius: 50%;
+      transform: rotate(-15deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.75rem;
+      color: #dc2626;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .coupon-amount {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #dc2626;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .coupon-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 1.5rem;
+    }
+    .coupon-code {
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      border: 2px dashed #f59e0b;
+      font-weight: 700;
+      color: #92400e;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .coupon-expiry {
+      font-size: 0.875rem;
+      color: #78350f;
+      font-weight: 600;
+    }
+
+    .financing-badge {
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: white;
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+    }
+    .fin-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .fin-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+    .fin-text {
+      font-size: 1.125rem;
+      opacity: 0.95;
+      margin-bottom: 1.5rem;
+    }
+    .fin-features {
+      list-style: none;
+      padding: 0;
+      text-align: left;
+      max-width: 350px;
+      margin: 0 auto;
+    }
+    .fin-features li {
+      padding: 0.75rem 0;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .fin-features li::before {
+      content: "✓";
+      width: 24px;
+      height: 24px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .free-estimate {
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: white;
+      padding: 4rem 2rem;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
+    }
+    .fe-title {
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      line-height: 1.1;
+    }
+    .fe-text {
+      font-size: 1.25rem;
+      opacity: 0.95;
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .fe-button {
+      display: inline-block;
+      background: white;
+      color: #2563eb;
+      padding: 1.5rem 4rem;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 1.5rem;
+      text-decoration: none;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+    }
+    .fe-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+    }
+
+    .service-checklist {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      border: 2px solid #e5e7eb;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .sc-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .sc-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 0.5rem;
+    }
+    .sc-subtitle {
+      color: #6b7280;
+    }
+    .sc-list {
+      list-style: none;
+      padding: 0;
+    }
+    .sc-list li {
+      padding: 1rem 0;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1.125rem;
+      color: #374151;
+    }
+    .sc-list li:last-child {
+      border-bottom: none;
+    }
+    .sc-list li::before {
+      content: "✓";
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .warranty-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 3px solid #2563eb;
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+    .warranty-badge {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2563eb;
+      color: white;
+      padding: 0.5rem 2rem;
+      border-radius: 24px;
+      font-weight: 800;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .warranty-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      color: #2563eb;
+    }
+    .warranty-title {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #1e40af;
+      margin-bottom: 1rem;
+    }
+    .warranty-text {
+      font-size: 1.125rem;
+      color: #1e40af;
+      line-height: 1.7;
+    }
+
+    .project-timeline {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .timeline-line {
+      position: absolute;
+      left: 30px;
+      top: 40px;
+      bottom: 40px;
+      width: 4px;
+      background: linear-gradient(to bottom, #2563eb, #e5e7eb);
+    }
+    .timeline-step {
+      position: relative;
+      padding-left: 80px;
+      margin-bottom: 3rem;
+    }
+    .step-number {
+      position: absolute;
+      left: 0;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      z-index: 1;
+    }
+    .step-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 2px solid #e5e7eb;
+      transition: all 0.3s;
+    }
+    .step-content:hover {
+      border-color: #2563eb;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+    .step-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 0.5rem;
+    }
+    .step-desc {
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .before-after {
+        grid-template-columns: 1fr;
+      }
+      .years-number {
+        font-size: 4rem;
+      }
+      .coupon-amount {
+        font-size: 3rem;
+      }
+      .fe-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 New HTML Blocks Preview</h1>
+    <p class="subtitle">Service Business Edition - 15 Professional Blocks</p>
+
+    <!-- EMERGENCY & URGENCY -->
+    <div class="block-section">
+      <div class="block-header">
+        <h2>🚨 Emergency & Urgency</h2>
+        <p>Drive immediate action with urgency-focused blocks</p>
+      </div>
+
+      <!-- Block 1: 24/7 Emergency Banner -->
+      <div class="block-demo">
+        <div class="block-name">Block 1: 24/7 Emergency Banner</div>
+        <div class="emergency-banner">
+          <div class="emergency-icon">🚨</div>
+          <div class="emergency-title">24/7 Emergency Service</div>
+          <div class="emergency-phone">(555) 911-HELP</div>
+          <div class="emergency-subtext">We're available day or night - Call now for immediate assistance!</div>
+        </div>
+      </div>
+
+      <!-- Block 2: Same Day Service Badge -->
+      <div class="block-demo">
+        <div class="block-name">Block 2: Same Day Service Badge</div>
+        <div class="same-day-badge">
+          <div class="badge-icon">⚡</div>
+          <div class="badge-title">Same Day Service</div>
+          <div class="badge-text">Call before 2 PM and get service today!</div>
+        </div>
+      </div>
+
+      <!-- Block 3: Limited Availability Alert -->
+      <div class="block-demo">
+        <div class="block-name">Block 3: Limited Availability Alert</div>
+        <div class="limited-alert">
+          <div class="alert-icon">⏰</div>
+          <div class="alert-content">
+            <div class="alert-heading">Limited Slots Available!</div>
+            <div class="alert-text">Only 3 appointments left this week - Book now before they're gone</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRUST & CREDENTIALS -->
+    <div class="block-section">
+      <div class="block-header">
+        <h2>🏆 Trust & Credentials</h2>
+        <p>Build credibility with professional certifications and guarantees</p>
+      </div>
+
+      <!-- Block 4: Certification Grid -->
+      <div class="block-demo">
+        <div class="block-name">Block 4: Certification Grid</div>
+        <div class="cert-grid">
+          <div class="cert-card">
+            <div class="cert-icon">🏅</div>
+            <div class="cert-name">BBB A+ Rated</div>
+            <div class="cert-desc">Better Business Bureau Accredited</div>
+          </div>
+          <div class="cert-card">
+            <div class="cert-icon">✓</div>
+            <div class="cert-name">Licensed</div>
+            <div class="cert-desc">State Licensed & Certified</div>
+          </div>
+          <div class="cert-card">
+            <div class="cert-icon">🛡️</div>
+            <div class="cert-name">Insured</div>
+            <div class="cert-desc">Fully Bonded & Insured</div>
+          </div>
+          <div class="cert-card">
+            <div class="cert-icon">⭐</div>
+            <div class="cert-name">Award Winner</div>
+            <div class="cert-desc">Best of 2024</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 5: Years in Business -->
+      <div class="block-demo">
+        <div class="block-name">Block 5: Years in Business Highlight</div>
+        <div class="years-highlight">
+          <div class="years-number">25+</div>
+          <div class="years-label">Years in Business</div>
+          <div class="years-text">Serving our community with pride since 1999. Experience you can trust.</div>
+        </div>
+      </div>
+
+      <!-- Block 6: Insurance Badge -->
+      <div class="block-demo">
+        <div class="block-name">Block 6: Insurance & Bonding Badge</div>
+        <div class="insurance-badge">
+          <div class="insurance-header">
+            <div class="insurance-icon">🛡️</div>
+            <div class="insurance-title">Fully Protected</div>
+          </div>
+          <ul class="insurance-list">
+            <li>Licensed & Certified Professionals</li>
+            <li>Fully Bonded & Insured</li>
+            <li>$2M Liability Coverage</li>
+            <li>Worker's Compensation Insurance</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Block 7: Before/After Grid -->
+      <div class="block-demo">
+        <div class="block-name">Block 7: Before/After Grid</div>
+        <div class="before-after">
+          <div class="ba-column">
+            <div class="ba-label">Before</div>
+            <div class="ba-image">📷</div>
+          </div>
+          <div class="ba-column">
+            <div class="ba-label">After</div>
+            <div class="ba-image">📷</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICE AREAS -->
+    <div class="block-section">
+      <div class="block-header">
+        <h2>📍 Service Areas & Location</h2>
+        <p>Show coverage areas and multiple locations</p>
+      </div>
+
+      <!-- Block 8: Service Area List -->
+      <div class="block-demo">
+        <div class="block-name">Block 8: Service Area List</div>
+        <div class="service-areas">
+          <div class="sa-header">
+            <div class="sa-title">Areas We Serve</div>
+            <div class="sa-subtitle">Proudly serving the greater metro area</div>
+          </div>
+          <div class="sa-grid">
+            <div class="sa-item">Downtown</div>
+            <div class="sa-item">North Side</div>
+            <div class="sa-item">South Side</div>
+            <div class="sa-item">East End</div>
+            <div class="sa-item">West End</div>
+            <div class="sa-item">Suburbs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 9: Multi-Location Cards -->
+      <div class="block-demo">
+        <div class="block-name">Block 9: Multi-Location Cards</div>
+        <div class="location-cards">
+          <div class="location-card">
+            <div class="loc-icon">📍</div>
+            <div class="loc-name">Downtown Office</div>
+            <div class="loc-address">123 Main Street<br>Suite 100<br>City, ST 12345</div>
+            <div class="loc-phone">(555) 123-4567</div>
+          </div>
+          <div class="location-card">
+            <div class="loc-icon">📍</div>
+            <div class="loc-name">North Branch</div>
+            <div class="loc-address">456 Oak Avenue<br>Unit 200<br>City, ST 12346</div>
+            <div class="loc-phone">(555) 987-6543</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OFFERS & PRICING -->
+    <div class="block-section">
+      <div class="block-header">
+        <h2>💰 Offers & Pricing</h2>
+        <p>Drive conversions with special offers and financing</p>
+      </div>
+
+      <!-- Block 10: Coupon Card -->
+      <div class="block-demo">
+        <div class="block-name">Block 10: Coupon Card</div>
+        <div class="coupon-card">
+          <div class="coupon-stamp">Limited<br>Offer</div>
+          <div class="coupon-amount">$50 OFF</div>
+          <div class="coupon-title">Your First Service</div>
+          <div class="coupon-code">CODE: SAVE50</div>
+          <div class="coupon-expiry">Expires: 12/31/2024</div>
+        </div>
+      </div>
+
+      <!-- Block 11: Financing Badge -->
+      <div class="block-demo">
+        <div class="block-name">Block 11: Financing Available Badge</div>
+        <div class="financing-badge">
+          <div class="fin-icon">💳</div>
+          <div class="fin-title">Flexible Financing Available</div>
+          <div class="fin-text">Make your project affordable with our payment plans</div>
+          <ul class="fin-features">
+            <li>0% APR for 12 months</li>
+            <li>Low monthly payments</li>
+            <li>Quick approval process</li>
+            <li>Multiple payment options</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Block 12: Free Estimate CTA -->
+      <div class="block-demo">
+        <div class="block-name">Block 12: Free Estimate CTA</div>
+        <div class="free-estimate">
+          <div class="fe-title">Get Your Free Estimate Today</div>
+          <div class="fe-text">No obligation. No hidden fees. Just honest pricing from local experts you can trust.</div>
+          <button class="fe-button">Click for Free Quote →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICE DETAILS -->
+    <div class="block-section">
+      <div class="block-header">
+        <h2>📋 Service Details</h2>
+        <p>Show what's included and build confidence</p>
+      </div>
+
+      <!-- Block 13: Service Checklist -->
+      <div class="block-demo">
+        <div class="block-name">Block 13: Service Checklist</div>
+        <div class="service-checklist">
+          <div class="sc-header">
+            <div class="sc-title">What's Included</div>
+            <div class="sc-subtitle">Every service includes:</div>
+          </div>
+          <ul class="sc-list">
+            <li>Free initial consultation</li>
+            <li>Detailed written estimate</li>
+            <li>Professional installation</li>
+            <li>Clean-up & debris removal</li>
+            <li>Final walkthrough & inspection</li>
+            <li>1-year workmanship warranty</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Block 14: Warranty Box -->
+      <div class="block-demo">
+        <div class="block-name">Block 14: Warranty Box</div>
+        <div class="warranty-box">
+          <div class="warranty-badge">Our Promise</div>
+          <div class="warranty-icon">🏆</div>
+          <div class="warranty-title">100% Satisfaction Guaranteed</div>
+          <div class="warranty-text">We stand behind our work with a comprehensive warranty. If you're not completely satisfied, we'll make it right - no questions asked.</div>
+        </div>
+      </div>
+
+      <!-- Block 15: Project Timeline -->
+      <div class="block-demo">
+        <div class="block-name">Block 15: Project Timeline</div>
+        <div class="project-timeline">
+          <div class="timeline-line"></div>
+          <div class="timeline-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <div class="step-title">Initial Consultation</div>
+              <div class="step-desc">We meet with you to understand your needs and provide a detailed quote</div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <div class="step-title">Project Planning</div>
+              <div class="step-desc">Our team develops a comprehensive plan and timeline for your project</div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <div class="step-title">Professional Installation</div>
+              <div class="step-desc">Certified technicians complete the work to perfection</div>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <div class="step-title">Quality Inspection</div>
+              <div class="step-desc">Final walkthrough to ensure everything exceeds your expectations</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align: center; padding: 3rem 0; border-top: 2px solid #e5e7eb; margin-top: 3rem;">
+      <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: #111827;">Ready to add these blocks?</h3>
+      <p style="color: #6b7280; margin-bottom: 2rem;">These 15 blocks are specifically designed for service businesses like HVAC, plumbing, landscaping, contractors, and more.</p>
+      <p style="color: #2563eb; font-weight: 600;">Preview complete! 🎉</p>
+    </div>
+  </div>
+</body>
+</html>

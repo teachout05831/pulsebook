@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServicePro — System Implementation Walkthrough</title>
+  <style>
+    :root {
+      --sidebar-bg: #0f172a; --sidebar-border: #1e293b; --sidebar-text: #94a3b8;
+      --sidebar-active: rgba(37,99,235,0.2); --sidebar-active-text: #fff; --sidebar-active-border: #3b82f6;
+      --main-bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0;
+      --text: #0f172a; --text-muted: #64748b;
+      --primary: #3b82f6; --primary-dark: #2563eb; --primary-light: rgba(59,130,246,0.1);
+      --green: #22c55e; --green-light: rgba(34,197,94,0.1);
+      --amber: #f59e0b; --amber-light: rgba(245,158,11,0.1);
+      --red: #ef4444; --red-light: rgba(239,68,68,0.1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: var(--text); line-height: 1.5; }
+
+    /* PAGE HEADER */
+    .page-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 48px 32px; text-align: center; border-bottom: 1px solid var(--sidebar-border); }
+    .page-header h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .page-header p { color: var(--sidebar-text); font-size: 1rem; max-width: 600px; margin: 0 auto; }
+    .step-badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+
+    /* STEP NAV */
+    .step-nav { display: flex; justify-content: center; gap: 4px; padding: 14px 20px; background: #1e293b; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+    .step-btn { padding: 7px 14px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--sidebar-text); font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .step-btn:hover { background: rgba(255,255,255,0.05); color: #e2e8f0; }
+    .step-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* STEP CONTENT */
+    .step { display: none; }
+    .step.active { display: block; }
+    .step-inner { max-width: 1100px; margin: 0 auto; padding: 40px 24px 60px; }
+    .step-title-area { text-align: center; margin-bottom: 36px; }
+    .step-number { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.9rem; font-weight: 700; margin-bottom: 12px; }
+    .step-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .step-subtitle { color: var(--sidebar-text); font-size: 0.95rem; }
+
+    /* ANNOTATIONS */
+    .annotation { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; padding: 14px 18px; margin: 20px 0; font-size: 0.85rem; color: #cbd5e1; }
+    .annotation strong { color: #60a5fa; }
+    .annotation-green { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); }
+    .annotation-green strong { color: #4ade80; }
+    .annotation-amber { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+    .annotation-amber strong { color: #fbbf24; }
+    .annotation-red { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); }
+    .annotation-red strong { color: #f87171; }
+
+    /* APP MOCKUP FRAME */
+    .app-frame { background: var(--main-bg); border-radius: 12px; overflow: hidden; border: 1px solid #334155; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .app-frame-bar { background: #1e293b; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ef4444; } .dot-y { background: #f59e0b; } .dot-g { background: #22c55e; }
+    .app-frame-url { flex: 1; text-align: center; font-size: 0.7rem; color: #64748b; font-family: monospace; }
+
+    /* SETTINGS LAYOUT */
+    .mock-settings-layout { display: flex; min-height: 480px; }
+    .mock-settings-sidebar { width: 200px; background: #fff; border-right: 1px solid var(--border); flex-shrink: 0; }
+    .mock-settings-header { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .mock-settings-nav { padding: 12px 8px; }
+    .mock-settings-section-label { font-size: 0.58rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 10px 8px 4px; }
+    .mock-settings-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; font-size: 0.75rem; color: #334155; cursor: default; margin-bottom: 1px; }
+    .mock-settings-item.active { background: rgba(59,130,246,0.08); color: var(--primary-dark); font-weight: 500; }
+    .mock-settings-item .s-icon { font-size: 0.75rem; width: 16px; text-align: center; }
+    .mock-settings-content { flex: 1; padding: 24px 28px; overflow-y: auto; }
+
+    /* 3-COLUMN DETAIL LAYOUT */
+    .mock-detail { display: grid; grid-template-columns: 230px 1fr 280px; gap: 12px; padding: 16px; min-height: 420px; }
+    .mock-detail-full { grid-column: 1 / -1; }
+
+    /* CARDS */
+    .mock-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+    .mock-card-header { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .mock-card-title { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+    .mock-card-body { padding: 10px 14px; }
+
+    /* FORM FIELDS */
+    .mock-field { margin-bottom: 12px; }
+    .mock-label { font-size: 0.7rem; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+    .mock-input { width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.78rem; color: var(--text); background: #fff; }
+    .mock-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.78rem; color: var(--primary-dark); background: #fff; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; border: 1px solid; cursor: default; white-space: nowrap; }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .btn-outline { background: #fff; color: var(--text); border-color: var(--border); }
+    .btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
+    .btn-sm { padding: 4px 10px; font-size: 0.7rem; }
+
+    /* HEADER MOCKUP */
+    .mock-header { background: #fff; border-bottom: 1px solid var(--border); padding: 12px 20px; }
+    .mock-header-row { display: flex; align-items: center; justify-content: space-between; }
+
+    /* BADGES */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.6rem; font-weight: 600; }
+    .badge-blue { background: var(--primary-light); color: var(--primary-dark); }
+    .badge-green { background: var(--green-light); color: #16a34a; }
+    .badge-amber { background: var(--amber-light); color: #d97706; }
+    .badge-red { background: var(--red-light); color: #dc2626; }
+
+    /* ROW ITEMS */
+    .fi { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; font-size: 0.78rem; }
+    .fi-label { color: var(--text-muted); font-weight: 500; }
+    .fi-value { color: var(--primary-dark); font-weight: 500; }
+
+    /* LINE ITEM TABLE */
+    .li-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .li-table th { text-align: left; padding: 6px 8px; color: var(--text-muted); font-weight: 600; font-size: 0.65rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .li-table td { padding: 6px 8px; border-bottom: 1px solid #f1f5f9; color: var(--text); }
+    .li-table .cat { color: var(--text-muted); font-size: 0.6rem; font-weight: 600; text-transform: uppercase; }
+
+    /* SLIDE PANEL MOCKUP */
+    .mock-panel { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; max-width: 380px; margin: 0 auto; }
+    .mock-panel-head { background: #1e293b; color: #fff; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; font-weight: 600; }
+
+    /* TIMELINE */
+    .timeline-entry { display: flex; gap: 10px; padding-bottom: 14px; position: relative; }
+    .timeline-entry::before { content: ''; position: absolute; left: 5px; top: 18px; bottom: 0; width: 1px; background: var(--border); }
+    .timeline-entry:last-child::before { display: none; }
+    .timeline-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+
+    /* DIALOG */
+    .mock-dialog-overlay { position: relative; background: rgba(0,0,0,0.04); border-radius: 8px; padding: 30px 20px; display: flex; justify-content: center; margin: 16px 0; }
+    .mock-dialog { background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,0.12); width: 100%; max-width: 500px; overflow: hidden; }
+    .mock-dialog-header { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+    .mock-dialog-title { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .mock-dialog-desc { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .mock-dialog-body { padding: 14px 18px; }
+    .mock-dialog-footer { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+    /* TWO COLUMN COMPARE */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 16px 0; }
+
+    /* CALENDAR */
+    .mini-cal { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+    .mini-cal-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; font-size: 0.65rem; }
+    .mini-cal-day { padding: 4px 2px; border-radius: 4px; cursor: default; color: var(--text); }
+    .mini-cal-day.header { color: var(--text-muted); font-weight: 600; font-size: 0.6rem; }
+    .mini-cal-day.today { background: var(--primary); color: #fff; font-weight: 600; }
+    .mini-cal-day.avail { position: relative; }
+    .mini-cal-day.avail::after { content: ''; position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; }
+    .mini-cal-day.green::after { background: var(--green); }
+    .mini-cal-day.yellow::after { background: var(--amber); }
+    .mini-cal-day.red-dot::after { background: var(--red); }
+
+    /* ARROW */
+    .arrow-down { text-align: center; padding: 16px 0; font-size: 1.5rem; color: #475569; }
+
+    /* FLOW SUMMARY */
+    .flow-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 0.78rem; }
+    .flow-step { padding: 6px 12px; border-radius: 6px; font-weight: 500; }
+    .flow-arrow { color: var(--text-muted); }
+
+    /* TOGGLE SWITCH */
+    .sw { display: inline-block; width: 32px; height: 18px; border-radius: 9px; background: #e2e8f0; position: relative; vertical-align: middle; }
+    .sw.on { background: var(--primary); }
+    .sw::after { content: ''; width: 14px; height: 14px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: 0.2s; }
+    .sw.on::after { transform: translateX(14px); }
+
+    /* TOTAL BAR */
+    .total-bar { background: #1e40af; color: white; padding: 10px 14px; border-radius: 0 0 10px 10px; display: flex; justify-content: space-between; align-items: center; }
+    .total-bar-label { font-size: 0.7rem; opacity: 0.8; }
+    .total-bar-amount { font-size: 1.1rem; font-weight: 700; }
+
+    /* RESOURCE GRID */
+    .resource-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .resource-tile { background: #f8fafc; border-radius: 8px; padding: 8px; text-align: center; }
+    .resource-tile-label { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em; }
+    .resource-tile-value { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-top: 2px; }
+    .resource-tile.green { background: var(--green-light); }
+    .resource-tile.green .resource-tile-value { color: #16a34a; }
+
+    /* ICON BUTTON */
+    .ico-btn { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 6px; background: #fff; font-size: 0.8rem; cursor: default; }
+
+    /* DROPDOWN MENU */
+    .mock-dropdown { background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); padding: 4px; width: 200px; }
+    .mock-dropdown-item { padding: 7px 10px; border-radius: 4px; font-size: 0.75rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .mock-dropdown-item:hover { background: #f1f5f9; }
+    .mock-dropdown-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .mock-detail { grid-template-columns: 1fr; }
+      .mock-settings-sidebar { display: none; }
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <span class="step-badge">Complete Implementation Plan</span>
+  <h1>ServicePro System Walkthrough</h1>
+  <p>Every feature, every screen, every flow — see exactly how the platform comes together across 17 phases of implementation.</p>
+</div>
+
+<!-- STEP NAV -->
+<div class="step-nav">
+  <button class="step-btn active" onclick="showStep('dropdowns')">1. Dropdowns</button>
+  <button class="step-btn" onclick="showStep('autofees')">2. Auto-Fees</button>
+  <button class="step-btn" onclick="showStep('jobdetail')">3. Job Detail</button>
+  <button class="step-btn" onclick="showStep('hourly')">4. Hourly Display</button>
+  <button class="step-btn" onclick="showStep('payments')">5. Payments</button>
+  <button class="step-btn" onclick="showStep('packages')">6. Packages</button>
+  <button class="step-btn" onclick="showStep('actions')">7. Actions</button>
+  <button class="step-btn" onclick="showStep('scheduler')">8. Scheduler</button>
+  <button class="step-btn" onclick="showStep('docs')">9. Documents</button>
+  <button class="step-btn" onclick="showStep('activity')">10. Activity</button>
+  <button class="step-btn" onclick="showStep('extras')">11. Extras</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 1: CUSTOMIZABLE DROPDOWNS -->
+<!-- ============================================================ -->
+<div id="step-dropdowns" class="step active">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">1</div>
+      <div class="step-title">Customizable Dropdowns</div>
+      <div class="step-subtitle">Replace hardcoded lists with company-defined options. Any industry, any terminology.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Why first:</strong> Zero migration. The DB already stores these as plain text — any value works. We just swap hardcoded arrays in the UI for company-defined options stored in settings JSONB. Quick win, huge impact on multi-industry support.
+    </div>
+
+    <!-- Settings Page Mockup -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/settings/dropdowns</div>
+      </div>
+      <div class="mock-settings-layout">
+        <div class="mock-settings-sidebar">
+          <div class="mock-settings-header">Settings</div>
+          <div class="mock-settings-nav">
+            <div class="mock-settings-section-label">General</div>
+            <div class="mock-settings-item"><span class="s-icon">&#127970;</span> Company</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128101;</span> Team</div>
+            <div class="mock-settings-section-label">Business</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128176;</span> Service Catalog</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128230;</span> Materials</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128196;</span> Estimate Builder</div>
+            <div class="mock-settings-item active" style="font-weight: 600;"><span class="s-icon">&#9776;</span> Dropdowns</div>
+            <div class="mock-settings-section-label">Customization</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128221;</span> Custom Fields</div>
+            <div class="mock-settings-item"><span class="s-icon">&#127991;</span> Tags</div>
+            <div class="mock-settings-item"><span class="s-icon">&#127912;</span> Brand Kit</div>
+          </div>
+        </div>
+        <div class="mock-settings-content">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+              <div style="font-size: 1.1rem; font-weight: 700; color: var(--text);">Dropdown Options</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Customize the options that appear in dropdown menus across your estimates and jobs.</div>
+            </div>
+          </div>
+
+          <!-- Tabs for each dropdown -->
+          <div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px;">
+            <div style="padding: 8px 16px; font-size: 0.8rem; font-weight: 500; color: var(--primary-dark); border-bottom: 2px solid var(--primary);">Service Types</div>
+            <div style="padding: 8px 16px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">Sources</div>
+            <div style="padding: 8px 16px; font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">Lead Statuses</div>
+          </div>
+
+          <!-- Service Types list -->
+          <div style="max-width: 500px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 0.8rem; font-weight: 600; color: var(--text);">Service Types</div>
+              <span class="btn btn-primary btn-sm">+ Add Option</span>
+            </div>
+
+            <!-- Draggable items -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid var(--border); border-radius: 6px;">
+                <span style="color: #cbd5e1; cursor: grab;">&#9783;</span>
+                <span style="flex: 1; font-size: 0.8rem; color: var(--text);">Local Move</span>
+                <span class="badge badge-green" style="font-size: 0.55rem;">DEFAULT</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#9998;</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#128465;</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid var(--border); border-radius: 6px;">
+                <span style="color: #cbd5e1; cursor: grab;">&#9783;</span>
+                <span style="flex: 1; font-size: 0.8rem; color: var(--text);">Long Distance</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#9998;</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#128465;</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid var(--border); border-radius: 6px;">
+                <span style="color: #cbd5e1; cursor: grab;">&#9783;</span>
+                <span style="flex: 1; font-size: 0.8rem; color: var(--text);">Commercial</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#9998;</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#128465;</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid var(--border); border-radius: 6px;">
+                <span style="color: #cbd5e1; cursor: grab;">&#9783;</span>
+                <span style="flex: 1; font-size: 0.8rem; color: var(--text);">Pest Control</span>
+                <span style="color: #8b5cf6; font-size: 0.55rem; font-weight: 600;">CUSTOM</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#9998;</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#128465;</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid var(--border); border-radius: 6px;">
+                <span style="color: #cbd5e1; cursor: grab;">&#9783;</span>
+                <span style="flex: 1; font-size: 0.8rem; color: var(--text);">HVAC Service</span>
+                <span style="color: #8b5cf6; font-size: 0.55rem; font-weight: 600;">CUSTOM</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#9998;</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">&#128465;</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 12px; font-size: 0.7rem; color: var(--text-muted);">Drag to reorder. These options appear in Service Type dropdowns on estimates and jobs.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="annotation-green annotation">
+      <strong>Result on Estimate Detail:</strong> The QuoteInfoCard now reads from company settings instead of hardcoded arrays. Every company sees their own custom options.
+    </div>
+
+    <!-- Before/After on QuoteInfoCard -->
+    <div class="compare-grid">
+      <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;">
+        <div style="background: var(--red-light); padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: #dc2626; border-bottom: 1px solid rgba(239,68,68,0.15);">BEFORE — Hardcoded</div>
+        <div style="padding: 12px;">
+          <div class="fi"><span class="fi-label">Service Type</span><span class="fi-value">Local Move &#9662;</span></div>
+          <div class="fi"><span class="fi-label">Source</span><span class="fi-value">Referral &#9662;</span></div>
+          <div class="fi"><span class="fi-label">Lead Status</span><span class="fi-value">New &#9662;</span></div>
+          <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 8px; text-align: center; background: #fef2f2; padding: 6px; border-radius: 4px;">&#9888; Same 7 options for every company — moving industry only</div>
+        </div>
+      </div>
+      <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;">
+        <div style="background: var(--green-light); padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: #16a34a; border-bottom: 1px solid rgba(34,197,94,0.15);">AFTER — Company-Defined</div>
+        <div style="padding: 12px;">
+          <div class="fi"><span class="fi-label">Service Type</span><span class="fi-value">Pest Control &#9662;</span></div>
+          <div class="fi"><span class="fi-label">Source</span><span class="fi-value">Yelp &#9662;</span></div>
+          <div class="fi"><span class="fi-label">Lead Status</span><span class="fi-value">Site Visit &#9662;</span></div>
+          <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 8px; text-align: center; background: #f0fdf4; padding: 6px; border-radius: 4px;">&#10003; Each company defines their own options in Settings</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation">
+      <strong>Technical:</strong> No migration needed. Stored in <code>companies.settings.customDropdowns</code> JSONB. Settings page uses <code>useDropdownSettings</code> hook → <code>PATCH /api/settings/dropdowns</code>. QuoteInfoCard receives options as props from the parent hook.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 2: AUTO-FEES SYSTEM -->
+<!-- ============================================================ -->
+<div id="step-autofees" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">2</div>
+      <div class="step-title">Auto-Fees System</div>
+      <div class="step-subtitle">Company-defined percentage or fixed fees — supply fee, trip fee, etc. Two-level control: settings enables it, per-estimate toggles it.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Smart approach:</strong> Auto-fees are stored as line items with <code>isAutoFee: true</code>. No new DB column needed — calculateTotals already sums all line items, PricingCard already renders by category. Only add: settings for fee definitions + per-estimate checkbox toggle.
+    </div>
+
+    <!-- Settings -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/settings/auto-fees</div>
+      </div>
+      <div class="mock-settings-layout">
+        <div class="mock-settings-sidebar">
+          <div class="mock-settings-header">Settings</div>
+          <div class="mock-settings-nav">
+            <div class="mock-settings-section-label">Business</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128176;</span> Service Catalog</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128230;</span> Materials</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128196;</span> Estimate Builder</div>
+            <div class="mock-settings-item"><span class="s-icon">&#9776;</span> Dropdowns</div>
+            <div class="mock-settings-item active" style="font-weight: 600;"><span class="s-icon">&#128176;</span> Auto-Fees</div>
+          </div>
+        </div>
+        <div class="mock-settings-content">
+          <div style="margin-bottom: 20px;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--text);">Auto-Fees</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">Define fees that automatically apply to new estimates and jobs. Each fee can be toggled per quote.</div>
+          </div>
+
+          <div style="max-width: 550px; display: flex; flex-direction: column; gap: 12px;">
+            <!-- Supply Fee -->
+            <div style="background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="sw on"></span>
+                  <span style="font-size: 0.85rem; font-weight: 600; color: var(--text);">Supply Fee</span>
+                </div>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">&#9998; Edit</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <div><div class="mock-label">Type</div><div class="mock-select" style="width: 100%;">Percentage</div></div>
+                <div><div class="mock-label">Rate</div><div class="mock-input">10%</div></div>
+                <div><div class="mock-label">Applies To</div><div class="mock-select" style="width: 100%;">All Jobs</div></div>
+              </div>
+            </div>
+
+            <!-- Trip Fee -->
+            <div style="background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="sw on"></span>
+                  <span style="font-size: 0.85rem; font-weight: 600; color: var(--text);">Trip Fee</span>
+                </div>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">&#9998; Edit</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <div><div class="mock-label">Type</div><div class="mock-select" style="width: 100%;">Fixed</div></div>
+                <div><div class="mock-label">Amount</div><div class="mock-input">$75.00</div></div>
+                <div><div class="mock-label">Applies To</div><div class="mock-select" style="width: 100%;">All Jobs</div></div>
+              </div>
+            </div>
+
+            <!-- Add Fee button -->
+            <span class="btn btn-outline" style="align-self: flex-start;">+ Add Fee</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="annotation">
+      <strong>On Estimate Detail:</strong> Auto-fees appear in the PricingCard as special line items. Each has a checkbox — uncheck to skip for this specific quote.
+    </div>
+
+    <!-- PricingCard with auto-fees -->
+    <div style="max-width: 300px; margin: 0 auto;">
+      <div class="mock-card">
+        <div class="mock-card-header">
+          <span class="mock-card-title">Pricing Breakdown</span>
+          <span class="btn btn-sm btn-ghost">+ Add</span>
+        </div>
+        <div class="mock-card-body" style="padding: 0;">
+          <table class="li-table">
+            <tr><td class="cat" colspan="3" style="padding-top: 8px;">SERVICES</td></tr>
+            <tr><td>Loading & Unloading</td><td></td><td style="text-align: right;">$1,200</td></tr>
+            <tr><td>Packing Service</td><td></td><td style="text-align: right;">$450</td></tr>
+            <tr><td class="cat" colspan="3" style="padding-top: 8px;">MATERIALS</td></tr>
+            <tr><td>Moving Boxes (20)</td><td></td><td style="text-align: right;">$120</td></tr>
+            <tr>
+              <td class="cat" colspan="3" style="padding-top: 8px; color: var(--primary-dark);">
+                AUTO-FEES
+              </td>
+            </tr>
+            <tr style="background: rgba(59,130,246,0.04);">
+              <td style="display: flex; align-items: center; gap: 6px;">
+                <input type="checkbox" checked style="accent-color: var(--primary);"> Supply Fee (10%)
+              </td>
+              <td></td>
+              <td style="text-align: right;">$177</td>
+            </tr>
+            <tr style="background: rgba(59,130,246,0.04);">
+              <td style="display: flex; align-items: center; gap: 6px;">
+                <input type="checkbox" checked style="accent-color: var(--primary);"> Trip Fee
+              </td>
+              <td></td>
+              <td style="text-align: right;">$75</td>
+            </tr>
+          </table>
+          <div style="padding: 8px 8px; border-top: 1px solid var(--border);">
+            <div class="fi"><span class="fi-label">Subtotal</span><span style="font-weight: 600;">$2,022</span></div>
+            <div class="fi"><span class="fi-label">Tax (8%)</span><span>$162</span></div>
+          </div>
+        </div>
+        <div class="total-bar">
+          <div>
+            <div class="total-bar-label">Estimated Price</div>
+          </div>
+          <div class="total-bar-amount">$2,184</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-amber annotation">
+      <strong>Hourly estimates:</strong> When pricing model is "hourly", auto-fees show as percentages only (e.g., "Supply Fee — 10%") since the total is unknown until the job is complete. The dollar amount calculates at completion time.
+    </div>
+
+    <div class="annotation-green annotation">
+      <strong>CC fee is different:</strong> Credit card processing fees (2.9%) are NOT auto-fees. They're applied at payment time in the Payment Panel (Phase 5) when the customer pays by card.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 3: JOB DETAIL & LINE ITEMS -->
+<!-- ============================================================ -->
+<div id="step-jobdetail" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">3</div>
+      <div class="step-title">Job Detail Redesign + Line Items</div>
+      <div class="step-subtitle">Jobs get the same 3-column layout and full pricing that estimates have. The biggest phase — transforms jobs from simple forms into professional detail pages.</div>
+    </div>
+
+    <div class="annotation-amber annotation">
+      <strong>Migration required:</strong> Adds <code>line_items</code> JSONB, <code>pricing_model</code>, <code>resources</code> JSONB, <code>subtotal</code>, <code>tax_rate</code>, <code>total</code>, <code>deposit_type/amount/paid</code>, and <code>source_estimate_id</code> to the <code>jobs</code> table.
+    </div>
+
+    <div class="annotation">
+      <strong>Two entry points:</strong> Jobs created from estimates inherit all line items + pricing. Quick-booked jobs (no estimate) enter line items directly. Both use the same shared picker modals.
+    </div>
+
+    <!-- Job Detail 3-column mockup -->
+    <div class="app-frame">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/jobs/abc-123</div>
+      </div>
+
+      <!-- Header -->
+      <div class="mock-header">
+        <div class="mock-header-row">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1rem; font-weight: 700; color: var(--text);">Sarah Johnson</span>
+              <span class="badge badge-green">In Progress</span>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">(555) 123-4567 &nbsp;&#183;&nbsp; sarah@email.com</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text); margin-right: 8px;">JOB-2026-001</div>
+            <span class="ico-btn" title="Documents">&#128196;</span>
+            <span class="ico-btn" title="Activity">&#9889;</span>
+            <span class="ico-btn" title="Payments">&#128176;</span>
+            <span class="btn btn-primary btn-sm">Schedule Job</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Column Layout -->
+      <div class="mock-detail">
+        <!-- LEFT COLUMN -->
+        <div>
+          <!-- Job Info Card -->
+          <div class="mock-card">
+            <div class="mock-card-header">
+              <span class="mock-card-title">Job Info</span>
+            </div>
+            <div class="mock-card-body">
+              <div class="fi"><span class="fi-label">Type</span><span class="fi-value">Local Move</span></div>
+              <div class="fi"><span class="fi-label">Source</span><span class="fi-value">EST-2026-042</span></div>
+              <div class="fi"><span class="fi-label">Assigned</span><span class="fi-value">Mike's Crew</span></div>
+              <div class="fi"><span class="fi-label">Scheduled</span><span class="fi-value">Feb 27, 2026</span></div>
+              <div class="fi"><span class="fi-label">Window</span><span class="fi-value">8AM - 12PM</span></div>
+              <div class="fi"><span class="fi-label">Lead</span><span class="fi-value">Referral</span></div>
+            </div>
+          </div>
+
+          <!-- Tasks Card -->
+          <div class="mock-card">
+            <div class="mock-card-header">
+              <span class="mock-card-title">Tasks</span>
+              <span style="color: var(--primary); font-size: 0.75rem; cursor: pointer;">+</span>
+            </div>
+            <div class="mock-card-body" style="font-size: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 6px; padding: 3px 0;">
+                <input type="checkbox" checked> <span style="text-decoration: line-through; color: var(--text-muted);">Confirm arrival time</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; padding: 3px 0;">
+                <input type="checkbox"> Pack kitchen items
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; padding: 3px 0;">
+                <input type="checkbox"> Wrap furniture
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER COLUMN -->
+        <div>
+          <!-- Address Card -->
+          <div class="mock-card">
+            <div class="mock-card-header">
+              <span class="mock-card-title">Stops</span>
+              <span style="color: var(--primary); font-size: 0.72rem;">+ Add Stop</span>
+            </div>
+            <div class="mock-card-body">
+              <div style="display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--green); margin-top: 3px; flex-shrink: 0;"></div>
+                <div>
+                  <div style="font-size: 0.78rem; font-weight: 500;">123 Oak Street, Apt 4B</div>
+                  <div style="font-size: 0.68rem; color: var(--text-muted);">Austin, TX 78701</div>
+                </div>
+              </div>
+              <div style="border-left: 2px dashed var(--border); margin-left: 4px; height: 14px;"></div>
+              <div style="display: flex; gap: 8px; align-items: flex-start; margin-top: 4px;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: var(--red); margin-top: 3px; flex-shrink: 0;"></div>
+                <div>
+                  <div style="font-size: 0.78rem; font-weight: 500;">456 Elm Avenue</div>
+                  <div style="font-size: 0.68rem; color: var(--text-muted);">Round Rock, TX 78664</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes Card -->
+          <div class="mock-card">
+            <div class="mock-card-header" style="padding: 0; border: none;">
+              <div style="display: flex; border-bottom: 1px solid var(--border); width: 100%;">
+                <div style="padding: 8px 14px; font-size: 0.75rem; font-weight: 500; color: var(--text); border-bottom: 2px solid var(--text);">Internal</div>
+                <div style="padding: 8px 14px; font-size: 0.75rem; font-weight: 500; color: var(--text-muted);">Customer</div>
+                <div style="padding: 8px 14px; font-size: 0.75rem; font-weight: 500; color: var(--text-muted);">Crew</div>
+                <div style="padding: 8px 14px; font-size: 0.75rem; font-weight: 500; color: var(--text-muted);">Photos</div>
+              </div>
+            </div>
+            <div class="mock-card-body">
+              <div style="font-size: 0.75rem; color: var(--text); min-height: 60px; padding: 4px; background: #fafafa; border-radius: 4px;">Customer has a large piano — need 4 people minimum. Second floor, no elevator at origin.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+          <!-- Resources -->
+          <div class="mock-card">
+            <div class="mock-card-header">
+              <span class="mock-card-title">Resources</span>
+            </div>
+            <div class="mock-card-body">
+              <div class="resource-grid">
+                <div class="resource-tile">
+                  <div class="resource-tile-label">Trucks</div>
+                  <div class="resource-tile-value">2</div>
+                </div>
+                <div class="resource-tile">
+                  <div class="resource-tile-label">Team Size</div>
+                  <div class="resource-tile-value">4</div>
+                </div>
+                <div class="resource-tile">
+                  <div class="resource-tile-label">Hours</div>
+                  <div class="resource-tile-value">6</div>
+                </div>
+                <div class="resource-tile green">
+                  <div class="resource-tile-label">Rate</div>
+                  <div class="resource-tile-value">$150/hr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing -->
+          <div class="mock-card" style="border-bottom: none; border-radius: 10px 10px 0 0;">
+            <div class="mock-card-header">
+              <span class="mock-card-title">Pricing</span>
+              <span class="btn btn-sm btn-ghost">+ Add</span>
+            </div>
+            <div class="mock-card-body" style="padding: 0;">
+              <table class="li-table">
+                <tr><td class="cat" colspan="2">SERVICES</td></tr>
+                <tr><td>Loading & Unloading</td><td style="text-align: right;">$1,200</td></tr>
+                <tr><td>Packing Service</td><td style="text-align: right;">$450</td></tr>
+                <tr><td class="cat" colspan="2">MATERIALS</td></tr>
+                <tr><td>Moving Boxes (20)</td><td style="text-align: right;">$120</td></tr>
+                <tr><td class="cat" colspan="2" style="color: var(--primary-dark);">AUTO-FEES</td></tr>
+                <tr><td>Supply Fee (10%)</td><td style="text-align: right;">$177</td></tr>
+              </table>
+              <div style="padding: 6px 8px; border-top: 1px solid var(--border);">
+                <div class="fi"><span class="fi-label">Subtotal</span><span style="font-weight: 600;">$1,947</span></div>
+                <div class="fi"><span class="fi-label">Tax (8%)</span><span>$156</span></div>
+                <div class="fi"><span class="fi-label">Deposit Paid</span><span style="color: var(--green);">-$500</span></div>
+              </div>
+            </div>
+            <div class="total-bar">
+              <div><div class="total-bar-label">Balance Due</div></div>
+              <div class="total-bar-amount">$1,603</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-green annotation">
+      <strong>Shared components:</strong> ServicePickerModal, MaterialPickerModal, CustomLineItemModal, and calculateTotals move to a shared <code>features/line-items/</code> folder. Both estimate and job detail pages import from the same source — no duplicate code.
+    </div>
+
+    <!-- Book Job Flow -->
+    <div style="background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-top: 16px;">
+      <div style="font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 16px;">Book Job Flow (Estimate → Job)</div>
+      <div class="flow-row">
+        <span class="flow-step" style="background: var(--primary-light); color: var(--primary-dark);">Click "Book Job" on estimate</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: #f1f5f9; color: var(--text);">Copy line items + pricing + resources</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: #f1f5f9; color: var(--text);">Copy locations → job address</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: var(--green-light); color: #16a34a;">Job created + linked to estimate</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 4: HOURLY DISPLAY OPTIONS -->
+<!-- ============================================================ -->
+<div id="step-hourly" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">4</div>
+      <div class="step-title">Hourly Rate Display Options</div>
+      <div class="step-subtitle">Control what customers see for hourly estimates — rate only, rate + estimated range, or a fixed total.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>No migration needed.</strong> Adds <code>showEstimatedHours</code>, <code>minHours</code>, and <code>maxHours</code> to the existing <code>resources</code> JSONB on estimates. Toggle per estimate.
+    </div>
+
+    <!-- ResourcesCard showing min/max hours -->
+    <div class="compare-grid">
+      <!-- Rate Only -->
+      <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;">
+        <div style="background: var(--primary-light); padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: var(--primary-dark); border-bottom: 1px solid rgba(59,130,246,0.15);">Option A — Rate Only</div>
+        <div style="padding: 14px;">
+          <div class="resource-grid" style="margin-bottom: 10px;">
+            <div class="resource-tile"><div class="resource-tile-label">Trucks</div><div class="resource-tile-value">2</div></div>
+            <div class="resource-tile"><div class="resource-tile-label">Team Size</div><div class="resource-tile-value">4</div></div>
+            <div class="resource-tile"><div class="resource-tile-label">Hours</div><div class="resource-tile-value">—</div></div>
+            <div class="resource-tile green"><div class="resource-tile-label">Rate</div><div class="resource-tile-value">$150/hr</div></div>
+          </div>
+          <div style="background: #f8fafc; border-radius: 6px; padding: 8px 10px; font-size: 0.72rem; text-align: center;">
+            <div style="color: var(--text-muted); margin-bottom: 2px;">Customer sees:</div>
+            <div style="font-size: 1rem; font-weight: 700; color: var(--text);">$150/hr</div>
+            <div style="font-size: 0.65rem; color: var(--text-muted);">No time estimate, no total shown</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rate + Range -->
+      <div style="background: #fff; border-radius: 10px; border: 1px solid var(--primary); overflow: hidden; box-shadow: 0 0 0 2px rgba(59,130,246,0.15);">
+        <div style="background: var(--green-light); padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: #16a34a; border-bottom: 1px solid rgba(34,197,94,0.15);">Option B — Rate + Estimated Range &#9733;</div>
+        <div style="padding: 14px;">
+          <div class="resource-grid" style="margin-bottom: 10px;">
+            <div class="resource-tile"><div class="resource-tile-label">Trucks</div><div class="resource-tile-value">2</div></div>
+            <div class="resource-tile"><div class="resource-tile-label">Team Size</div><div class="resource-tile-value">4</div></div>
+            <div class="resource-tile">
+              <div class="resource-tile-label">Est. Hours</div>
+              <div class="resource-tile-value">6 - 8</div>
+            </div>
+            <div class="resource-tile green"><div class="resource-tile-label">Rate</div><div class="resource-tile-value">$150/hr</div></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+            <input type="checkbox" checked style="accent-color: var(--primary);">
+            <span style="font-size: 0.72rem; color: var(--text);">Show estimated hours to customer</span>
+          </div>
+          <div style="background: #f0fdf4; border-radius: 6px; padding: 8px 10px; font-size: 0.72rem; text-align: center;">
+            <div style="color: var(--text-muted); margin-bottom: 2px;">Customer sees:</div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--text);">$150/hr &middot; Est. 6-8 hours</div>
+            <div style="font-size: 0.85rem; font-weight: 600; color: #16a34a;">$900 — $1,200</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-green annotation">
+      <strong>Toggle per estimate:</strong> The "Show estimated hours" checkbox lives on the ResourcesCard. When checked, min/max hour inputs appear and the customer-facing estimate page displays a price range instead of a single number.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 5: PAYMENTS -->
+<!-- ============================================================ -->
+<div id="step-payments" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">5</div>
+      <div class="step-title">Payments</div>
+      <div class="step-subtitle">Full payment infrastructure — slide panel on estimate/job detail, collect payments, track history, send payment links.</div>
+    </div>
+
+    <div class="annotation-amber annotation">
+      <strong>Migration required:</strong> New <code>payments</code> and <code>payment_methods</code> tables. Everything after this phase (prepaid packages, customer balance) depends on payment data.
+    </div>
+
+    <!-- Payment Panel Mockup -->
+    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: flex-start;">
+      <!-- Left: Context -->
+      <div>
+        <div class="annotation" style="margin-top: 0;">
+          <strong>Opens from:</strong> Payment icon button in estimate/job headers, or "Take Payment" in the Book dropdown, or the "Pay" link in the PricingCard.
+        </div>
+
+        <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 16px; margin-bottom: 16px;">
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 10px;">Payment Methods</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f8fafc; border-radius: 6px;">
+              <span style="font-size: 1.1rem;">&#128179;</span>
+              <div>
+                <div style="font-size: 0.78rem; font-weight: 500;">Credit / Debit Card</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">2.9% processing fee auto-added</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f8fafc; border-radius: 6px;">
+              <span style="font-size: 1.1rem;">&#128181;</span>
+              <div>
+                <div style="font-size: 0.78rem; font-weight: 500;">Cash</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">No processing fee</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 8px; background: #f8fafc; border-radius: 6px;">
+              <span style="font-size: 1.1rem;">&#128221;</span>
+              <div>
+                <div style="font-size: 0.78rem; font-weight: 500;">Check</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Reference number recorded</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="annotation-green annotation" style="margin-bottom: 0;">
+          <strong>Tech Portal:</strong> Technicians get a separate step-by-step payment flow optimized for mobile — not the slide panel. They can collect cash/card payments on-site.
+        </div>
+      </div>
+
+      <!-- Right: Slide Panel -->
+      <div class="mock-panel">
+        <div class="mock-panel-head">
+          <span>&#128176; Payments</span>
+          <span style="cursor: pointer; font-size: 1.1rem;">&#10005;</span>
+        </div>
+        <div style="padding: 14px;">
+          <!-- Balance Summary -->
+          <div style="background: #fef2f2; border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 14px;">
+            <div style="font-size: 0.65rem; font-weight: 600; text-transform: uppercase; color: #dc2626;">Balance Due</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">$1,603.00</div>
+            <div style="display: flex; justify-content: center; gap: 16px; margin-top: 6px; font-size: 0.68rem; color: var(--text-muted);">
+              <span>Total: $2,103</span>
+              <span>Paid: $500</span>
+            </div>
+          </div>
+
+          <!-- Record Payment -->
+          <div class="mock-field">
+            <div class="mock-label">Amount</div>
+            <div class="mock-input" style="font-size: 1rem; font-weight: 700;">$1,603.00</div>
+          </div>
+          <div class="mock-field">
+            <div class="mock-label">Method</div>
+            <div class="mock-select" style="width: 100%;">Credit Card &#9662;</div>
+          </div>
+          <!-- CC Fee callout -->
+          <div style="background: var(--amber-light); border-radius: 6px; padding: 8px 10px; font-size: 0.7rem; color: #92400e; margin-bottom: 12px;">
+            &#9888; CC processing fee: <strong>$46.49</strong> (2.9%) will be added. Customer pays <strong>$1,649.49</strong>.
+          </div>
+          <div class="mock-field">
+            <div class="mock-label">Notes (optional)</div>
+            <div class="mock-input" style="height: 40px; color: var(--text-muted);">Final payment - completion</div>
+          </div>
+          <span class="btn btn-green" style="width: 100%; justify-content: center; padding: 10px;">&#128176; Record Payment</span>
+
+          <!-- Divider -->
+          <div style="border-top: 1px solid var(--border); margin: 16px 0; position: relative;">
+            <span style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 8px; font-size: 0.65rem; color: var(--text-muted);">OR</span>
+          </div>
+
+          <!-- Send Link -->
+          <span class="btn btn-outline" style="width: 100%; justify-content: center;">&#128279; Send Payment Link</span>
+
+          <!-- Payment History -->
+          <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px;">
+            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text); margin-bottom: 8px;">Payment History</div>
+            <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.72rem;">
+              <div>
+                <div style="font-weight: 500;">Deposit — Cash</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Feb 15, 2026 &middot; Admin</div>
+              </div>
+              <div style="font-weight: 600; color: var(--green);">$500.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 6: PREPAID PACKAGES -->
+<!-- ============================================================ -->
+<div id="step-packages" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">6</div>
+      <div class="step-title">Prepaid Packages</div>
+      <div class="step-subtitle">Companies define package deals. Customers buy X visits upfront at a discount. Completed visits auto-deduct.</div>
+    </div>
+
+    <div class="annotation-amber annotation">
+      <strong>Depends on Phase 5:</strong> Requires <code>payments</code> table for recording package purchases. New tables: <code>service_packages</code> (company templates) and <code>customer_packages</code> (purchased instances).
+    </div>
+
+    <!-- Package Settings -->
+    <div class="app-frame" style="margin-bottom: 20px;">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/settings/packages</div>
+      </div>
+      <div class="mock-settings-layout" style="min-height: 340px;">
+        <div class="mock-settings-sidebar">
+          <div class="mock-settings-header">Settings</div>
+          <div class="mock-settings-nav">
+            <div class="mock-settings-section-label">Business</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128176;</span> Service Catalog</div>
+            <div class="mock-settings-item"><span class="s-icon">&#128176;</span> Auto-Fees</div>
+            <div class="mock-settings-item active" style="font-weight: 600;"><span class="s-icon">&#127873;</span> Packages</div>
+          </div>
+        </div>
+        <div class="mock-settings-content">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <div style="font-size: 1.1rem; font-weight: 700;">Prepaid Packages</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Define package deals that customers can purchase upfront.</div>
+            </div>
+            <span class="btn btn-primary btn-sm">+ Create Package</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 600px;">
+            <!-- Package 1 -->
+            <div style="background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text);">10-Visit Bundle</span>
+                <span class="badge badge-green">Active</span>
+              </div>
+              <div class="fi"><span class="fi-label">Visits</span><span style="font-weight: 600;">10</span></div>
+              <div class="fi"><span class="fi-label">Total Price</span><span style="font-weight: 600;">$850</span></div>
+              <div class="fi"><span class="fi-label">Per Visit</span><span style="font-weight: 600;">$85</span></div>
+              <div class="fi"><span class="fi-label">Discount</span><span style="font-weight: 600; color: var(--green);">15% off</span></div>
+            </div>
+            <!-- Package 2 -->
+            <div style="background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text);">5-Visit Starter</span>
+                <span class="badge badge-green">Active</span>
+              </div>
+              <div class="fi"><span class="fi-label">Visits</span><span style="font-weight: 600;">5</span></div>
+              <div class="fi"><span class="fi-label">Total Price</span><span style="font-weight: 600;">$475</span></div>
+              <div class="fi"><span class="fi-label">Per Visit</span><span style="font-weight: 600;">$95</span></div>
+              <div class="fi"><span class="fi-label">Discount</span><span style="font-weight: 600; color: var(--green);">5% off</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">&#8595;</div>
+
+    <div class="annotation">
+      <strong>On Recurring Jobs:</strong> The Package Tracker appears in the right column showing visual progress of visits used vs remaining.
+    </div>
+
+    <!-- Package Tracker on Recurring Job -->
+    <div style="max-width: 300px; margin: 0 auto;">
+      <div class="mock-card">
+        <div class="mock-card-header">
+          <span class="mock-card-title">&#127873; Prepaid Package</span>
+          <span class="badge badge-green">Active</span>
+        </div>
+        <div class="mock-card-body">
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 8px;">10-Visit Bundle</div>
+
+          <!-- Visual dots -->
+          <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.55rem; font-weight: 700;">&#10003;</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.55rem; font-weight: 700;">&#10003;</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.55rem; font-weight: 700;">&#10003;</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.55rem; font-weight: 700;">&#10003;</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.55rem; font-weight: 700;">&#10003;</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.55rem; font-weight: 700;">&#10003;</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.55rem; font-weight: 700;">&#10003;</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--amber); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.6rem; font-weight: 700;">8</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.6rem;">9</div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: #e2e8f0; color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.6rem;">10</div>
+          </div>
+
+          <!-- Progress bar -->
+          <div style="background: #e2e8f0; border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 8px;">
+            <div style="background: var(--green); width: 70%; height: 100%; border-radius: 4px;"></div>
+          </div>
+
+          <div class="fi"><span class="fi-label">Used</span><span style="font-weight: 600;">7 of 10</span></div>
+          <div class="fi"><span class="fi-label">Remaining</span><span style="font-weight: 600; color: var(--amber);">3 visits</span></div>
+          <div class="fi"><span class="fi-label">Auto-Renew</span><span class="sw on"></span></div>
+
+          <div style="background: var(--amber-light); border-radius: 6px; padding: 6px 10px; font-size: 0.68rem; color: #92400e; margin-top: 8px;">
+            &#9888; 3 visits remaining. Auto-renew is ON — card will be charged $850 when package completes.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-green annotation">
+      <strong>Auto-deduct logic:</strong> When a job's status changes to "completed" and the job has an active customer package, <code>visits_used</code> increments automatically. When all visits are used, if auto-renew is ON, a new package is created and payment is charged to the card on file.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 7: BOOK DROPDOWN & JOB ACTIONS -->
+<!-- ============================================================ -->
+<div id="step-actions" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">7</div>
+      <div class="step-title">Book Dropdown & Job Actions</div>
+      <div class="step-subtitle">Estimate gets a "Book" dropdown with all actions. Job gets icon buttons + Schedule Job.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>No migration needed.</strong> Pure frontend — uses existing status fields and actions. This is the UX polish that makes the platform feel professional.
+    </div>
+
+    <div class="compare-grid">
+      <!-- Estimate Header -->
+      <div>
+        <div style="font-size: 0.8rem; font-weight: 600; color: #fff; margin-bottom: 8px;">Estimate Header</div>
+        <div class="app-frame">
+          <div class="app-frame-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="app-frame-url">localhost:4000/estimates/abc-123</div>
+          </div>
+          <div class="mock-header">
+            <div class="mock-header-row">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 0.95rem; font-weight: 700;">John Smith</span>
+                  <span class="badge badge-blue">Draft</span>
+                </div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">(555) 987-6543</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text);">EST-2026-042</span>
+                <span class="ico-btn">&#128196;</span>
+                <span class="ico-btn">&#9889;</span>
+                <span class="ico-btn">&#128176;</span>
+                <!-- Book dropdown -->
+                <div style="position: relative; display: inline-block;">
+                  <span class="btn btn-green btn-sm">Book &#9662;</span>
+                  <div class="mock-dropdown" style="position: absolute; top: 100%; right: 0; margin-top: 4px;">
+                    <div class="mock-dropdown-item">&#128065; Preview Estimate</div>
+                    <div class="mock-dropdown-item">&#128233; Send Estimate</div>
+                    <div class="mock-dropdown-item">&#128176; Take Payment</div>
+                    <div class="mock-dropdown-sep"></div>
+                    <div class="mock-dropdown-item" style="color: var(--green); font-weight: 600;">&#10003; Book Job</div>
+                    <div class="mock-dropdown-sep"></div>
+                    <div class="mock-dropdown-item">&#128196; Duplicate</div>
+                    <div class="mock-dropdown-item" style="color: var(--red);">&#10005; Mark Lost</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job Header -->
+      <div>
+        <div style="font-size: 0.8rem; font-weight: 600; color: #fff; margin-bottom: 8px;">Job Header</div>
+        <div class="app-frame">
+          <div class="app-frame-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="app-frame-url">localhost:4000/jobs/def-456</div>
+          </div>
+          <div class="mock-header">
+            <div class="mock-header-row">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 0.95rem; font-weight: 700;">Sarah Johnson</span>
+                  <span class="badge badge-green">In Progress</span>
+                </div>
+                <div style="font-size: 0.68rem; color: var(--text-muted);">(555) 123-4567</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text);">JOB-2026-001</span>
+                <span class="ico-btn" title="Documents">&#128196;</span>
+                <span class="ico-btn" title="Activity">&#9889;</span>
+                <span class="ico-btn" title="Payments">&#128176;</span>
+                <span class="btn btn-primary btn-sm">Schedule Job</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-amber annotation">
+      <strong>No Dispatch button on job detail.</strong> Dispatch happens on the Dispatch Board only. The "Schedule Job" button opens the Schedule Modal (Phase 8) to pick a date/time/tech. These are different concepts: scheduling = when it happens, dispatching = confirming the crew's daily assignment.
+    </div>
+
+    <div class="annotation-green annotation">
+      <strong>Icon buttons open slide panels:</strong> &#128196; opens Documents panel (Phase 9), &#9889; opens Activity panel (Phase 10), &#128176; opens Payment panel (Phase 5). All three are Sheet components sliding from the right.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 8: JOB SCHEDULER + AVAILABILITY ENGINE -->
+<!-- ============================================================ -->
+<div id="step-scheduler" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">8</div>
+      <div class="step-title">Job Scheduler + Availability Engine</div>
+      <div class="step-subtitle">Shared scheduling engine powers admin booking now and customer self-booking later. Build once, use everywhere.</div>
+    </div>
+
+    <div class="annotation">
+      <strong>Strategy:</strong> Reps use the admin scheduler daily, providing real-world feedback. By the time customer-facing online booking goes live (<code>/s/[token]</code>), the engine is battle-tested through hundreds of real bookings.
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="app-frame" style="margin-bottom: 20px;">
+      <div class="app-frame-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <div class="app-frame-url">localhost:4000/estimates/abc-123 — Schedule Modal</div>
+      </div>
+      <div class="mock-dialog-overlay" style="background: rgba(0,0,0,0.08); min-height: 460px; margin: 0;">
+        <div class="mock-dialog" style="max-width: 600px;">
+          <div class="mock-dialog-header">
+            <div class="mock-dialog-title">&#128197; Schedule Job</div>
+            <div class="mock-dialog-desc">EST-2026-042 &middot; Local Move &middot; ~6 hrs &middot; 4 team needed</div>
+          </div>
+          <div class="mock-dialog-body" style="padding: 0;">
+            <div style="display: grid; grid-template-columns: 220px 1fr; min-height: 320px;">
+              <!-- Left: Mini Calendar -->
+              <div style="border-right: 1px solid var(--border); padding: 14px;">
+                <div class="mini-cal">
+                  <div class="mini-cal-header">
+                    <span style="cursor: pointer;">&#9664;</span>
+                    <span>February 2026</span>
+                    <span style="cursor: pointer;">&#9654;</span>
+                  </div>
+                  <div class="mini-cal-grid">
+                    <div class="mini-cal-day header">S</div><div class="mini-cal-day header">M</div><div class="mini-cal-day header">T</div><div class="mini-cal-day header">W</div><div class="mini-cal-day header">T</div><div class="mini-cal-day header">F</div><div class="mini-cal-day header">S</div>
+                    <div class="mini-cal-day" style="color: #cbd5e1;">1</div>
+                    <div class="mini-cal-day avail green">2</div>
+                    <div class="mini-cal-day avail green">3</div>
+                    <div class="mini-cal-day avail yellow">4</div>
+                    <div class="mini-cal-day avail green">5</div>
+                    <div class="mini-cal-day avail green">6</div>
+                    <div class="mini-cal-day" style="color: #cbd5e1;">7</div>
+                    <div class="mini-cal-day" style="color: #cbd5e1;">8</div>
+                    <div class="mini-cal-day avail green">9</div>
+                    <div class="mini-cal-day today avail green">10</div>
+                    <div class="mini-cal-day avail red-dot">11</div>
+                    <div class="mini-cal-day avail green">12</div>
+                    <div class="mini-cal-day avail green">13</div>
+                    <div class="mini-cal-day" style="color: #cbd5e1;">14</div>
+                    <div class="mini-cal-day" style="color: #cbd5e1;">15</div>
+                    <div class="mini-cal-day avail green">16</div>
+                    <div class="mini-cal-day avail green">17</div>
+                    <div class="mini-cal-day avail yellow">18</div>
+                    <div class="mini-cal-day avail green">19</div>
+                    <div class="mini-cal-day avail green">20</div>
+                    <div class="mini-cal-day" style="color: #cbd5e1;">21</div>
+                    <div class="mini-cal-day" style="color: #cbd5e1;">22</div>
+                    <div class="mini-cal-day avail green">23</div>
+                    <div class="mini-cal-day avail green">24</div>
+                    <div class="mini-cal-day avail green">25</div>
+                    <div class="mini-cal-day avail green">26</div>
+                    <div class="mini-cal-day avail green" style="background: var(--primary-light); border: 1px solid var(--primary); font-weight: 600;">27</div>
+                    <div class="mini-cal-day" style="color: #cbd5e1;">28</div>
+                  </div>
+                  <div style="display: flex; gap: 10px; margin-top: 8px; font-size: 0.6rem; color: var(--text-muted);">
+                    <span><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); vertical-align: middle;"></span> Open</span>
+                    <span><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); vertical-align: middle;"></span> Partial</span>
+                    <span><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--red); vertical-align: middle;"></span> Full</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Time Slots -->
+              <div style="padding: 14px;">
+                <div style="font-size: 0.8rem; font-weight: 600; color: var(--text); margin-bottom: 10px;">Friday, Feb 27 — Available Slots</div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <!-- Slot 1 -->
+                  <div style="padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.78rem; font-weight: 600;">8:00 AM — 12:00 PM</div>
+                      <div style="font-size: 0.65rem; color: var(--text-muted);">4 techs available &middot; 2 crews free</div>
+                    </div>
+                    <span class="badge badge-green">Open</span>
+                  </div>
+                  <!-- Slot 2 - Selected -->
+                  <div style="padding: 8px 10px; border: 2px solid var(--primary); border-radius: 6px; background: var(--primary-light); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.78rem; font-weight: 600; color: var(--primary-dark);">10:00 AM — 2:00 PM</div>
+                      <div style="font-size: 0.65rem; color: var(--primary-dark);">3 techs available &middot; 1 crew free</div>
+                    </div>
+                    <span class="badge badge-blue">Selected</span>
+                  </div>
+                  <!-- Slot 3 -->
+                  <div style="padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.78rem; font-weight: 600;">1:00 PM — 5:00 PM</div>
+                      <div style="font-size: 0.65rem; color: var(--text-muted);">5 techs available &middot; 2 crews free</div>
+                    </div>
+                    <span class="badge badge-green">Open</span>
+                  </div>
+                </div>
+
+                <!-- Assignment -->
+                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div class="mock-field" style="margin: 0;">
+                      <div class="mock-label">Assign To</div>
+                      <div class="mock-select" style="width: 100%;">Mike's Crew &#9662;</div>
+                    </div>
+                    <div class="mock-field" style="margin: 0;">
+                      <div class="mock-label">Arrival Window</div>
+                      <div class="mock-select" style="width: 100%;">10AM - 2PM &#9662;</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mock-dialog-footer" style="justify-content: space-between;">
+            <span style="font-size: 0.72rem; color: var(--primary); cursor: pointer;">&#128197; Open Full Calendar</span>
+            <div style="display: flex; gap: 8px;">
+              <span class="btn btn-outline btn-sm">Cancel</span>
+              <span class="btn btn-green btn-sm">&#10003; Confirm Schedule</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shared Engine Diagram -->
+    <div style="background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin: 20px 0;">
+      <div style="font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 16px; text-align: center;">Shared Availability Engine</div>
+
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="display: inline-block; background: var(--primary-light); border: 2px solid var(--primary); border-radius: 10px; padding: 12px 20px;">
+          <div style="font-size: 0.6rem; font-weight: 700; text-transform: uppercase; color: var(--primary-dark);">Shared Engine</div>
+          <div style="font-size: 0.9rem; font-weight: 600; color: var(--text);">getAvailability(date, companyId)</div>
+          <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Jobs + Business Hours + Team Schedules → Open Slots</div>
+        </div>
+      </div>
+
+      <div style="text-align: center; color: var(--primary); margin-bottom: 12px;">&#8593;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8593;</div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="text-align: center; border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+          <div style="font-size: 1.2rem; margin-bottom: 4px;">&#128187;</div>
+          <div style="font-size: 0.8rem; font-weight: 600; color: var(--text);">Admin Scheduler</div>
+          <div style="font-size: 0.68rem; color: var(--text-muted);">Schedule Modal + Calendar Page</div>
+          <div style="font-size: 0.6rem; color: var(--primary); font-weight: 600; margin-top: 4px;">Sees ALL slots</div>
+        </div>
+        <div style="text-align: center; border: 1px dashed var(--border); border-radius: 8px; padding: 14px; opacity: 0.7;">
+          <div style="font-size: 1.2rem; margin-bottom: 4px;">&#127760;</div>
+          <div style="font-size: 0.8rem; font-weight: 600; color: var(--text);">Customer Booking</div>
+          <div style="font-size: 0.68rem; color: var(--text-muted);">Online Booking Page /s/[token]</div>
+          <div style="font-size: 0.6rem; color: var(--amber); font-weight: 600; margin-top: 4px;">Filtered by business rules (Phase 2)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-green annotation">
+      <strong>Build order:</strong> Phase 8a: Engine + Schedule Modal (now) → Reps battle-test daily → Phase 8b: Full Calendar at <code>/calendar</code> → Online Booking Phase 2 connects same engine to customer-facing <code>/s/[token]</code>.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 9: DOCUMENTS PANEL -->
+<!-- ============================================================ -->
+<div id="step-docs" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">9</div>
+      <div class="step-title">Documents Panel</div>
+      <div class="step-subtitle">Slide panel showing all contracts, invoices, and work orders for the estimate or job. Status tracking from Draft to Signed.</div>
+    </div>
+
+    <div class="annotation-amber annotation">
+      <strong>Migration required:</strong> New <code>documents</code> table with company_id, customer_id, estimate_id, job_id, type, name, status, template_id, content JSONB, public_token.
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: flex-start;">
+      <!-- Left: Context -->
+      <div>
+        <div class="annotation" style="margin-top: 0;">
+          <strong>Opens from:</strong> The &#128196; icon button in both estimate and job detail headers. Groups documents by type with status badges.
+        </div>
+
+        <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 16px;">
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 10px;">Document Status Flow</div>
+          <div class="flow-row">
+            <span class="flow-step" style="background: #f1f5f9; color: var(--text);">Draft</span>
+            <span class="flow-arrow">&#8594;</span>
+            <span class="flow-step" style="background: var(--primary-light); color: var(--primary-dark);">Sent</span>
+            <span class="flow-arrow">&#8594;</span>
+            <span class="flow-step" style="background: var(--green-light); color: #16a34a;">Signed / Paid</span>
+          </div>
+          <div style="margin-top: 12px; font-size: 0.72rem; color: var(--text-muted);">Contracts follow Draft → Sent → Signed. Invoices follow Draft → Sent → Paid.</div>
+        </div>
+
+        <div class="annotation-green annotation">
+          <strong>Contract Auto-Attachment (Phase 13):</strong> Company defines templates with AUTO toggle. When a new estimate is created, matching contracts auto-attach. Admin can remove or add more.
+        </div>
+      </div>
+
+      <!-- Right: Documents Panel -->
+      <div class="mock-panel">
+        <div class="mock-panel-head">
+          <span>&#128196; Documents</span>
+          <span style="cursor: pointer; font-size: 1.1rem;">&#10005;</span>
+        </div>
+        <div style="padding: 14px;">
+          <!-- Generate button -->
+          <span class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 14px;">+ Generate Document</span>
+
+          <!-- Estimate Documents -->
+          <div style="font-size: 0.68rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em; margin-bottom: 6px;">Estimate Documents</div>
+          <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+              <div>
+                <div style="font-size: 0.78rem; font-weight: 500;">Moving Agreement</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Contract &middot; Feb 10, 2026</div>
+              </div>
+              <span class="badge badge-green">Signed</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+              <div>
+                <div style="font-size: 0.78rem; font-weight: 500;">Estimate Page</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Estimate &middot; Feb 8, 2026</div>
+              </div>
+              <span class="badge badge-blue">Sent</span>
+            </div>
+          </div>
+
+          <!-- Job Documents -->
+          <div style="font-size: 0.68rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.04em; margin-bottom: 6px;">Job Documents</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+              <div>
+                <div style="font-size: 0.78rem; font-weight: 500;">Invoice #INV-2026-018</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Invoice &middot; Feb 27, 2026</div>
+              </div>
+              <span class="badge badge-amber">Pending</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+              <div>
+                <div style="font-size: 0.78rem; font-weight: 500;">Work Order</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Work Order &middot; Feb 26, 2026</div>
+              </div>
+              <span class="badge" style="background: #f1f5f9; color: var(--text-muted);">Draft</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 10: ACTIVITY PANEL -->
+<!-- ============================================================ -->
+<div id="step-activity" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">10</div>
+      <div class="step-title">Activity Panel</div>
+      <div class="step-subtitle">Timestamped audit trail for every change to estimates and jobs. Who did what, when.</div>
+    </div>
+
+    <div class="annotation-amber annotation">
+      <strong>Migration required:</strong> New <code>activity_log</code> table with entity_type, entity_id, action, description, metadata JSONB, performed_by, performer_type. Indexed on (entity_type, entity_id).
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: flex-start;">
+      <!-- Left: Integration points -->
+      <div>
+        <div class="annotation" style="margin-top: 0;">
+          <strong>Opens from:</strong> The &#9889; icon button in estimate and job headers. Shows a vertical timeline of all events.
+        </div>
+
+        <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 16px;">
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 10px;">What Gets Logged</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.72rem;">
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Estimate created</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Status changes</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Line items edited</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Estimate sent</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Payment received</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Job scheduled</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Job dispatched</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Job completed</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Contract signed</div>
+            <div style="padding: 6px 8px; background: #f8fafc; border-radius: 4px;">&#10003; Document generated</div>
+          </div>
+          <div style="margin-top: 10px; font-size: 0.68rem; color: var(--text-muted);"><code>logActivity()</code> is called from estimate, job, payment, and document actions — automatic event recording on every CRUD operation.</div>
+        </div>
+      </div>
+
+      <!-- Right: Activity Panel -->
+      <div class="mock-panel">
+        <div class="mock-panel-head">
+          <span>&#9889; Activity</span>
+          <span style="cursor: pointer; font-size: 1.1rem;">&#10005;</span>
+        </div>
+        <div style="padding: 14px;">
+          <!-- Timeline -->
+          <div class="timeline-entry">
+            <div class="timeline-dot" style="background: var(--green);"></div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 500; color: var(--text);">Payment received — $500 cash deposit</div>
+              <div style="font-size: 0.65rem; color: var(--text-muted);">Today, 2:30 PM &middot; Admin (John)</div>
+            </div>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-dot" style="background: var(--primary);"></div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 500; color: var(--text);">Job scheduled for Feb 27, 10:00 AM</div>
+              <div style="font-size: 0.65rem; color: var(--text-muted);">Today, 2:15 PM &middot; Admin (John)</div>
+            </div>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-dot" style="background: var(--primary);"></div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 500; color: var(--text);">Job created from EST-2026-042</div>
+              <div style="font-size: 0.65rem; color: var(--text-muted);">Today, 2:10 PM &middot; Admin (John)</div>
+            </div>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-dot" style="background: var(--green);"></div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 500; color: var(--text);">Contract signed by customer</div>
+              <div style="font-size: 0.65rem; color: var(--text-muted);">Feb 12, 11:20 AM &middot; Customer (Sarah)</div>
+            </div>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-dot" style="background: var(--primary);"></div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 500; color: var(--text);">Estimate sent via email</div>
+              <div style="font-size: 0.65rem; color: var(--text-muted);">Feb 10, 3:45 PM &middot; Admin (John)</div>
+            </div>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-dot" style="background: var(--amber);"></div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 500; color: var(--text);">Line items updated — added Packing Service</div>
+              <div style="font-size: 0.65rem; color: var(--text-muted);">Feb 10, 3:30 PM &middot; Admin (John)</div>
+            </div>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-dot" style="background: #94a3b8;"></div>
+            <div>
+              <div style="font-size: 0.78rem; font-weight: 500; color: var(--text);">Estimate created</div>
+              <div style="font-size: 0.65rem; color: var(--text-muted);">Feb 8, 9:00 AM &middot; Admin (John)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- STEP 11: EXTRAS (Balance, Photos, Contracts, Maps, Labels, Windows) -->
+<!-- ============================================================ -->
+<div id="step-extras" class="step">
+  <div class="step-inner">
+    <div class="step-title-area">
+      <div class="step-number">11</div>
+      <div class="step-title">Final Touches</div>
+      <div class="step-subtitle">Customer balance, job photos, contract auto-attachment, maps, resource labels, and arrival time windows.</div>
+    </div>
+
+    <!-- Customer Account Balance -->
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 12px;">&#128176; Customer Account Balance (Phase 11)</div>
+      <div class="annotation" style="margin-top: 0;">
+        <strong>No migration.</strong> Computed field: sum of job totals minus sum of payments. Shows at-a-glance on every customer record.
+      </div>
+      <div class="app-frame">
+        <div class="app-frame-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <div class="app-frame-url">localhost:4000/customers/abc-123</div>
+        </div>
+        <div class="mock-header">
+          <div class="mock-header-row">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div>
+                <div style="font-size: 1rem; font-weight: 700; color: var(--text);">Sarah Johnson</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">(555) 123-4567 &middot; sarah@email.com</div>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.6rem; font-weight: 600; text-transform: uppercase; color: #dc2626;">Balance Due</div>
+              <div style="font-size: 1.3rem; font-weight: 700; color: #dc2626;">$1,603.00</div>
+              <div style="font-size: 0.65rem; color: var(--text-muted);">2 unpaid jobs &middot; 1 open invoice</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Photos -->
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 12px;">&#128247; Job Photos (Phase 12)</div>
+      <div class="annotation" style="margin-top: 0;">
+        <strong>Smallest phase.</strong> JobPhotosSection and useJobFiles hook already exist. Just wire them into the new job detail center column as a "Photos" tab alongside Notes.
+      </div>
+      <div style="max-width: 500px;">
+        <div class="mock-card">
+          <div class="mock-card-header" style="padding: 0; border: none;">
+            <div style="display: flex; border-bottom: 1px solid var(--border); width: 100%;">
+              <div style="padding: 8px 14px; font-size: 0.75rem; font-weight: 500; color: var(--text-muted);">Internal</div>
+              <div style="padding: 8px 14px; font-size: 0.75rem; font-weight: 500; color: var(--text-muted);">Customer</div>
+              <div style="padding: 8px 14px; font-size: 0.75rem; font-weight: 500; color: var(--text-muted);">Crew</div>
+              <div style="padding: 8px 14px; font-size: 0.75rem; font-weight: 500; color: var(--text); border-bottom: 2px solid var(--text);">Photos</div>
+            </div>
+          </div>
+          <div class="mock-card-body">
+            <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+              <span class="btn btn-sm btn-primary" style="font-size: 0.65rem;">All</span>
+              <span class="btn btn-sm btn-outline" style="font-size: 0.65rem;">Before</span>
+              <span class="btn btn-sm btn-outline" style="font-size: 0.65rem;">During</span>
+              <span class="btn btn-sm btn-outline" style="font-size: 0.65rem;">After</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+              <div style="aspect-ratio: 1; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--text-muted);">&#128247;</div>
+              <div style="aspect-ratio: 1; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--text-muted);">&#128247;</div>
+              <div style="aspect-ratio: 1; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--text-muted);">&#128247;</div>
+              <div style="aspect-ratio: 1; background: var(--primary-light); border: 2px dashed var(--primary); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--primary); font-weight: 500;">+ Upload</div>
+            </div>
+            <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 6px;">Tech portal: camera/gallery upload from phone on-site</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map on Addresses -->
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 12px;">&#127758; Map on Addresses (Phase 14)</div>
+      <div class="compare-grid">
+        <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;">
+          <div style="padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border);">Single Address (HVAC, Cleaning, Pest)</div>
+          <div style="height: 140px; background: linear-gradient(135deg, #e8f0fe, #d2e3fc); display: flex; align-items: center; justify-content: center; position: relative;">
+            <div style="width: 24px; height: 24px; background: var(--red); border-radius: 50% 50% 50% 0; transform: rotate(-45deg);"></div>
+            <div style="position: absolute; bottom: 8px; right: 8px; background: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 500; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">&#128204; Navigate</div>
+          </div>
+        </div>
+        <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;">
+          <div style="padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: var(--text); border-bottom: 1px solid var(--border);">Two Addresses (Moving, Delivery)</div>
+          <div style="height: 140px; background: linear-gradient(135deg, #e8f0fe, #d2e3fc); display: flex; align-items: center; justify-content: center; position: relative;">
+            <div style="display: flex; align-items: center; gap: 30px;">
+              <div style="width: 16px; height: 16px; background: var(--green); border-radius: 50%;"></div>
+              <div style="width: 60px; height: 2px; background: var(--primary); position: relative;">
+                <div style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); font-size: 0.6rem; color: var(--primary); font-weight: 600; white-space: nowrap;">12 mi &middot; 25 min</div>
+              </div>
+              <div style="width: 16px; height: 16px; background: var(--red); border-radius: 50%;"></div>
+            </div>
+            <div style="position: absolute; bottom: 8px; right: 8px; background: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 500; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">&#128204; Navigate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resource Labels -->
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 12px;">&#127991; Resource Labels & Terminology (Phase 15)</div>
+      <div class="annotation" style="margin-top: 0;">
+        <strong>No migration.</strong> All stored in <code>CompanySettings.terminology</code> JSONB. A <code>useTerminology()</code> hook provides labels throughout the app.
+      </div>
+      <div class="compare-grid">
+        <div style="background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden;">
+          <div style="padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border);">Default Labels</div>
+          <div style="padding: 12px; font-size: 0.78rem;">
+            <div class="fi"><span class="fi-label">Estimates</span><span>&#8594; Estimates</span></div>
+            <div class="fi"><span class="fi-label">Jobs</span><span>&#8594; Jobs</span></div>
+            <div class="fi"><span class="fi-label">Customers</span><span>&#8594; Customers</span></div>
+            <div class="fi"><span class="fi-label">Trucks</span><span>&#8594; Trucks</span></div>
+            <div class="fi"><span class="fi-label">Prefix</span><span>&#8594; EST-2026-001</span></div>
+          </div>
+        </div>
+        <div style="background: #fff; border-radius: 10px; border: 1px solid var(--primary); overflow: hidden;">
+          <div style="padding: 8px 14px; font-size: 0.7rem; font-weight: 600; color: var(--primary-dark); border-bottom: 1px solid rgba(59,130,246,0.2);">Custom Labels (Example: HVAC Company)</div>
+          <div style="padding: 12px; font-size: 0.78rem;">
+            <div class="fi"><span class="fi-label">Estimates</span><span style="color: var(--primary-dark); font-weight: 500;">&#8594; Quotes</span></div>
+            <div class="fi"><span class="fi-label">Jobs</span><span style="color: var(--primary-dark); font-weight: 500;">&#8594; Work Orders</span></div>
+            <div class="fi"><span class="fi-label">Customers</span><span style="color: var(--primary-dark); font-weight: 500;">&#8594; Clients</span></div>
+            <div class="fi"><span class="fi-label">Trucks</span><span style="color: var(--primary-dark); font-weight: 500;">&#8594; Vehicles</span></div>
+            <div class="fi"><span class="fi-label">Prefix</span><span style="color: var(--primary-dark); font-weight: 500;">&#8594; Q-2026-001</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrival Time Windows -->
+    <div style="margin-bottom: 32px;">
+      <div style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 12px;">&#128337; Arrival Time Windows (Phase 16)</div>
+      <div class="annotation" style="margin-top: 0;">
+        <strong>No migration.</strong> Stored in <code>CompanySettings.arrivalWindows</code> array. Customer sees "Arrival between 8 AM - 12 PM" instead of an exact time.
+      </div>
+      <div style="max-width: 400px;">
+        <div class="mock-card">
+          <div class="mock-card-header">
+            <span class="mock-card-title">&#128337; Arrival Windows</span>
+            <span class="btn btn-sm btn-ghost">+ Add</span>
+          </div>
+          <div class="mock-card-body">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #f8fafc; border-radius: 6px;">
+                <div>
+                  <div style="font-size: 0.78rem; font-weight: 500;">Morning</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">8:00 AM — 12:00 PM</div>
+                </div>
+                <span class="badge badge-green">Default</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #f8fafc; border-radius: 6px;">
+                <div>
+                  <div style="font-size: 0.78rem; font-weight: 500;">Midday</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">10:00 AM — 2:00 PM</div>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #f8fafc; border-radius: 6px;">
+                <div>
+                  <div style="font-size: 0.78rem; font-weight: 500;">Afternoon</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">1:00 PM — 5:00 PM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Complete System Flow Summary -->
+    <div style="background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-top: 20px;">
+      <div style="font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 16px; text-align: center;">Complete Implementation Flow</div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; font-size: 0.72rem;">
+        <span class="flow-step" style="background: var(--green-light); color: #16a34a;">1. Dropdowns</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: var(--green-light); color: #16a34a;">2. Auto-Fees</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: var(--amber-light); color: #d97706;">3. Job Detail &#9733;</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: var(--green-light); color: #16a34a;">4. Hourly Display</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: var(--amber-light); color: #d97706;">5. Payments &#9733;</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: #f1f5f9; color: var(--text);">6. Packages</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: #f1f5f9; color: var(--text);">7. Actions</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: var(--amber-light); color: #d97706;">8. Scheduler &#9733;</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: #f1f5f9; color: var(--text);">9. Docs</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: #f1f5f9; color: var(--text);">10. Activity</span>
+        <span class="flow-arrow">&#8594;</span>
+        <span class="flow-step" style="background: #f1f5f9; color: var(--text);">11-16. Extras</span>
+      </div>
+      <div style="text-align: center; margin-top: 12px; font-size: 0.68rem; color: var(--text-muted);">
+        &#9733; = Migration required &nbsp;&middot;&nbsp; Green = No migration, quick wins &nbsp;&middot;&nbsp; 6 total migrations across all 16 phases
+      </div>
+    </div>
+
+    <!-- Migration Summary -->
+    <div style="background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-top: 16px;">
+      <div style="font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 12px;">Migrations Summary (6 total)</div>
+      <table class="li-table">
+        <tr><th>Phase</th><th>Migration</th><th>What</th></tr>
+        <tr><td>3</td><td style="font-family: monospace; font-size: 0.65rem;">20250201000030_job_line_items.sql</td><td>line_items, pricing, resources on jobs</td></tr>
+        <tr><td>5</td><td style="font-family: monospace; font-size: 0.65rem;">20250201000031_payments.sql</td><td>payments + payment_methods tables</td></tr>
+        <tr><td>6</td><td style="font-family: monospace; font-size: 0.65rem;">20250201000032_prepaid_packages.sql</td><td>service_packages + customer_packages</td></tr>
+        <tr><td>9</td><td style="font-family: monospace; font-size: 0.65rem;">20250201000033_documents.sql</td><td>documents table</td></tr>
+        <tr><td>10</td><td style="font-family: monospace; font-size: 0.65rem;">20250201000034_activity_log.sql</td><td>activity_log table</td></tr>
+        <tr><td>13</td><td style="font-family: monospace; font-size: 0.65rem;">20250201000035_contract_templates.sql</td><td>contract_templates table</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showStep(id) {
+    document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.step-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('step-' + id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>

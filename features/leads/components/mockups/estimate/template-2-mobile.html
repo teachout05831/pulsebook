@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Template 2: Mobile-First Cards</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-100 max-w-md mx-auto">
+  <!-- Header -->
+  <header class="bg-white sticky top-0 z-50 shadow-sm">
+    <div class="flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3">
+        <button class="text-gray-500">
+          <i class="fas fa-arrow-left text-lg"></i>
+        </button>
+        <div>
+          <h1 class="text-lg font-bold text-gray-900">#67550</h1>
+          <p class="text-sm text-gray-500">John Smith</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
+          Pending
+        </span>
+        <button class="p-2 text-gray-500">
+          <i class="fas fa-ellipsis-v"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pb-24">
+    <!-- Total Card (Prominent) -->
+    <div class="m-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl p-5 shadow-lg">
+      <div class="text-center">
+        <p class="text-blue-200 text-sm mb-1">Estimated Total</p>
+        <p class="text-4xl font-bold mb-4">$425.00</p>
+        <button class="w-full py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">
+          <i class="far fa-paper-plane mr-2"></i>
+          Send to Customer
+        </button>
+      </div>
+    </div>
+
+    <!-- Service Location Card -->
+    <div class="mx-4 mb-4 bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b">
+        <i class="fas fa-map-marker-alt text-blue-500"></i>
+        <span class="font-semibold text-gray-700">Service Location</span>
+      </div>
+      <div class="p-4">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-circle text-green-500 text-xs"></i>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 uppercase tracking-wide">Origin</p>
+            <p class="font-medium">123 Main Street</p>
+            <p class="text-sm text-gray-600">Chandler, AZ 85225</p>
+            <span class="inline-block mt-1 px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">House • 1 Bedroom</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center my-2">
+          <div class="border-l-2 border-dashed border-gray-300 h-6"></div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-flag text-red-500 text-xs"></i>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 uppercase tracking-wide">Destination</p>
+            <p class="font-medium">456 Oak Avenue</p>
+            <p class="text-sm text-gray-600">Phoenix, AZ 85044</p>
+            <span class="inline-block mt-1 px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">Townhouse</span>
+          </div>
+        </div>
+
+        <button class="w-full mt-4 py-2 border border-blue-500 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition">
+          <i class="fas fa-map mr-2"></i>
+          View on Map
+        </button>
+      </div>
+    </div>
+
+    <!-- Schedule Card -->
+    <div class="mx-4 mb-4 bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b">
+        <i class="far fa-calendar text-blue-500"></i>
+        <span class="font-semibold text-gray-700">Schedule</span>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <p class="font-semibold text-lg">February 1, 2026</p>
+            <p class="text-gray-500">8:00 AM - 12:00 PM</p>
+          </div>
+          <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
+            Unscheduled
+          </span>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <i class="fas fa-truck text-gray-400 mb-1"></i>
+            <p class="text-lg font-bold">1</p>
+            <p class="text-xs text-gray-500">Truck</p>
+          </div>
+          <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <i class="fas fa-users text-gray-400 mb-1"></i>
+            <p class="text-lg font-bold">2</p>
+            <p class="text-xs text-gray-500">Crew</p>
+          </div>
+          <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <i class="far fa-clock text-gray-400 mb-1"></i>
+            <p class="text-lg font-bold">2h</p>
+            <p class="text-xs text-gray-500">Est. Time</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Card -->
+    <div class="mx-4 mb-4 bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-b">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-receipt text-blue-500"></i>
+          <span class="font-semibold text-gray-700">Pricing</span>
+        </div>
+        <span class="text-xs text-gray-500">Hourly • Non-Binding</span>
+      </div>
+      <div class="p-4">
+        <div class="space-y-3">
+          <div class="flex justify-between items-center py-2">
+            <span class="text-gray-700">Moving Services</span>
+            <span class="font-medium">$300.00</span>
+          </div>
+          <div class="flex justify-between items-center py-2">
+            <span class="text-gray-700">Trip Fee</span>
+            <span class="font-medium">$125.00</span>
+          </div>
+          <div class="border-t border-gray-100 pt-3 mt-3">
+            <div class="flex justify-between items-center py-1">
+              <span class="text-gray-500">Subtotal</span>
+              <span>$425.00</span>
+            </div>
+            <div class="flex justify-between items-center py-1">
+              <span class="text-gray-500">Tax (0%)</span>
+              <span>$0.00</span>
+            </div>
+          </div>
+          <div class="border-t-2 border-gray-200 pt-3 mt-3">
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-bold">Total</span>
+              <span class="text-lg font-bold text-blue-600">$425.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Card -->
+    <div class="mx-4 mb-4 bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b">
+        <i class="far fa-sticky-note text-blue-500"></i>
+        <span class="font-semibold text-gray-700">Notes</span>
+      </div>
+      <div class="p-4">
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-4 overflow-x-auto">
+          <button class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium whitespace-nowrap">
+            Internal
+          </button>
+          <button class="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-sm whitespace-nowrap">
+            Customer
+          </button>
+          <button class="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-sm whitespace-nowrap">
+            Crew
+          </button>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3">
+          <p class="text-gray-600 text-sm">Customer has a piano on 2nd floor. Will need specialty equipment.</p>
+        </div>
+        <button class="w-full mt-3 py-2 text-blue-600 text-sm font-medium">
+          <i class="fas fa-plus mr-1"></i> Add Note
+        </button>
+      </div>
+    </div>
+
+    <!-- More Options Accordion -->
+    <div class="mx-4 mb-4 bg-white rounded-xl shadow-sm overflow-hidden">
+      <button class="w-full flex items-center justify-between px-4 py-3">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-sliders-h text-gray-400"></i>
+          <span class="font-semibold text-gray-700">More Options</span>
+        </div>
+        <i class="fas fa-chevron-down text-gray-400"></i>
+      </button>
+      <div class="px-4 pb-4 space-y-2">
+        <button class="w-full flex items-center justify-between py-3 border-t border-gray-100">
+          <span class="text-gray-600">Quote Info</span>
+          <i class="fas fa-chevron-right text-gray-400"></i>
+        </button>
+        <button class="w-full flex items-center justify-between py-3 border-t border-gray-100">
+          <span class="text-gray-600">Tasks</span>
+          <span class="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs">0</span>
+        </button>
+        <button class="w-full flex items-center justify-between py-3 border-t border-gray-100">
+          <span class="text-gray-600">Inventory</span>
+          <span class="text-gray-400 text-sm">Empty</span>
+        </button>
+        <button class="w-full flex items-center justify-between py-3 border-t border-gray-100">
+          <span class="text-gray-600">History</span>
+          <i class="fas fa-chevron-right text-gray-400"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Action Bar -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 max-w-md mx-auto">
+    <div class="flex gap-3">
+      <button class="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">
+        <i class="far fa-edit mr-2"></i>
+        Edit
+      </button>
+      <button class="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
+        <i class="fas fa-briefcase mr-2"></i>
+        Convert to Job
+      </button>
+    </div>
+  </div>
+</body>
+</html>

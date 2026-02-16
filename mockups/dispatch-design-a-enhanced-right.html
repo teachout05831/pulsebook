@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Design A — Enhanced Right Panel with Tabs</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; background: #f3f4f6; display: flex; flex-direction: column; }
+
+  .banner { position: fixed; top: 50px; left: 50%; transform: translateX(-50%); background: #dbeafe; color: #1d4ed8; padding: 5px 16px; border-radius: 0 0 8px 8px; font-size: 11px; font-weight: 600; z-index: 60; white-space: nowrap; }
+
+  /* Header */
+  .header { height: 44px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; padding: 0 12px; gap: 8px; z-index: 30; position: relative; }
+  .header h1 { font-size: 14px; font-weight: 700; color: #111827; }
+  .sep { width: 1px; height: 20px; background: #e5e7eb; }
+  .date-nav { display: flex; align-items: center; gap: 4px; }
+  .date-nav button { background: none; border: none; cursor: pointer; font-size: 14px; color: #6b7280; padding: 2px 6px; border-radius: 4px; }
+  .date-nav button:hover { background: #f3f4f6; }
+  .date-nav span { font-size: 13px; font-weight: 500; color: #374151; }
+  .day-badge { font-size: 11px; background: #e5e7eb; color: #374151; padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+  .stat-dots { display: flex; gap: 4px; }
+  .stat-dot { display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: #374151; padding: 2px 6px; border-radius: 4px; }
+  .stat-dot .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .view-dropdown { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; font-weight: 500; background: #fff; cursor: pointer; color: #374151; }
+  .add-btn { height: 32px; padding: 0 10px; border: none; border-radius: 6px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+  /* Timeline */
+  .timeline-area { height: calc(50vh - 22px); overflow: hidden; background: #fff; }
+  .timeline-flex { display: flex; height: 100%; overflow: hidden; }
+  .crew-col { width: 150px; flex-shrink: 0; border-right: 1px solid #e5e7eb; overflow-y: auto; }
+  .crew-col-header { height: 28px; background: #fafafa; border-bottom: 1px solid #e5e7eb; }
+  .crew-row { display: flex; align-items: center; height: 56px; padding: 0 10px; gap: 8px; border-bottom: 1px solid #f3f4f6; }
+  .crew-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .crew-info { flex: 1; min-width: 0; }
+  .crew-name { font-size: 13px; font-weight: 600; color: #111827; }
+  .crew-meta { font-size: 10px; color: #9ca3af; }
+  .unassigned-row { display: flex; height: 40px; background: #fef2f2; border-bottom: 1px solid #fecaca; align-items: center; padding: 0 10px; gap: 6px; }
+  .unassigned-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; }
+  .unassigned-label { font-size: 12px; font-weight: 600; color: #dc2626; }
+  .unassigned-count { font-size: 11px; color: #f87171; }
+
+  .grid-area { flex: 1; overflow-x: auto; overflow-y: auto; }
+  .time-headers { display: flex; height: 28px; border-bottom: 1px solid #e5e7eb; background: #fafafa; }
+  .time-header { min-width: 80px; font-size: 10px; color: #9ca3af; font-weight: 500; display: flex; align-items: center; padding-left: 6px; border-right: 1px solid #f3f4f6; }
+  .grid-row { height: 56px; border-bottom: 1px solid #f3f4f6; position: relative; min-width: 960px; }
+  .job-block { height: 40px; border-radius: 6px; padding: 4px 8px; font-size: 11px; color: #fff; font-weight: 500; display: flex; flex-direction: column; justify-content: center; cursor: pointer; position: absolute; top: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: transform 0.15s, box-shadow 0.15s; }
+  .job-block:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+  .job-block .jb-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .job-block .jb-sub { font-size: 10px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .unassigned-chips { display: flex; gap: 4px; padding: 8px; min-width: 960px; height: 40px; background: #fef2f2; }
+  .ua-chip { padding: 4px 10px; background: #fff; border: 1px solid #fecaca; border-radius: 6px; font-size: 11px; font-weight: 500; color: #374151; white-space: nowrap; cursor: pointer; }
+  .ua-chip:hover { background: #fef2f2; }
+
+  /* Drawer handle */
+  .drawer-handle { height: 28px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: ns-resize; }
+  .handle-bar { width: 40px; height: 4px; background: #d1d5db; border-radius: 2px; }
+  .handle-label { font-size: 11px; color: #6b7280; font-weight: 500; }
+
+  /* Map area */
+  .map-drawer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .map-content { flex: 1; display: flex; overflow: hidden; position: relative; }
+  .map-canvas { flex: 1; position: relative; background: linear-gradient(135deg, #dce8d0 0%, #e2dcc8 30%, #ddd8c6 50%, #d5ddd0 70%, #e0e4d6 100%); transition: margin-right 0.35s ease; }
+  .map-canvas.panel-open { margin-right: 380px; }
+  .map-roads { position: absolute; inset: 0; opacity: 0.12; }
+  .area-label { position: absolute; font-weight: 500; letter-spacing: 1.5px; color: #777; font-size: 11px; }
+
+  /* Pins */
+  .map-pin { position: absolute; cursor: pointer; transition: transform 0.2s; z-index: 2; }
+  .map-pin:hover { transform: scale(1.15); z-index: 5; }
+  .map-pin.selected { transform: scale(1.25); z-index: 10; }
+  .pin-svg { width: 28px; height: 34px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
+  .pin-num { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; color: #fff; }
+  .pin-tip { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+  .map-pin:hover .pin-tip { opacity: 1; }
+  .map-pin.selected .pin-tip { opacity: 1; background: #2563eb; }
+
+  /* Map controls */
+  .map-zoom { position: absolute; bottom: 12px; right: 12px; background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); overflow: hidden; z-index: 5; transition: right 0.35s ease; }
+  .map-zoom.shifted { right: 392px; }
+  .map-zoom button { display: block; width: 32px; height: 32px; border: none; background: #fff; cursor: pointer; font-size: 16px; color: #374151; border-bottom: 1px solid #e5e7eb; }
+  .map-zoom button:last-child { border-bottom: none; }
+  .map-zoom button:hover { background: #f3f4f6; }
+  .map-legend { position: absolute; bottom: 12px; left: 12px; background: #fff; padding: 6px 10px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-size: 10px; z-index: 5; }
+  .legend-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+  .legend-row:last-child { margin-bottom: 0; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ═══ Enhanced Right Panel ═══ */
+  .detail-panel { position: absolute; right: 0; top: 0; bottom: 0; width: 380px; background: #fff; border-left: 1px solid #e5e7eb; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 20; display: flex; flex-direction: column; box-shadow: -3px 0 15px rgba(0,0,0,0.08); }
+  .detail-panel.open { transform: translateX(0); }
+
+  .dp-header { padding: 14px 16px 0; }
+  .dp-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .dp-header h3 { font-size: 16px; font-weight: 600; color: #111827; }
+  .dp-header p { font-size: 12px; color: #6b7280; margin-top: 2px; line-height: 1.3; }
+  .dp-close { background: none; border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; color: #9ca3af; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .dp-close:hover { background: #f3f4f6; color: #374151; }
+
+  /* Tabs */
+  .dp-tabs { display: flex; border-bottom: 1px solid #e5e7eb; }
+  .dp-tab { flex: 1; padding: 8px 12px; font-size: 12px; font-weight: 500; color: #6b7280; background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .dp-tab:hover { color: #374151; background: #f9fafb; }
+  .dp-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+  .dp-body { flex: 1; overflow-y: auto; }
+  .tab-content { display: none; padding: 14px 16px; }
+  .tab-content.active { display: block; }
+
+  /* Details tab */
+  .dp-customer { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .dp-cust-name { font-size: 14px; font-weight: 600; color: #111827; }
+  .dp-cust-phone { font-size: 12px; color: #2563eb; cursor: pointer; margin-top: 2px; }
+  .dp-cust-phone:hover { text-decoration: underline; }
+  .dp-cust-email { font-size: 11px; color: #6b7280; margin-top: 1px; }
+  .dp-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 99px; }
+  .badge-normal { background: #dbeafe; color: #1d4ed8; }
+
+  .dp-info { margin-bottom: 10px; }
+  .dp-info-row { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; color: #4b5563; margin-bottom: 6px; }
+  .dp-icon { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; color: #9ca3af; }
+
+  /* Mini map placeholder */
+  .dp-mini-map { width: 100%; height: 80px; background: linear-gradient(135deg, #dce8d0, #e2dcc8); border-radius: 6px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #777; border: 1px solid #e5e7eb; cursor: pointer; position: relative; overflow: hidden; }
+  .dp-mini-map:hover .mini-map-overlay { opacity: 1; }
+  .mini-map-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; color: #fff; font-size: 12px; font-weight: 500; }
+
+  .dp-divider { border-top: 1px solid #e5e7eb; margin: 10px 0; }
+
+  .dp-form-group { margin-bottom: 10px; }
+  .dp-label { font-size: 11px; font-weight: 500; color: #374151; margin-bottom: 3px; display: block; }
+  .dp-select { width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #d1d5db; border-radius: 5px; background: #fff; }
+  .dp-tab-group { display: flex; margin-bottom: 4px; border: 1px solid #d1d5db; border-radius: 5px; overflow: hidden; }
+  .dp-tab-btn { flex: 1; padding: 4px 8px; font-size: 10px; font-weight: 500; border: none; cursor: pointer; text-align: center; background: #fff; color: #6b7280; }
+  .dp-tab-btn.active { background: #f3f4f6; color: #111827; }
+
+  /* Quick actions */
+  .quick-actions { display: flex; gap: 4px; margin-top: 10px; }
+  .qa-btn { flex: 1; padding: 6px 4px; font-size: 10px; font-weight: 500; border: 1px solid #e5e7eb; border-radius: 5px; background: #fff; cursor: pointer; text-align: center; color: #374151; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .qa-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+  .qa-btn .qa-icon { font-size: 14px; }
+
+  /* Photos tab */
+  .photos-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .photos-title { font-size: 13px; font-weight: 600; color: #111827; }
+  .photos-count { font-size: 11px; color: #6b7280; }
+  .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .photo-thumb { aspect-ratio: 1; border-radius: 6px; overflow: hidden; cursor: pointer; position: relative; border: 1px solid #e5e7eb; transition: transform 0.15s; }
+  .photo-thumb:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-thumb .zoom-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; }
+  .photo-thumb:hover .zoom-overlay { opacity: 1; }
+  .zoom-overlay svg { width: 20px; height: 20px; color: #fff; }
+  .upload-btn { margin-top: 10px; width: 100%; padding: 8px; font-size: 12px; font-weight: 500; border: 2px dashed #d1d5db; border-radius: 6px; background: #f9fafb; cursor: pointer; color: #6b7280; text-align: center; }
+  .upload-btn:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
+
+  /* History tab */
+  .history-list { position: relative; padding-left: 20px; }
+  .history-list::before { content: ''; position: absolute; left: 7px; top: 4px; bottom: 4px; width: 2px; background: #e5e7eb; }
+  .history-item { position: relative; margin-bottom: 16px; }
+  .history-item:last-child { margin-bottom: 0; }
+  .history-dot { position: absolute; left: -17px; top: 3px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; }
+  .history-text { font-size: 12px; color: #374151; line-height: 1.4; }
+  .history-time { font-size: 10px; color: #9ca3af; margin-top: 1px; }
+  .history-user { font-size: 10px; color: #6b7280; }
+
+  /* Footer */
+  .dp-footer { padding: 10px 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 6px; }
+  .dp-btn { flex: 1; padding: 7px 12px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; border: none; text-align: center; }
+  .dp-btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+  .dp-btn-outline:hover { background: #f9fafb; }
+  .dp-btn-primary { background: #2563eb; color: #fff; }
+  .dp-btn-primary:hover { background: #1d4ed8; }
+
+  /* Lightbox */
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 200; }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 85%; max-height: 80vh; border-radius: 8px; }
+  .lb-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); border: none; color: #fff; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+  .lb-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); border: none; color: #fff; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+  .lb-nav.prev { left: 16px; }
+  .lb-nav.next { right: 16px; }
+
+  .status-legend { display: flex; gap: 12px; padding: 4px 12px; background: #fff; border-bottom: 1px solid #e5e7eb; font-size: 10px; color: #6b7280; justify-content: flex-end; }
+  .sl-item { display: flex; align-items: center; gap: 4px; }
+  .sl-dot { width: 6px; height: 6px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<div class="banner">DESIGN A — Enhanced Right Panel with Tabs (Details · Photos · History)</div>
+
+<!-- Header -->
+<div class="header">
+  <h1>Dispatch</h1><div class="sep"></div>
+  <div class="date-nav">
+    <button>‹</button><button>›</button>
+    <span>Monday, February 9, 2026</span>
+    <span class="day-badge">Day</span>
+  </div>
+  <div class="sep"></div>
+  <div class="stat-dots">
+    <div class="stat-dot"><div class="dot" style="background:#ef4444;"></div>2</div>
+    <div class="stat-dot"><div class="dot" style="background:#3b82f6;"></div>4</div>
+    <div class="stat-dot"><div class="dot" style="background:#eab308;"></div>1</div>
+    <div class="stat-dot"><div class="dot" style="background:#22c55e;"></div>1</div>
+  </div>
+  <div class="header-right">
+    <span style="font-size:12px;color:#6b7280;">View:</span>
+    <button class="view-dropdown">👥 Crew + Map ▾</button>
+    <button class="add-btn">+ Job</button>
+  </div>
+</div>
+
+<!-- Timeline (top half) -->
+<div class="timeline-area">
+  <div class="timeline-flex">
+    <div class="crew-col">
+      <div class="crew-col-header"></div>
+      <div class="unassigned-row">
+        <div class="unassigned-dot"></div>
+        <span class="unassigned-label">Unassigned</span>
+        <span class="unassigned-count">2</span>
+      </div>
+      <div class="crew-row">
+        <div class="crew-avatar" style="background:#2563eb;">T1</div>
+        <div class="crew-info"><div class="crew-name">Truck 1</div><div class="crew-meta">Adam R. · 5 jobs</div></div>
+      </div>
+      <div class="crew-row">
+        <div class="crew-avatar" style="background:#dc2626;">T2</div>
+        <div class="crew-info"><div class="crew-name">Truck 2</div><div class="crew-meta">John S., Sammy T · 2 jobs</div></div>
+      </div>
+    </div>
+    <div class="grid-area">
+      <div class="time-headers">
+        <div class="time-header">6am</div><div class="time-header">7am</div><div class="time-header">8am</div><div class="time-header">9am</div><div class="time-header">10am</div><div class="time-header">11am</div><div class="time-header">12pm</div><div class="time-header">1pm</div><div class="time-header">2pm</div><div class="time-header">3pm</div><div class="time-header">4pm</div><div class="time-header">5pm</div>
+      </div>
+      <!-- Unassigned -->
+      <div class="unassigned-chips">
+        <div class="ua-chip">HVAC Maintenance</div>
+        <div class="ua-chip">Garage Door Fix</div>
+      </div>
+      <!-- Truck 1 -->
+      <div class="grid-row">
+        <div class="job-block" style="background:#2563eb;left:80px;width:120px;" onclick="selectJob('ac')"><span class="jb-title">AC Unit Repair</span><span class="jb-sub">Adam Richardson</span></div>
+        <div class="job-block" style="background:#2563eb;left:240px;width:140px;" onclick="selectJob('elec')"><span class="jb-title">Electrical Panel</span><span class="jb-sub">David Chen</span></div>
+        <div class="job-block" style="background:#eab308;left:480px;width:100px;"><span class="jb-title">HVAC Maint.</span><span class="jb-sub">James Thompson</span></div>
+        <div class="job-block" style="background:#2563eb;left:640px;width:120px;"><span class="jb-title">Water Heater</span><span class="jb-sub">Maria Gonzales</span></div>
+      </div>
+      <!-- Truck 2 -->
+      <div class="grid-row">
+        <div class="job-block" style="background:#dc2626;left:240px;width:120px;" onclick="selectJob('plumb')"><span class="jb-title">Plumbing Insp.</span><span class="jb-sub">Sarah Mitchell</span></div>
+        <div class="job-block" style="background:#dc2626;left:480px;width:100px;"><span class="jb-title">Kitchen Faucet</span><span class="jb-sub">Lisa Park</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Status Legend -->
+<div class="status-legend">
+  <div class="sl-item"><div class="sl-dot" style="background:#6b7280;"></div>Unassigned</div>
+  <div class="sl-item"><div class="sl-dot" style="background:#3b82f6;"></div>Scheduled</div>
+  <div class="sl-item"><div class="sl-dot" style="background:#eab308;"></div>In Progress</div>
+  <div class="sl-item"><div class="sl-dot" style="background:#22c55e;"></div>Completed</div>
+  <div class="sl-item"><div class="sl-dot" style="background:#ef4444;"></div>Cancelled</div>
+</div>
+
+<!-- Drawer Handle -->
+<div class="drawer-handle">
+  <div class="handle-bar"></div>
+  <span class="handle-label">🗺 Map View · 8 jobs</span>
+  <div class="handle-bar"></div>
+</div>
+
+<!-- Map (bottom half) -->
+<div class="map-drawer">
+  <div class="map-content">
+    <div class="map-canvas" id="mapCanvas">
+      <svg class="map-roads" style="width:100%;height:100%;">
+        <line x1="0" y1="30%" x2="100%" y2="28%" stroke="#888" stroke-width="2"/>
+        <line x1="0" y1="60%" x2="100%" y2="62%" stroke="#888" stroke-width="2"/>
+        <line x1="25%" y1="0" x2="27%" y2="100%" stroke="#888" stroke-width="2"/>
+        <line x1="55%" y1="0" x2="52%" y2="100%" stroke="#888" stroke-width="2"/>
+        <line x1="80%" y1="0" x2="78%" y2="100%" stroke="#888" stroke-width="1.5"/>
+      </svg>
+      <div class="area-label" style="top:15%;left:35%;">SCOTTSDALE</div>
+      <div class="area-label" style="top:65%;left:55%;">TEMPE</div>
+      <div class="area-label" style="top:40%;left:12%;">PHOENIX</div>
+
+      <!-- Pins -->
+      <div class="map-pin" id="pin-ac" style="top:20%;left:42%;color:#2563eb;" onclick="selectJob('ac')">
+        <svg class="pin-svg" viewBox="0 0 28 34"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="#2563eb"/></svg>
+        <span class="pin-num">1</span><div class="pin-tip">AC Unit Repair — Truck 1</div>
+      </div>
+      <div class="map-pin" id="pin-elec" style="top:35%;left:55%;color:#2563eb;" onclick="selectJob('elec')">
+        <svg class="pin-svg" viewBox="0 0 28 34"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="#2563eb"/></svg>
+        <span class="pin-num">2</span><div class="pin-tip">Electrical Panel — Truck 1</div>
+      </div>
+      <div class="map-pin" style="top:55%;left:48%;color:#2563eb;">
+        <svg class="pin-svg" viewBox="0 0 28 34"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="#2563eb"/></svg>
+        <span class="pin-num">3</span><div class="pin-tip">HVAC Maint. — Truck 1</div>
+      </div>
+      <div class="map-pin" style="top:25%;left:70%;color:#2563eb;">
+        <svg class="pin-svg" viewBox="0 0 28 34"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="#2563eb"/></svg>
+        <span class="pin-num">4</span><div class="pin-tip">Water Heater — Truck 1</div>
+      </div>
+      <div class="map-pin" id="pin-plumb" style="top:42%;left:30%;color:#dc2626;" onclick="selectJob('plumb')">
+        <svg class="pin-svg" viewBox="0 0 28 34"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="#dc2626"/></svg>
+        <span class="pin-num">1</span><div class="pin-tip">Plumbing Insp. — Truck 2</div>
+      </div>
+      <div class="map-pin" style="top:60%;left:65%;color:#dc2626;">
+        <svg class="pin-svg" viewBox="0 0 28 34"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="#dc2626"/></svg>
+        <span class="pin-num">2</span><div class="pin-tip">Kitchen Faucet — Truck 2</div>
+      </div>
+
+      <div class="map-zoom" id="mapZoom"><button>+</button><button>−</button></div>
+      <div class="map-legend">
+        <div class="legend-row"><div class="legend-dot" style="background:#2563eb;"></div>Truck 1 (5)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#dc2626;"></div>Truck 2 (2)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#6b7280;"></div>Unassigned (2)</div>
+      </div>
+
+      <!-- ═══ Enhanced Detail Panel ═══ -->
+      <div class="detail-panel" id="detailPanel">
+        <div class="dp-header">
+          <div class="dp-header-top">
+            <div>
+              <h3 id="dpTitle">AC Unit Repair</h3>
+              <p id="dpDesc">Central AC not cooling properly. Customer reports warm air from all vents.</p>
+            </div>
+            <button class="dp-close" onclick="closePanel()">✕</button>
+          </div>
+          <div class="dp-tabs">
+            <button class="dp-tab active" onclick="switchTab('details')">Details</button>
+            <button class="dp-tab" onclick="switchTab('photos')">Photos</button>
+            <button class="dp-tab" onclick="switchTab('history')">History</button>
+          </div>
+        </div>
+
+        <div class="dp-body">
+          <!-- Details Tab -->
+          <div class="tab-content active" id="tab-details">
+            <div class="dp-customer">
+              <div>
+                <div class="dp-cust-name">Adam Richardson</div>
+                <div class="dp-cust-phone">📞 (480) 555-1234</div>
+                <div class="dp-cust-email">adam.r@email.com</div>
+              </div>
+              <span class="dp-badge badge-normal">Normal</span>
+            </div>
+
+            <div class="dp-mini-map">
+              <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.1;"><line x1="0" y1="40%" x2="100%" y2="38%" stroke="#888" stroke-width="3"/><line x1="45%" y1="0" x2="42%" y2="100%" stroke="#888" stroke-width="3"/></svg>
+              <div style="width:12px;height:16px;position:relative;">
+                <svg viewBox="0 0 28 34" style="width:12px;height:16px;"><path d="M14 0C6.3 0 0 6.3 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.3 21.7 0 14 0z" fill="#2563eb"/></svg>
+              </div>
+              <div class="mini-map-overlay">📍 Open in Maps</div>
+            </div>
+
+            <div class="dp-info">
+              <div class="dp-info-row">
+                <svg class="dp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>4521 E Cactus Rd, Scottsdale, AZ 85254</span>
+              </div>
+              <div class="dp-info-row">
+                <svg class="dp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>2026-02-09 at 07:00</span>
+              </div>
+              <div class="dp-info-row">
+                <svg class="dp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>90 minutes</span>
+              </div>
+              <div class="dp-info-row">
+                <svg class="dp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Test job for Adam Richardson. Check refrigerant levels and clean condenser coils.</span>
+              </div>
+            </div>
+
+            <div class="dp-divider"></div>
+
+            <div class="dp-form-group">
+              <label class="dp-label">Status</label>
+              <select class="dp-select"><option selected>Scheduled</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select>
+            </div>
+            <div class="dp-form-group">
+              <label class="dp-label">Assigned Technician</label>
+              <div class="dp-tab-group"><button class="dp-tab-btn active">Individual</button><button class="dp-tab-btn">Crew</button></div>
+              <select class="dp-select"><option>Truck 1 — Adam R.</option><option>Truck 2 — John S., Sammy T</option><option>Jimmy G.</option></select>
+            </div>
+
+            <div class="quick-actions">
+              <button class="qa-btn"><span class="qa-icon">📞</span>Call</button>
+              <button class="qa-btn"><span class="qa-icon">📍</span>Navigate</button>
+              <button class="qa-btn"><span class="qa-icon">📧</span>Email</button>
+              <button class="qa-btn"><span class="qa-icon">📋</span>Copy Addr</button>
+            </div>
+          </div>
+
+          <!-- Photos Tab -->
+          <div class="tab-content" id="tab-photos">
+            <div class="photos-header">
+              <span class="photos-title">Job Photos</span>
+              <span class="photos-count">5 photos</span>
+            </div>
+            <div class="photo-grid">
+              <div class="photo-thumb" onclick="openLB(0)">
+                <img src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=200&h=200&fit=crop"/>
+                <div class="zoom-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+              </div>
+              <div class="photo-thumb" onclick="openLB(1)">
+                <img src="https://images.unsplash.com/photo-1631545806609-3c480a498e26?w=200&h=200&fit=crop"/>
+                <div class="zoom-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+              </div>
+              <div class="photo-thumb" onclick="openLB(2)">
+                <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=200&h=200&fit=crop"/>
+                <div class="zoom-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+              </div>
+              <div class="photo-thumb" onclick="openLB(3)">
+                <img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=200&h=200&fit=crop"/>
+                <div class="zoom-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+              </div>
+              <div class="photo-thumb" onclick="openLB(4)">
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200&h=200&fit=crop"/>
+                <div class="zoom-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+              </div>
+            </div>
+            <button class="upload-btn">📷 Upload Photos</button>
+          </div>
+
+          <!-- History Tab -->
+          <div class="tab-content" id="tab-history">
+            <div class="history-list">
+              <div class="history-item">
+                <div class="history-dot" style="background:#22c55e;"></div>
+                <div class="history-text">Status changed to <strong>Scheduled</strong></div>
+                <div class="history-time">Today at 6:30 AM</div>
+                <div class="history-user">by Admin</div>
+              </div>
+              <div class="history-item">
+                <div class="history-dot" style="background:#2563eb;"></div>
+                <div class="history-text">Assigned to <strong>Truck 1 — Adam R.</strong></div>
+                <div class="history-time">Today at 6:28 AM</div>
+                <div class="history-user">by Admin</div>
+              </div>
+              <div class="history-item">
+                <div class="history-dot" style="background:#8b5cf6;"></div>
+                <div class="history-text">Dispatched to technician</div>
+                <div class="history-time">Today at 6:25 AM</div>
+                <div class="history-user">by System</div>
+              </div>
+              <div class="history-item">
+                <div class="history-dot" style="background:#f59e0b;"></div>
+                <div class="history-text">Customer confirmed appointment</div>
+                <div class="history-time">Yesterday at 4:15 PM</div>
+                <div class="history-user">via SMS</div>
+              </div>
+              <div class="history-item">
+                <div class="history-dot" style="background:#6b7280;"></div>
+                <div class="history-text">Reminder sent to customer</div>
+                <div class="history-time">Yesterday at 9:00 AM</div>
+                <div class="history-user">by System</div>
+              </div>
+              <div class="history-item">
+                <div class="history-dot" style="background:#3b82f6;"></div>
+                <div class="history-text">Job created from estimate #1042</div>
+                <div class="history-time">Feb 7 at 2:30 PM</div>
+                <div class="history-user">by Admin</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dp-footer">
+          <button class="dp-btn dp-btn-outline" onclick="closePanel()">Close</button>
+          <button class="dp-btn dp-btn-primary">View Full Job →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLB()">
+  <button class="lb-close" onclick="closeLB()">✕</button>
+  <button class="lb-nav prev" onclick="event.stopPropagation(); navLB(-1)">‹</button>
+  <img id="lbImg" src="" onclick="event.stopPropagation()" />
+  <button class="lb-nav next" onclick="event.stopPropagation(); navLB(1)">›</button>
+</div>
+
+<script>
+const photos = [
+  'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=900&h=700&fit=crop',
+  'https://images.unsplash.com/photo-1631545806609-3c480a498e26?w=900&h=700&fit=crop',
+  'https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=900&h=700&fit=crop',
+  'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=900&h=700&fit=crop',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=900&h=700&fit=crop',
+];
+let currentPhoto = 0;
+
+function selectJob(id) {
+  document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+  const pin = document.getElementById('pin-' + id);
+  if (pin) pin.classList.add('selected');
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('mapCanvas').classList.add('panel-open');
+  document.getElementById('mapZoom').classList.add('shifted');
+}
+
+function closePanel() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('mapCanvas').classList.remove('panel-open');
+  document.getElementById('mapZoom').classList.remove('shifted');
+  document.querySelectorAll('.map-pin').forEach(p => p.classList.remove('selected'));
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.dp-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function openLB(i) { currentPhoto = i; document.getElementById('lbImg').src = photos[i]; document.getElementById('lightbox').classList.add('open'); }
+function closeLB() { document.getElementById('lightbox').classList.remove('open'); }
+function navLB(d) { currentPhoto = (currentPhoto + d + photos.length) % photos.length; document.getElementById('lbImg').src = photos[currentPhoto]; }
+</script>
+
+</body>
+</html>
