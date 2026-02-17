@@ -5,6 +5,7 @@ import { getTeamMemberOptions } from "@/features/estimates/queries/getTeamMember
 import { getCrewOptions } from "@/features/estimates/queries/getCrewOptions";
 import { getCustomDropdowns } from "@/features/custom-dropdowns/queries/getCustomDropdowns";
 import { EstimateDetailLayout } from "@/features/estimates/components/EstimateDetailLayout";
+import { defaultEstimateBuilderSettings, defaultCustomDropdowns } from "@/types/company";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -32,10 +33,10 @@ export default async function EstimateDetailPage({ params }: PageProps) {
   }
 
   const [settings, teamMembers, crews, dropdowns] = await Promise.all([
-    safeQuery("getEstimateSettings", () => getEstimateSettings(), { resourceFields: [], pricingCategories: [], multiStopRoutesEnabled: false }),
+    safeQuery("getEstimateSettings", () => getEstimateSettings(), { ...defaultEstimateBuilderSettings, multiStopRoutesEnabled: false }),
     safeQuery("getTeamMemberOptions", () => getTeamMemberOptions(), []),
     safeQuery("getCrewOptions", () => getCrewOptions(), []),
-    safeQuery("getCustomDropdowns", () => getCustomDropdowns(), { serviceTypes: [], sources: [], leadStatuses: [] }),
+    safeQuery("getCustomDropdowns", () => getCustomDropdowns(), defaultCustomDropdowns),
   ]);
 
   const estimate = convertEstimateDetail(rawData as Record<string, unknown>);
