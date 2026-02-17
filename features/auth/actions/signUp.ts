@@ -1,11 +1,10 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { SignUpInput, AuthResult } from '../types'
 
 export async function signUp(input: SignUpInput): Promise<AuthResult> {
-  const supabase = await createClient()
-
   // Validate input
   if (!input.email || !input.email.includes('@')) {
     return { success: false, error: 'Valid email is required' }
@@ -19,6 +18,9 @@ export async function signUp(input: SignUpInput): Promise<AuthResult> {
   if (!input.companyName || input.companyName.length < 2) {
     return { success: false, error: 'Company name is required' }
   }
+
+  // Use cookie-based client for auth (sets session cookie)
+  const supabase = await createClient()
 
   // Create auth user
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -39,8 +41,13 @@ export async function signUp(input: SignUpInput): Promise<AuthResult> {
     return { success: false, error: 'Failed to create user' }
   }
 
+  // Use admin client for setup steps (bypasses RLS)
+  // The regular client can't reliably do these inserts because
+  // RLS policies require active_company_id which doesn't exist yet
+  const admin = createAdminClient()
+
   // Create user profile in public.users table
-  const { error: profileError } = await supabase
+  const { error: profileError } = await admin
     .from('users')
     .insert({
       id: authData.user.id,
@@ -59,7 +66,7 @@ export async function signUp(input: SignUpInput): Promise<AuthResult> {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
 
-  const { data: company, error: companyError } = await supabase
+  const { data: company, error: companyError } = await admin
     .from('companies')
     .insert({
       name: input.companyName,
@@ -74,7 +81,7 @@ export async function signUp(input: SignUpInput): Promise<AuthResult> {
   }
 
   // Add user to company as owner
-  const { error: memberError } = await supabase
+  const { error: memberError } = await admin
     .from('user_companies')
     .insert({
       user_id: authData.user.id,
@@ -83,16 +90,18 @@ export async function signUp(input: SignUpInput): Promise<AuthResult> {
     })
 
   if (memberError) {
+    console.error('Membership creation error:', memberError)
     return { success: false, error: 'Failed to add user to company' }
   }
 
   // Set active company
-  const { error: updateError } = await supabase
+  const { error: updateError } = await admin
     .from('users')
     .update({ active_company_id: company.id })
     .eq('id', authData.user.id)
 
   if (updateError) {
+    console.error('Set active company error:', updateError)
     return { success: false, error: 'Failed to set active company' }
   }
 

@@ -26,7 +26,7 @@ function convertJob(data: Record<string, unknown>) {
     recurrenceConfig: data.recurrence_config || null,
     parentJobId: data.parent_job_id || null, instanceDate: data.instance_date || null,
     lineItems: data.line_items || [], pricingModel: data.pricing_model || "flat",
-    resources: data.resources || { trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, customFields: {} },
+    resources: data.resources || { trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, showEstimatedHours: false, minHours: null, maxHours: null, customFields: {} },
     subtotal: data.subtotal || 0, taxRate: data.tax_rate || 0,
     taxAmount: data.tax_amount || 0, total: data.total || 0,
     depositType: data.deposit_type || null, depositAmount: data.deposit_amount || 0,

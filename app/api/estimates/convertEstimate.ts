@@ -21,7 +21,7 @@ function convertBase(data: Row) {
       taxAmount: data.tax_amount, total: data.total, notes: data.notes, terms: data.terms,
       address: data.address, internalNotes: data.internal_notes, customerNotes: data.customer_notes,
       crewNotes: data.crew_notes, crewFeedback: data.crew_feedback,
-      resources: data.resources || {},
+      resources: data.resources || { trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, showEstimatedHours: false, minHours: null, maxHours: null, customFields: {} },
       depositType: data.deposit_type, depositAmount: data.deposit_amount, depositPaid: data.deposit_paid || 0,
       customFields: data.custom_fields || {},
       appliedFees: data.applied_fees || [],
@@ -49,7 +49,7 @@ export function convertEstimateDetail(data: Row) {
 
   return {
     ...base,
-    resources: data.resources || { trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, customFields: {} },
+    resources: data.resources || { trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, showEstimatedHours: false, minHours: null, maxHours: null, customFields: {} },
     jobId: (data.job_id as string) || null,
     assignedCrewId: (data.assigned_crew_id as string) || null,
     technicianId: (data.technician_id as string) || null,

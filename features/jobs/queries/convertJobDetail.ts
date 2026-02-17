@@ -29,7 +29,7 @@ export function convertJobDetail(d: Record<string, unknown>): JobDetail {
     lineItems: (d.line_items as JobDetail["lineItems"]) || [],
     pricingModel: (d.pricing_model as JobDetail["pricingModel"]) || "flat",
     resources: (d.resources as JobDetail["resources"]) || {
-      trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, customFields: {},
+      trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, showEstimatedHours: false, minHours: null, maxHours: null, customFields: {},
     },
     subtotal: (d.subtotal as number) || 0,
     taxRate: (d.tax_rate as number) || 0,

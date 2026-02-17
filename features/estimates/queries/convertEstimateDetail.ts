@@ -27,7 +27,7 @@ export function convertEstimateDetail(d: Record<string, unknown>): EstimateDetai
     notes: d.notes as string | null, terms: d.terms as string | null, address: d.address as string | null,
     internalNotes: d.internal_notes as string | null, customerNotes: d.customer_notes as string | null,
     crewNotes: d.crew_notes as string | null, crewFeedback: d.crew_feedback as string | null,
-    resources: (d.resources as EstimateDetail["resources"]) || { trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, customFields: {} },
+    resources: (d.resources as EstimateDetail["resources"]) || { trucks: null, teamSize: null, estimatedHours: null, hourlyRate: null, showEstimatedHours: false, minHours: null, maxHours: null, customFields: {} },
     depositType: d.deposit_type as EstimateDetail["depositType"],
     depositAmount: d.deposit_amount as number | null,
     depositPaid: (d.deposit_paid as number) || 0,
