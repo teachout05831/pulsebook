@@ -10,14 +10,32 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+async function safeQuery<T>(name: string, fn: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    console.error(`[EstimateDetail] ${name} failed:`, e);
+    return fallback;
+  }
+}
+
 export default async function EstimateDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const [rawData, settings, teamMembers, crews, dropdowns] = await Promise.all([
-    getEstimateDetail(id),
-    getEstimateSettings(),
-    getTeamMemberOptions(),
-    getCrewOptions(),
-    getCustomDropdowns(),
+
+  // getEstimateDetail is critical — let errors propagate with logging
+  let rawData;
+  try {
+    rawData = await getEstimateDetail(id);
+  } catch (e) {
+    console.error("[EstimateDetail] getEstimateDetail failed:", e);
+    throw e;
+  }
+
+  const [settings, teamMembers, crews, dropdowns] = await Promise.all([
+    safeQuery("getEstimateSettings", () => getEstimateSettings(), { resourceFields: [], pricingCategories: [], multiStopRoutesEnabled: false }),
+    safeQuery("getTeamMemberOptions", () => getTeamMemberOptions(), []),
+    safeQuery("getCrewOptions", () => getCrewOptions(), []),
+    safeQuery("getCustomDropdowns", () => getCustomDropdowns(), { serviceTypes: [], sources: [], leadStatuses: [] }),
   ]);
 
   const estimate = convertEstimateDetail(rawData as Record<string, unknown>);
