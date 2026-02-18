@@ -42,9 +42,19 @@ export function StopsCard({ locations, onAdd, onRemove }: Props) {
     return parts.join(", ") || loc.address;
   };
 
-  const mapsUrl = locations.length > 0
-    ? `https://maps.google.com/?q=${encodeURIComponent(locations.map((l) => l.address).join(" to "))}`
-    : null;
+  const mapsUrl = (() => {
+    if (locations.length === 0) return null;
+    const addrs = locations.map((l) => fullAddress(l));
+    if (addrs.length === 1) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addrs[0])}`;
+    }
+    const origin = encodeURIComponent(addrs[0]);
+    const destination = encodeURIComponent(addrs[addrs.length - 1]);
+    const waypoints = addrs.slice(1, -1).map((a) => encodeURIComponent(a)).join("|");
+    let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}`;
+    if (waypoints) url += `&waypoints=${waypoints}`;
+    return url;
+  })();
 
   return (
     <Card>

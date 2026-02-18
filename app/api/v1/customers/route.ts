@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from("customers")
-      .select("id, name, email, phone, address, status, lead_status, source, estimated_value, service_type, notes, custom_fields, tags, created_at, updated_at", { count: "exact" })
+      .select("id, name, email, phone, address, status, lead_status, source, estimated_value, service_type, notes, custom_fields, tags, ghl_contact_id, created_at, updated_at", { count: "exact" })
       .eq("company_id", companyId);
 
     if (search) {
@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
         source: c.source, estimatedValue: c.estimated_value,
         serviceType: c.service_type, notes: c.notes,
         customFields: c.custom_fields || {}, tags: c.tags || [],
+        ghlContactId: c.ghl_contact_id || null,
         createdAt: c.created_at, updatedAt: c.updated_at,
       })),
       pagination: { page, limit, total: count || 0 },
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
         last_contact_date: body.lastContactDate || null, assigned_to: body.assignedTo || null,
         custom_fields: body.customFields || {}, tags: body.tags || [],
       })
-      .select("id, name, email, phone, address, status, lead_status, source, estimated_value, service_type, notes, custom_fields, tags, created_at, updated_at")
+      .select("id, name, email, phone, address, status, lead_status, source, estimated_value, service_type, notes, custom_fields, tags, ghl_contact_id, created_at, updated_at")
       .single();
 
     if (error) {
@@ -94,6 +95,7 @@ export async function POST(request: NextRequest) {
         source: data.source, estimatedValue: data.estimated_value,
         serviceType: data.service_type, notes: data.notes,
         customFields: data.custom_fields || {}, tags: data.tags || [],
+        ghlContactId: data.ghl_contact_id || null,
         createdAt: data.created_at, updatedAt: data.updated_at,
       },
     }, { status: 201 });

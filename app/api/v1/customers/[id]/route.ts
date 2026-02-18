@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   return withApiAuth(request, async ({ companyId, supabase }) => {
     const { data, error } = await supabase
       .from("customers")
-      .select("id, name, email, phone, address, status, lead_status, source, estimated_value, service_type, notes, custom_fields, tags, created_at, updated_at")
+      .select("id, name, email, phone, address, status, lead_status, source, estimated_value, service_type, notes, custom_fields, tags, ghl_contact_id, created_at, updated_at")
       .eq("id", id)
       .eq("company_id", companyId)
       .single();
@@ -26,6 +26,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         source: data.source, estimatedValue: data.estimated_value,
         serviceType: data.service_type, notes: data.notes,
         customFields: data.custom_fields || {}, tags: data.tags || [],
+        ghlContactId: data.ghl_contact_id || null,
         createdAt: data.created_at, updatedAt: data.updated_at,
       },
     }, {
@@ -77,7 +78,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       .update(updateData)
       .eq("id", id)
       .eq("company_id", companyId)
-      .select("id, name, email, phone, address, status, lead_status, source, estimated_value, service_type, notes, custom_fields, tags, created_at, updated_at")
+      .select("id, name, email, phone, address, status, lead_status, source, estimated_value, service_type, notes, custom_fields, tags, ghl_contact_id, created_at, updated_at")
       .single();
 
     if (error || !data) {
@@ -91,6 +92,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         source: data.source, estimatedValue: data.estimated_value,
         serviceType: data.service_type, notes: data.notes,
         customFields: data.custom_fields || {}, tags: data.tags || [],
+        ghlContactId: data.ghl_contact_id || null,
         createdAt: data.created_at, updatedAt: data.updated_at,
       },
     });

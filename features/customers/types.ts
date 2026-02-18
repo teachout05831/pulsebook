@@ -8,6 +8,7 @@ export interface Customer {
   notes: string | null
   customFields: Record<string, unknown>
   accountBalance?: number
+  ghlContactId?: string | null
   createdAt: string
   updatedAt: string
 }

@@ -18,6 +18,7 @@ import {
   Smartphone,
   Globe,
   Key,
+  Link2,
   Video,
   CalendarDays,
   Package,
@@ -86,6 +87,7 @@ const settingsNavSections: NavSection[] = [
       { label: 'API Keys', href: '/settings/api-keys', icon: <Key className="h-5 w-5" /> },
       { label: 'Consultations', href: '/settings/consultations', icon: <Video className="h-5 w-5" /> },
       { label: 'Online Booking', href: '/settings/scheduling', icon: <CalendarDays className="h-5 w-5" /> },
+      { label: 'Integrations', href: '/settings/integrations', icon: <Link2 className="h-5 w-5" /> },
     ],
   },
 ];

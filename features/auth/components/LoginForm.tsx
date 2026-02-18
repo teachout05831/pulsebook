@@ -45,21 +45,21 @@ export function LoginForm() {
 
   return (
     <div className="w-full max-w-sm">
-      <div className="rounded-xl border border-slate-200 bg-white shadow-lg p-8">
+      <div className="rounded-xl border border-slate-800 bg-slate-900 shadow-lg p-8">
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-slate-900">Sign in</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <h2 className="text-xl font-semibold text-white">Sign in</h2>
+          <p className="mt-1 text-sm text-slate-400">
             Enter your credentials to access your account
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-600">
+            <div className="rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-400">
               {error}
             </div>
           )}
           <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email</Label>
+            <Label htmlFor="email" className="text-sm font-medium text-slate-300">Email</Label>
             <Input
               id="email"
               type="email"
@@ -68,11 +68,11 @@ export function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
-              className="h-10"
+              className="h-10 border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus:border-blue-500"
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-sm font-medium text-slate-700">Password</Label>
+            <Label htmlFor="password" className="text-sm font-medium text-slate-300">Password</Label>
             <Input
               id="password"
               type="password"
@@ -81,18 +81,17 @@ export function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
-              className="h-10"
+              className="h-10 border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus:border-blue-500"
             />
           </div>
-          <Button type="submit" className="w-full h-10 mt-2" disabled={isLoading}>
+          <Button type="submit" className="w-full h-10 mt-2 bg-blue-500 hover:bg-blue-400" disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>
       </div>
       <p className="mt-6 text-center text-sm text-slate-500">
-        Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
-          Sign up
+        <Link href="/" className="font-medium text-blue-400 hover:text-blue-300 hover:underline">
+          Back to home
         </Link>
       </p>
     </div>
