@@ -65,7 +65,7 @@ export function InstallPrompt() {
       <div className="rounded-xl border bg-white shadow-lg p-4">
         <div className="flex items-start gap-3">
           <div className="flex-1">
-            <p className="text-sm font-semibold">Install ServicePro</p>
+            <p className="text-sm font-semibold">Install Pulsebook</p>
             {iosMode ? (
               <p className="text-xs text-muted-foreground mt-1">
                 Tap <Share className="inline h-3 w-3 -mt-0.5" /> then &quot;Add to Home Screen&quot;

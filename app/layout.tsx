@@ -12,13 +12,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "ServicePro",
+  title: "Pulsebook",
   description: "Service business management platform",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "ServicePro",
+    title: "Pulsebook",
   },
 };
 

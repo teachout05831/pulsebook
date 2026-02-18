@@ -11,7 +11,7 @@ export default function SignPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="border-b bg-white px-4 py-3">
         <div className="max-w-lg mx-auto">
-          <span className="font-semibold text-sm">ServicePro</span>
+          <span className="font-semibold text-sm">Pulsebook</span>
           <span className="text-xs text-muted-foreground ml-2">Contract Signing</span>
         </div>
       </div>

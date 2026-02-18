@@ -65,7 +65,7 @@ function MinimalFooter({ section }: SectionProps) {
       {!!section.content.hours && (
         <p className="text-xs opacity-50 mt-2 text-center">{section.content.hours as string}</p>
       )}
-      <p className="text-xs opacity-25 mt-4 text-center tracking-wide">Powered by ServicePro</p>
+      <p className="text-xs opacity-25 mt-4 text-center tracking-wide">Powered by Pulsebook</p>
     </div>
   );
 }
@@ -128,7 +128,7 @@ export function ContactSection({ section, brandKit }: SectionProps) {
           {!!section.content.hours && (
             <p className="text-sm opacity-60 whitespace-pre-line">{section.content.hours as string}</p>
           )}
-          <p className="text-xs opacity-20 mt-6 tracking-wide">Powered by ServicePro</p>
+          <p className="text-xs opacity-20 mt-6 tracking-wide">Powered by Pulsebook</p>
         </div>
       )}
     </div>

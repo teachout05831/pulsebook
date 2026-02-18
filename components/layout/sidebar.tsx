@@ -150,9 +150,9 @@ export function Sidebar({ user, activeCompany, userCompanies }: SidebarProps) {
         <div className="flex h-16 items-center px-5 border-b border-slate-800">
           <Link href="/dashboard" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">S</span>
+              <span className="text-white font-bold text-sm">P</span>
             </div>
-            <span className="font-semibold text-lg">ServicePro</span>
+            <span className="font-semibold text-lg">Pulsebook</span>
           </Link>
         </div>
 

@@ -43,7 +43,7 @@ export function PublicSchedulingPage({ data, token }: Props) {
               </div>
             );
           })}
-          <div className="text-center py-8 text-xs text-muted-foreground"><p>Powered by ServicePro</p></div>
+          <div className="text-center py-8 text-xs text-muted-foreground"><p>Powered by Pulsebook</p></div>
         </div>
       </ThemeProvider>
     </BookingProvider>

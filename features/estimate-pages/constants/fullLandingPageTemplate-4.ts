@@ -76,7 +76,7 @@ export const footerHtml = `<footer class="lpf-footer">
     </div>
     <div class="lpf-bottom">
       <span>&copy; 2026 Your Company Name. All rights reserved.</span>
-      <div class="lpf-powered">Powered by <strong>ServicePro</strong></div>
+      <div class="lpf-powered">Powered by <strong>Pulsebook</strong></div>
     </div>
   </div>
 </footer>`;

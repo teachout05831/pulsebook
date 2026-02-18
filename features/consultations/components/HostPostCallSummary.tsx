@@ -87,7 +87,7 @@ export function HostPostCallSummary({ companyName, logoUrl, primaryColor, durati
           </div>
 
           <div className="mt-8 text-center">
-            <span className="text-white/15 text-xs">Powered by ServicePro</span>
+            <span className="text-white/15 text-xs">Powered by Pulsebook</span>
           </div>
         </div>
       </div>

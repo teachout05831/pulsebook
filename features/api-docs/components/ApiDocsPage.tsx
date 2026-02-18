@@ -7,9 +7,9 @@ export function ApiDocsPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-3">ServicePro API</h1>
+          <h1 className="text-4xl font-bold mb-3">Pulsebook API</h1>
           <p className="text-lg text-gray-600">
-            Connect AI agents, automations, and external tools to your ServicePro account.
+            Connect AI agents, automations, and external tools to your Pulsebook account.
           </p>
           <div className="mt-4 flex gap-3">
             <a href="/api/openapi.json" target="_blank" className="inline-flex items-center px-4 py-2 bg-slate-900 text-white rounded-md text-sm font-medium hover:bg-slate-800">
@@ -87,7 +87,7 @@ export function ApiDocsPage() {
         </Section>
 
         <div className="mt-16 pt-8 border-t text-center text-gray-400 text-sm">
-          ServicePro API v1
+          Pulsebook API v1
         </div>
       </div>
     </div>

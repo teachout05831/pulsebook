@@ -59,7 +59,7 @@ export const FOOTER_BLOCKS: HtmlBlock[] = [
     </div>
     <div class="lpf-bottom">
       <span>&copy; {{year}} {{companyName}}. All rights reserved.</span>
-      <div class="lpf-powered">Powered by <strong>ServicePro</strong></div>
+      <div class="lpf-powered">Powered by <strong>Pulsebook</strong></div>
     </div>
   </div>
 </footer>`,

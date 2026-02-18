@@ -103,7 +103,7 @@ export function ConsultationLobby({
         </div>
 
         <div className="px-6 py-3 border-t border-white/5 text-center">
-          <span className="text-white/20 text-xs">Powered by ServicePro</span>
+          <span className="text-white/20 text-xs">Powered by Pulsebook</span>
         </div>
       </div>
     </div>
