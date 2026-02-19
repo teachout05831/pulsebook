@@ -1,6 +1,6 @@
 {
-  "name": "ServicePro",
-  "short_name": "ServicePro",
+  "name": "Pulsebook",
+  "short_name": "Pulsebook",
   "description": "Service business management platform",
   "start_url": "/",
   "display": "standalone",

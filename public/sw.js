@@ -1,4 +1,4 @@
-const CACHE_NAME = 'servicepro-v2'
+const CACHE_NAME = 'pulsebook-v3'
 const STATIC_ASSETS = ['/', '/manifest.json']
 
 self.addEventListener('install', (event) => {
