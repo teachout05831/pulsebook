@@ -5,6 +5,7 @@ export type CustomerTab =
   | "estimates"
   | "jobs"
   | "invoices"
+  | "consultations"
   | "files"
   | "notes";
 

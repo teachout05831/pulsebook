@@ -33,6 +33,7 @@ export function PublicConsultationPage({ consultation }: PublicConsultationPageP
   const [callState, setCallState] = useState<CallState>("lobby");
   const [isJoining, setIsJoining] = useState(false);
   const [meetingToken, setMeetingToken] = useState<string | null>(null);
+  const [roomUrl, setRoomUrl] = useState<string | null>(consultation.dailyRoomUrl);
   const [callDuration, setCallDuration] = useState(0);
   const [liveEstimateId, setLiveEstimateId] = useState<string | null>(null);
 
@@ -69,9 +70,9 @@ export function PublicConsultationPage({ consultation }: PublicConsultationPageP
         }),
       });
       const data = await res.json();
-      if (data.data?.token) {
-        setMeetingToken(data.data.token);
-      }
+      if (!res.ok) return;
+      if (data.data?.token) setMeetingToken(data.data.token);
+      if (data.data?.roomUrl) setRoomUrl(data.data.roomUrl);
       setCallState("call");
     } catch {
       setCallState("call"); // Join without token (public room)
@@ -84,11 +85,11 @@ export function PublicConsultationPage({ consultation }: PublicConsultationPageP
     setCallState("ended");
   }, []);
 
-  if (callState === "call" && consultation.dailyRoomUrl) {
+  if (callState === "call" && roomUrl) {
     if (!isHost) {
       return (
         <CustomerCallView
-          roomUrl={consultation.dailyRoomUrl} token={meetingToken}
+          roomUrl={roomUrl} token={meetingToken}
           userName={consultation.customerName || "Guest"} companyName={consultation.companyName}
           logoUrl={logoUrl} primaryColor={primaryColor} onCallEnded={handleCallEnded}
           widgets={consultation.widgets} brandKit={lobbyBrandKit} consultationId={consultation.id}
@@ -97,7 +98,7 @@ export function PublicConsultationPage({ consultation }: PublicConsultationPageP
     }
     return (
       <VideoRoom
-        roomUrl={consultation.dailyRoomUrl} token={meetingToken}
+        roomUrl={roomUrl} token={meetingToken}
         userName={consultation.hostName} companyName={consultation.companyName}
         logoUrl={logoUrl} primaryColor={primaryColor} onCallEnded={handleCallEnded}
         widgets={consultation.widgets} brandKit={lobbyBrandKit} isHost

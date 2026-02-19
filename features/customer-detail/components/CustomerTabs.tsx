@@ -6,6 +6,7 @@ import {
   ClipboardList,
   Wrench,
   DollarSign,
+  Video,
   Folder,
   FileText,
 } from "lucide-react";
@@ -26,6 +27,7 @@ const tabs: TabItem[] = [
   { id: "estimates", label: "Estimates", icon: ClipboardList, countKey: "estimates", badgeVariant: "warning" },
   { id: "jobs", label: "Jobs", icon: Wrench, countKey: "jobs", badgeVariant: "success" },
   { id: "invoices", label: "Invoices", icon: DollarSign },
+  { id: "consultations", label: "Consultations", icon: Video },
   { id: "files", label: "Files", icon: Folder },
   { id: "notes", label: "Notes", icon: FileText },
 ];

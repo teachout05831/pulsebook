@@ -7,6 +7,7 @@ import {
   EstimatesTab,
   JobsTab,
   InvoicesTab,
+  ConsultationsTab,
   FilesTab,
   NotesTab,
 } from "./tabs";
@@ -93,6 +94,9 @@ export function CustomerDetailContent({
             onRefresh={refetchInvoices}
           />
         )
+      )}
+      {activeTab === "consultations" && (
+        <ConsultationsTab customerId={customerId} customerName={customer.name} />
       )}
       {activeTab === "files" && <FilesTab customerId={customerId} />}
       {activeTab === "notes" && <NotesTab customerId={customerId} />}

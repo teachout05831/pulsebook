@@ -3,12 +3,16 @@ interface DailyRoom {
   roomUrl: string;
 }
 
+/**
+ * Create a Daily.co video room.
+ * Room lives for 24 hours from creation by default.
+ */
 export async function createDailyRoom(): Promise<DailyRoom | null> {
   const DAILY_API_KEY = process.env.DAILY_API_KEY;
   if (!DAILY_API_KEY) return null;
 
   const roomName = `consult-${Date.now()}`;
-  const expiresAt = Math.floor(Date.now() / 1000) + 86400;
+  const expiresAt = Math.floor(Date.now() / 1000) + 86400; // 24h
 
   try {
     const res = await fetch("https://api.daily.co/v1/rooms", {

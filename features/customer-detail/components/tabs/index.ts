@@ -5,4 +5,5 @@ export { JobsTab } from "./JobsTab";
 export { InvoicesTab } from "./InvoicesTab";
 export { FilesTab } from "./FilesTab";
 export { NotesTab } from "./NotesTab";
+export { ConsultationsTab } from "./ConsultationsTab";
 export { ActivityTab } from "./ActivityTab";

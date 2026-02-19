@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, ExternalLink, CheckCircle2 } from "lucide-react";
+import { Copy, Check, ExternalLink, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ConsultationLinkDisplayProps {
@@ -11,68 +11,78 @@ interface ConsultationLinkDisplayProps {
 
 export function ConsultationLinkDisplay({
   link,
-  consultationId,
 }: ConsultationLinkDisplayProps) {
-  const [copied, setCopied] = useState(false);
+  const [copiedCustomer, setCopiedCustomer] = useState(false);
+  const [copiedHost, setCopiedHost] = useState(false);
 
-  async function handleCopy() {
+  const hostLink = `${link}?role=host`;
+
+  async function handleCopyCustomer() {
     await navigator.clipboard.writeText(link);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedCustomer(true);
+    setTimeout(() => setCopiedCustomer(false), 2000);
+  }
+
+  async function handleCopyHost() {
+    await navigator.clipboard.writeText(hostLink);
+    setCopiedHost(true);
+    setTimeout(() => setCopiedHost(false), 2000);
   }
 
   function handleJoinAsHost() {
-    window.open(link, "_blank", "noopener,noreferrer");
+    window.open(hostLink, "_blank", "noopener,noreferrer");
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 rounded-lg bg-green-500/10 border border-green-500/20 px-3 py-2">
-        <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
-        <p className="text-sm text-green-600 dark:text-green-400">
-          Consultation room created successfully.
-        </p>
-      </div>
-
-      <p className="text-sm text-muted-foreground">
-        Share this link with your customer to start the video consultation.
-      </p>
-
-      {/* Link display with inline copy */}
-      <div className="flex items-center gap-2 rounded-md border bg-muted/50 px-3 py-2.5">
-        <span className="flex-1 text-sm font-mono truncate select-all">
-          {link}
-        </span>
-        <button
-          onClick={handleCopy}
-          className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+    <div className="space-y-3">
+      <div>
+        <p className="text-xs font-medium text-muted-foreground mb-1.5">Customer Link</p>
+        <div
+          onClick={handleCopyCustomer}
+          className="rounded-lg bg-muted/50 border px-3 py-2 cursor-pointer hover:bg-muted/80 transition-colors"
         >
-          {copied ? (
-            <Check className="h-4 w-4 text-green-500" />
-          ) : (
-            <Copy className="h-4 w-4" />
-          )}
-        </button>
+          <p className="text-[11px] font-mono text-muted-foreground break-all select-all leading-relaxed">
+            {link}
+          </p>
+        </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-3 pt-1">
-        <Button onClick={handleCopy} variant="outline" className="flex-1">
-          {copied ? (
-            <>
-              <Check className="h-4 w-4 mr-1.5 text-green-500" />
-              Copied!
-            </>
+      <div>
+        <p className="text-xs font-medium text-muted-foreground mb-1.5">Host Link</p>
+        <div
+          onClick={handleCopyHost}
+          className="rounded-lg bg-muted/50 border px-3 py-2 cursor-pointer hover:bg-muted/80 transition-colors"
+        >
+          <p className="text-[11px] font-mono text-muted-foreground break-all select-all leading-relaxed">
+            {hostLink}
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        <Button onClick={handleCopyCustomer} variant="outline" size="sm">
+          {copiedCustomer ? (
+            <Check className="h-3.5 w-3.5 text-green-500" />
           ) : (
             <>
-              <Copy className="h-4 w-4 mr-1.5" />
-              Copy Link
+              <Users className="h-3.5 w-3.5 mr-1" />
+              <span className="text-xs">Customer</span>
             </>
           )}
         </Button>
-        <Button onClick={handleJoinAsHost} className="flex-1">
-          <ExternalLink className="h-4 w-4 mr-1.5" />
-          Join as Host
+        <Button onClick={handleCopyHost} variant="outline" size="sm">
+          {copiedHost ? (
+            <Check className="h-3.5 w-3.5 text-green-500" />
+          ) : (
+            <>
+              <Copy className="h-3.5 w-3.5 mr-1" />
+              <span className="text-xs">Host</span>
+            </>
+          )}
+        </Button>
+        <Button onClick={handleJoinAsHost} size="sm">
+          <ExternalLink className="h-3.5 w-3.5 mr-1" />
+          <span className="text-xs">Join</span>
         </Button>
       </div>
     </div>

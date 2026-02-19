@@ -1,10 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthCompany, AuthError } from "@/lib/auth/getAuthCompany";
 import { createDailyRoom } from "@/lib/daily/createRoom";
+import { getConsultations } from "@/features/consultations/queries/getConsultations";
 
 const RESULT_FIELDS = "id, company_id, customer_id, estimate_id, title, purpose, public_token, daily_room_name, daily_room_url, status, host_name, customer_name, scheduled_at, created_at";
 
 const VALID_PURPOSES = ["discovery", "estimate_review", "follow_up"];
+
+// GET /api/consultations - List consultations for the company
+export async function GET(request: NextRequest) {
+  try {
+    const { companyId } = await getAuthCompany();
+    const { searchParams } = new URL(request.url);
+
+    const page = parseInt(searchParams.get("_page") || "1", 10);
+    const limit = parseInt(searchParams.get("_limit") || "20", 10);
+    const status = searchParams.get("status") || undefined;
+    const customerId = searchParams.get("customerId") || undefined;
+
+    const result = await getConsultations(companyId, { status, customerId, page, limit });
+
+    const data = result.data.map((row: Record<string, unknown>) => ({
+      id: row.id,
+      title: row.title,
+      purpose: row.purpose,
+      status: row.status,
+      pipelineStatus: row.pipeline_status,
+      customerName: row.customer_name,
+      hostName: row.host_name,
+      durationSeconds: row.duration_seconds,
+      scheduledAt: row.scheduled_at,
+      createdAt: row.created_at,
+      estimateId: row.estimate_id,
+      publicToken: row.public_token,
+    }));
+
+    return NextResponse.json(
+      { data, total: result.total },
+      { headers: { "Cache-Control": "private, max-age=15, stale-while-revalidate=30" } }
+    );
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+    }
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
+}
 
 // POST /api/consultations - Create a consultation with a Daily.co room
 export async function POST(request: NextRequest) {
@@ -47,8 +88,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create Daily.co room
-    const room = await createDailyRoom();
+    // Create Daily.co room now for instant calls, skip for scheduled (created on-demand at join)
+    const isScheduled = !!body.scheduledAt;
+    const room = isScheduled ? null : await createDailyRoom();
     const publicToken = crypto.randomUUID();
 
     const { data, error } = await supabase

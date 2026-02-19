@@ -23,6 +23,7 @@ import {
   Presentation,
   LayoutTemplate,
   CalendarPlus,
+  Video,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,7 @@ function buildNavSections(t: ReturnType<typeof useTerminology>): NavSection[] {
         { label: t.estimate.plural, href: "/estimates", icon: <FileText className="h-5 w-5" /> },
         { label: t.estimatePage.plural, href: "/estimate-pages", icon: <Presentation className="h-5 w-5" /> },
         { label: "Page Templates", href: "/estimate-pages/templates", icon: <LayoutTemplate className="h-5 w-5" /> },
+        { label: "Consultations", href: "/consultations", icon: <Video className="h-5 w-5" /> },
         { label: "Online Booking", href: "/scheduling", icon: <CalendarPlus className="h-5 w-5" /> },
       ],
     },

@@ -3,6 +3,8 @@ import { getAuthCompany, AuthError } from "@/lib/auth/getAuthCompany";
 
 const CONSULTATION_FIELDS = "id, company_id, customer_id, estimate_id, title, purpose, public_token, daily_room_name, daily_room_url, status, pipeline_status, pipeline_error, scheduled_at, started_at, ended_at, duration_seconds, expires_at, host_user_id, host_name, customer_name, customer_email, customer_phone, created_at";
 
+const VALID_STATUSES = ["pending", "active", "completed", "cancelled"];
+
 // GET /api/consultations/[id] - Get consultation details
 export async function GET(
   request: NextRequest,
@@ -62,6 +64,27 @@ export async function GET(
   }
 }
 
+// DELETE /api/consultations/[id] - Delete a consultation
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  try {
+    const { companyId, supabase } = await getAuthCompany();
+    const { data: existing } = await supabase
+      .from("consultations").select("company_id").eq("id", id).limit(1).single();
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (existing.company_id !== companyId) return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+    const { error } = await supabase.from("consultations").delete().eq("id", id);
+    if (error) return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    if (error instanceof AuthError) return NextResponse.json({ error: error.message }, { status: error.statusCode });
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
+}
+
 // PATCH /api/consultations/[id] - Update consultation status
 export async function PATCH(
   request: NextRequest,
@@ -77,6 +100,7 @@ export async function PATCH(
       .from("consultations")
       .select("company_id, status")
       .eq("id", id)
+      .limit(1)
       .single();
 
     if (!existing) {
@@ -89,18 +113,25 @@ export async function PATCH(
     const body = await request.json();
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
 
-    if (body.status) updates.status = body.status;
+    if (body.status) {
+      if (!VALID_STATUSES.includes(body.status)) {
+        return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+      }
+      updates.status = body.status;
+    }
     if (body.status === "active") updates.started_at = new Date().toISOString();
     if (body.status === "completed") {
       updates.ended_at = new Date().toISOString();
       if (body.durationSeconds) updates.duration_seconds = body.durationSeconds;
     }
+    if (body.scheduledAt !== undefined) updates.scheduled_at = body.scheduledAt;
+    if (body.title) updates.title = body.title;
 
     const { data, error } = await supabase
       .from("consultations")
       .update(updates)
       .eq("id", id)
-      .select("id, status, started_at, ended_at, duration_seconds")
+      .select("id, status, scheduled_at, started_at, ended_at, duration_seconds")
       .single();
 
     if (error) {
@@ -111,6 +142,7 @@ export async function PATCH(
       data: {
         id: data.id,
         status: data.status,
+        scheduledAt: data.scheduled_at,
         startedAt: data.started_at,
         endedAt: data.ended_at,
         durationSeconds: data.duration_seconds,
